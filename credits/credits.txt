@@ -4,4 +4,4 @@ game develop by: malybaryl
 audio comes from: www.zapsplat.com
 part of sprites comes from: craftpix.net
 more of my project: https://github.com/malybaryl
-open sorce code: 
+open sorce code: https://github.com/malybaryl/DungeonCrawler

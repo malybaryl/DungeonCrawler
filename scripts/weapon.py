@@ -10,12 +10,12 @@ class Bow:
         }
 
     def draw(self, surface):
-        surface.blit(pygame.transform.rotate(self.assets["bow"][0],45), (100,100))
+        surface.blit(self.assets["bow"][0], (100,100))
 
 class Arrow:
     def __init__(self):
         self.assets = {
-            "arrow": loadImages("wepons/arrow/arrowbow")
+            "arrow": loadImages("wepons/arrow")
         }
 
     def draw(self, surface):

@@ -4,6 +4,8 @@ from scripts.character import Character
 from scripts.weapon import Bow, Arrow
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
+from scripts.background import Bg
+from scripts.enemies import Orc
 
 loadConfig()
 
@@ -23,6 +25,7 @@ moving_left = False
 moving_right = False
 moving_up = False
 moving_down = False
+moving = False
 is_flipped = False
 
 
@@ -30,6 +33,8 @@ is_flipped = False
 player = Character(100,100)
 bow = Bow()
 aroow = Arrow()
+background = Bg()
+orc = Orc(0,50)
 # main game loop
 game_is_on = True
 while game_is_on:
@@ -48,18 +53,9 @@ while game_is_on:
                 moving_up = True
             if event.key == pygame.K_s:
                 moving_down = True
-            if event.key == pygame.K_f:
-                if is_fullscreened:
-                    screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),True)
-                    is_fullscreened = False
-                else:
-                    screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),False)
-                    is_fullscreened = True
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
-            
-        
-
+                   
         # keyboard button relaeased
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
@@ -71,33 +67,43 @@ while game_is_on:
             if event.key == pygame.K_s:
                 moving_down = False
 
+
     # background color
     display.fill(scripts.constants.BG)
 
     # calculate player movement
     dx = 0
     dy = 0
+    moving = False
     if moving_right:
         dx = scripts.constants.SPEED
         is_flipped = False
+        moving = True
     if moving_left:
         dx = -scripts.constants.SPEED
         is_flipped = True
+        moving = True
     if moving_up:
         dy = -scripts.constants.SPEED
+        moving = True
     if moving_down:
         dy = scripts.constants.SPEED
- 
+        moving = True
+
     # move player
     player.move(dx,dy)
+    orc.move()
     
     # update player
-    player.update(is_flipped)
-
+    player.update(is_flipped, moving)
+    orc.update()
+    background.update()
     # draw player on screen
+    background.draw(display)
     player.draw(display)
     bow.draw(display)
     aroow.draw(display)
+    orc.draw(display)
     
 
     pygame.display.update()
