@@ -6,10 +6,12 @@ from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
 from scripts.background import Bg
 from scripts.enemies import Orc
+from scripts.damageText import DamageText
 
 loadConfig()
 
 pygame.init()
+
 
 is_fullscreened = scripts.constants.FULLSCREEN
 if is_fullscreened == True:
@@ -19,6 +21,7 @@ else:
 display = pygame.Surface((scripts.constants.DISPLAY_WIDTH, scripts.constants.DISPLAY_HEIGHT))
 pygame.display.set_caption('Dungeon Clawler')
 clock = pygame.time.Clock()
+
 
 # define player movement variables
 moving_left = False
@@ -30,11 +33,20 @@ is_flipped = False
 
 
 # create player
-player = Character(100,100)
-bow = Bow()
-aroow = Arrow()
+player = Character(100,100,100)
+bow = Bow("classicBow",100,100)
+# create background
 background = Bg()
-orc = Orc(0,50)
+# create mobs
+orc = Orc(50,50,100)
+# create enoty enemy list
+enemy_list = []
+enemy_list.append(orc)
+
+# create sprite groups
+damage_text_group = pygame.sprite.Group()
+arrow_group = pygame.sprite.Group()
+
 # main game loop
 game_is_on = True
 while game_is_on:
@@ -94,18 +106,31 @@ while game_is_on:
     player.move(dx,dy)
     orc.move()
     
-    # update player
+    # update 
     player.update(is_flipped, moving)
-    orc.update()
+    arrow = bow.update(player)
+    if arrow:
+        arrow_group.add(arrow)
+    for arrow in arrow_group:
+        damage, damage_pos = arrow.update(enemy_list)
+        if damage:
+            damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
+            damage_text_group.add(damage_text)
+    damage_text_group.update()
+    for enemy in enemy_list:
+        enemy.update()
     background.update()
     # draw player on screen
     background.draw(display)
     player.draw(display)
     bow.draw(display)
-    aroow.draw(display)
+    for arrow in arrow_group:
+        arrow.draw(display)
+    damage_text_group.draw(display)
     orc.draw(display)
     
 
     pygame.display.update()
     clock.tick(60)
     screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))
+    

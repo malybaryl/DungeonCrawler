@@ -4,7 +4,7 @@ import math
 from scripts.load import loadImages
 
 class Character():
-    def __init__(self, x, y):
+    def __init__(self, x, y, health):
         self.rect = pygame.Rect(0,0,16,32)
         self.rect.center = (x,y)
         self.image_to_show = 0
@@ -13,6 +13,8 @@ class Character():
         "player_idle": loadImages("char/player1/idle"),
         "player_run": loadImages("char/player1/run")
         }
+        self.health = health
+        self.alive = True
 
     def move(self, dx, dy):
         # control diagonal speed
