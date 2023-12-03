@@ -7,4 +7,12 @@ class DamageText(pygame.sprite.Sprite):
         self.image = self.font.render(damage, True, color)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        
+        self.counter = 0
+
+    def update(self):
+        # move damage text up
+        self.rect.y -= 1
+        # delete the counter after few seconds
+        self.counter += 1
+        if self.counter > 30:
+            self.kill()     

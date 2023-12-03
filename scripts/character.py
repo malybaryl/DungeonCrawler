@@ -24,7 +24,7 @@ class Character():
         self.rect.x += dx
         self.rect.y += dy
 
-    def update(self, flip, moving):
+    def update(self, flip, moving, health):
         # handle animation
         # update image
         if not moving and not flip:
@@ -47,7 +47,8 @@ class Character():
             self.animation_index[1][1] += 0.1
             if self.animation_index[1][1] >= 4:
                 self.animation_index[1][1] = 0
-        pass
+        # health update
+        self.health = health
 
     def draw(self, surface):
             surface.blit(self.image_to_show, (self.rect.center[0]-16,self.rect.center[1]-16))

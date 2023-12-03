@@ -72,7 +72,6 @@ class Arrow(pygame.sprite.Sprite):
         self.rect.x += self.dx
         self.rect.y += self.dy
         
-
         # check if arrow has gone off screen
         if self.rect.right < 0 or self.rect.left > scripts.constants.DISPLAY_WIDTH or self.rect.bottom < 0 or self.rect.top > scripts.constants.DISPLAY_HEIGHT:
             self.kill()
@@ -86,9 +85,6 @@ class Arrow(pygame.sprite.Sprite):
                 self.kill()
                 break
         return damage, damage_pos
-
-
-        
 
     def draw(self, surface):
         surface.blit(pygame.transform.flip(self.image_to_show,True,False), (self.rect.center[0]-int(self.image_to_show.get_width()/2),self.rect.center[1]-int(self.image_to_show.get_height()/2)))

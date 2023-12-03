@@ -15,7 +15,7 @@ class Bg():
             self.x = -scripts.constants.DISPLAY_WIDTH
 
     def draw(self, surface):
-        surface.blit(self.assets["bg"][0], (0,0))
-        surface.blit(pygame.transform.flip(self.assets["bg"][1],False,True), (self.x,-175))
-        surface.blit(self.assets["bg"][2], (-self.x,50))
+        surface.fill(scripts.constants.BG)
+        surface.blit(pygame.transform.flip(self.assets["bg"][0],False,True), (self.x,-175))
+        surface.blit(self.assets["bg"][1], (-self.x,50))
 

@@ -10,5 +10,4 @@ def changeResolution(resolution = (0,0), isFullscrened = False):
         scripts.constants.SCALE_WIDTH = display_size[0] / scripts.constants.DISPLAY_WIDTH
         scripts.constants.SCALE_HEIGHT = display_size[1] / scripts.constants.DISPLAY_HEIGHT
         
-
     return screen

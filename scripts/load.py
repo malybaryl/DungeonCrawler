@@ -21,7 +21,6 @@ def loadConfig():
         for line in f:
             words.append(line.strip().split(" "))
    
-    #print(words)
     scripts.constants.SCREEN_WIDTH = int(words[0][1])
     scripts.constants.SCREEN_HEIGHT = int(words[1][1])
     if words[2][1]== "yes":
