@@ -1,27 +1,32 @@
 import pygame
 import scripts.constants
 from scripts.character import Character
-from scripts.weapon import Bow, Arrow
+from scripts.weapon import Bow
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
 from scripts.background import Bg
 from scripts.enemies import Orc
 from scripts.damageText import DamageText
+from scripts.HUD import HUD
+from scripts.items import Item
 
+# loading config
 loadConfig()
 
+# pygame init
 pygame.init()
 
-
+# display settings etc
 is_fullscreened = scripts.constants.FULLSCREEN
 if is_fullscreened == True:
     screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),False)
 else:
     screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),True)
 display = pygame.Surface((scripts.constants.DISPLAY_WIDTH, scripts.constants.DISPLAY_HEIGHT))
+
+# defining aplications name etc. and clock
 pygame.display.set_caption('Dungeon Clawler')
 clock = pygame.time.Clock()
-
 
 # define player movement variables
 moving_left = False
@@ -31,14 +36,17 @@ moving_down = False
 moving = False
 is_flipped = False
 
-
-# create player
+# create player and player wepon
 player = Character(100,100,100)
 bow = Bow("classicBow",100,100)
-# create background
+
+# create background and HUD
 background = Bg()
+hud = HUD(player)
+
 # create mobs
 orc = Orc(50,50,100)
+
 # create enoty enemy list
 enemy_list = []
 enemy_list.append(orc)
@@ -46,6 +54,7 @@ enemy_list.append(orc)
 # create sprite groups
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
 
 # main game loop
 game_is_on = True
@@ -66,8 +75,7 @@ while game_is_on:
             if event.key == pygame.K_s:
                 moving_down = True
             if event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                   
+                pygame.quit()     
         # keyboard button relaeased
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
@@ -78,10 +86,6 @@ while game_is_on:
                 moving_up = False
             if event.key == pygame.K_s:
                 moving_down = False
-
-
-    # background color
-    display.fill(scripts.constants.BG)
 
     # calculate player movement
     dx = 0
@@ -104,10 +108,13 @@ while game_is_on:
 
     # move player
     player.move(dx,dy)
+
+    # move enemies 
     orc.move()
     
     # update 
-    player.update(is_flipped, moving)
+    player.update(is_flipped, moving, player.health)
+    hud.update(player)
     arrow = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
@@ -118,19 +125,32 @@ while game_is_on:
             damage_text_group.add(damage_text)
     damage_text_group.update()
     for enemy in enemy_list:
-        enemy.update()
+        enemy.hit_player(1,player)
+        gold_, potion_, enemy_alive = enemy.update()
+        if gold_:
+            item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
+        if potion_:
+            item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"health_potion"))
+        if not enemy_alive:
+            enemy_list.pop()
+    for item in item_group:
+        item.update(player)
     background.update()
-    # draw player on screen
+
+    # draw 
     background.draw(display)
     player.draw(display)
     bow.draw(display)
     for arrow in arrow_group:
         arrow.draw(display)
+    for items in item_group:
+        items.draw(display)
     damage_text_group.draw(display)
-    orc.draw(display)
+    for enemy in enemy_list:
+        enemy.draw(display)
+    hud.draw(display)
     
-
+    # display all on screen
     pygame.display.update()
     clock.tick(60)
     screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))
-    
