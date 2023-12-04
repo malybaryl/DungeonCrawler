@@ -15,6 +15,7 @@ class Character():
         }
         self.health = health
         self.alive = True
+        self.gold = 0
 
     def move(self, dx, dy):
         # control diagonal speed
@@ -24,7 +25,7 @@ class Character():
         self.rect.x += dx
         self.rect.y += dy
 
-    def update(self, flip, moving, health):
+    def update(self, flip, moving, health, gold):
         # handle animation
         # update image
         if not moving and not flip:
@@ -49,6 +50,8 @@ class Character():
                 self.animation_index[1][1] = 0
         # health update
         self.health = health
+        # gold update
+        self.gold = gold
 
     def draw(self, surface):
             surface.blit(self.image_to_show, (self.rect.center[0]-16,self.rect.center[1]-16))

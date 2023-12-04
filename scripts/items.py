@@ -21,6 +21,7 @@ class Item(pygame.sprite.Sprite):
                 self.kill()
         if self.item_type == "coin":
             if self.rect.colliderect(player.rect):
+                player.gold += 1
                 self.kill()
 
     def draw(self, display):

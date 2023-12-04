@@ -113,7 +113,7 @@ while game_is_on:
     orc.move()
     
     # update 
-    player.update(is_flipped, moving, player.health)
+    player.update(is_flipped, moving, player.health, player.gold)
     hud.update(player)
     arrow = bow.update(player)
     if arrow:

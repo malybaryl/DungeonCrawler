@@ -37,9 +37,9 @@ class Orc():
         if self.animation_index[0][1] >= 5:
             self.animation_index[0][1] = 0
         if not self.alive:
-            if self.randgold <= 100:
+            if self.randgold <= 50:
                 gold = True
-            if self.randpotion <= 100:
+            if self.randpotion <= 10:
                 health_potion = True
             self.alive = False
         return gold, health_potion, self.alive
