@@ -125,8 +125,8 @@ while game_is_on:
             damage_text_group.add(damage_text)
     damage_text_group.update()
     for enemy in enemy_list:
-        enemy.hit_player(1,player)
-        gold_, potion_, enemy_alive = enemy.update()
+        enemy.hit_player(10,player)
+        gold_, potion_, enemy_alive = enemy.update(player)
         if gold_:
             item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
         if potion_:
