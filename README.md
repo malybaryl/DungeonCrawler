@@ -1,4 +1,4 @@
-###----------------------------------------------ENGLISH----------------------------------------------
+----------------------------------------------ENGLISH----------------------------------------------
 # Dungeon Crawler
 
 Dungeon Crawler is a simple game created in Python using the Pygame library. The game offers a classic dungeon crawl system where players explore dungeons, battle enemies, collect items, and gain experience.
@@ -57,7 +57,7 @@ You can customize game settings, such as screen resolution, sound, or fullscreen
 
 The scripts are written by me, and you can use them freely. Of course, it would be nice if you mention me. Some of the assets are made by me, but not all of them. For more information, see credits/credits.txt.
 
-###----------------------------------------------POLSKI----------------------------------------------
+----------------------------------------------POLSKI----------------------------------------------
 # Dungeon Crawler
 
 Dungeon Crawler to prosta gra stworzona w Pythonie przy użyciu biblioteki Pygame. Gra oferuje klasyczny system dungeon crawl, gdzie gracz eksploruje lochy, walczy z przeciwnikami, zbiera przedmioty i zdobywa doświadczenie.
