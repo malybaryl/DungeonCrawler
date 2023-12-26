@@ -16,6 +16,6 @@ class Bg():
 
     def draw(self, surface):
         surface.fill(scripts.constants.BG)
-        surface.blit(pygame.transform.flip(self.assets["bg"][0],False,True), (self.x,-175))
-        surface.blit(self.assets["bg"][1], (-self.x,50))
+        #surface.blit(pygame.transform.flip(self.assets["bg"][0],False,True), (self.x,-175))
+        #surface.blit(self.assets["bg"][1], (-self.x,50))
 

@@ -14,7 +14,12 @@ class Item(pygame.sprite.Sprite):
         self.rect = pygame.Rect(0,0,16,16)
         self.rect.center = (x,y)
 
-    def update(self, player) :
+    def update(self, player, screen_scroll) :
+        # reposition based on screen scrool
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
+        # check if item has been colleted
         if self.item_type == "health_potion":
             if self.rect.colliderect(player.rect):
                 player.health = 100
@@ -26,4 +31,5 @@ class Item(pygame.sprite.Sprite):
 
     def draw(self, display):
         display.blit(self.assets[self.item_type],(self.rect.center[0]-8,self.rect.center[1]-8))
-        pygame.draw.rect(display, scripts.constants.RED, self.rect, 1)
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(display, scripts.constants.RED, self.rect, 1)

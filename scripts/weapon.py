@@ -8,8 +8,11 @@ import random
 class Bow:
     def __init__(self,type_of_bow,x,y):
         self.assets = {
-            "bow": loadImages(f"wepons/bow/{type_of_bow}")
+            "bow": loadImages(f"wepons/bow/{type_of_bow}"),
+            "sound": pygame.mixer.Sound("assets/audio/bow.mp3")
+                
         }
+        self.assets["sound"].set_volume(scripts.constants.FX_VOLUME)
         self.type_of_bow = type_of_bow
         self.original_image = self.assets["bow"][0]
         self.angle = 0
@@ -35,17 +38,22 @@ class Bow:
             arrow = Arrow("classicArrow",self)
             self.fired = True
             self.last_shot = pygame.time.get_ticks()
+            self.assets["sound"].play()
 
         # reset mouseclick
         if pygame.mouse.get_pressed()[0] == False:
             self.fired = False
         
         return arrow
+    
+    def change_fx_volume(self):
+        self.assets["sound"].set_volume(scripts.constants.FX_VOLUME)
 
     def draw(self, surface):
         self.image_to_show= pygame.transform.rotate(self.original_image, self.angle)
         surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2),self.rect.center[1]-int(self.image_to_show.get_height()/2)))
-        #pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
 
 class Arrow(pygame.sprite.Sprite):
     def __init__(self,type_of_arrow, bow):
@@ -60,17 +68,24 @@ class Arrow(pygame.sprite.Sprite):
         self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = pygame.Rect(0,0,16,16)
         self.rect.center = (self.x_cord,self.y_cord)
+        
         #calculate the horizontal and vertical speeds based on the angle
         self.dx = math.cos(math.radians(self.angle)) * scripts.constants.ARROW_SPEED
         self.dy = math.sin(math.radians(self.angle)) * scripts.constants.ARROW_SPEED
 
-    def update(self, enemy_list):
+    def update(self, enemy_list, screen_scroll, obstacle_tile, boss_list):
         # reset variables
         damage = 0
         damage_pos = None
-        #reposition based on speed
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+
+        #reposition based on speed and screen scroll
+        self.rect.x += screen_scroll[0] + self.dx
+        self.rect.y += screen_scroll[1] + self.dy
+
+        # check for collision
+        for obstacle in obstacle_tile:
+            if obstacle[1].colliderect(self.rect):
+                self.kill()
         
         # check if arrow has gone off screen
         if self.rect.right < 0 or self.rect.left > scripts.constants.DISPLAY_WIDTH or self.rect.bottom < 0 or self.rect.top > scripts.constants.DISPLAY_HEIGHT:
@@ -84,8 +99,78 @@ class Arrow(pygame.sprite.Sprite):
                 enemy.health -= damage
                 self.kill()
                 break
+        for enemy in boss_list:
+            if enemy.rect.colliderect(self.rect) and enemy.alive:
+                damage = 10 + random.randint(-5,5)
+                damage_pos = enemy.rect
+                enemy.health -= damage
+                self.kill()
+                break
         return damage, damage_pos
 
     def draw(self, surface):
         surface.blit(pygame.transform.flip(self.image_to_show,True,False), (self.rect.center[0]-int(self.image_to_show.get_width()/2),self.rect.center[1]-int(self.image_to_show.get_height()/2)))
-        pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+
+class Magicball(pygame.sprite.Sprite):
+    def __init__(self, type_of_magicball, x, y, target_x, target_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.assets = {
+            "magicball": loadImages(f"effects/{type_of_magicball}"),
+            "audio": pygame.mixer.Sound(f"assets/audio/{type_of_magicball}.mp3")
+        }
+        self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
+        self.sound_counter= pygame.time.get_ticks()
+        self.original_image = self.assets["magicball"][0]
+        self.animation_index = 0
+        self.x_cord = x
+        self.y_cord = y        
+        x_dist = (target_x - x)
+        y_dist = -(target_y - y)
+        self.angle = math.degrees(math.atan2(y_dist,x_dist))
+        self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = pygame.Rect(0,0,32,16)
+        self.rect.center = (self.x_cord, self.y_cord)
+
+        #calculate the horizontal and vertical speeds based on the angle
+        self.dx = math.cos(math.radians(self.angle)) * scripts.constants.MAGIC_BALL_SPEED
+        self.dy = -(math.sin(math.radians(self.angle)) * scripts.constants.MAGIC_BALL_SPEED)
+        
+    def update(self, screen_scroll, player):
+        #handle audio
+        current_time = pygame.time.get_ticks()
+        if current_time - self.sound_counter >= 100:
+            self.assets["audio"].play()
+            self.sound_counter = current_time
+
+        #handle animation
+        self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
+        self.animation_index += 0.2
+        if self.animation_index >= 7:
+            self.animation_index = 5
+
+        # reset variables
+        damage = 0
+
+        #reposition based on speed and screen scroll
+        self.rect.x += screen_scroll[0] + self.dx
+        self.rect.y += screen_scroll[1] + self.dy
+        
+        # check if magic ball has gone off screen
+        if self.rect.right < 0 or self.rect.left > scripts.constants.DISPLAY_WIDTH or self.rect.bottom < 0 or self.rect.top > scripts.constants.DISPLAY_HEIGHT:
+            self.kill()
+
+        # check collision between magicball and enemies
+        if player.rect.colliderect(self.rect) and player.alive:
+                damage = 6 + random.randint(-5,10)
+                player.health -= damage
+                self.kill()
+    
+    def change_fx_volume(self):
+        self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
+                
+    def draw(self, surface):
+        surface.blit(self.image_to_show, (self.rect.centerx-16,self.rect.centery-16))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
