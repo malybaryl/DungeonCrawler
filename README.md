@@ -94,7 +94,7 @@ Możesz dostosować ustawienia gry, takie jak rozdzielczość ekranu, dźwięk c
 - **character.py**: Obsługuje ruch gracza i wszystkie zdarzenia związane z graczem.
 - **constants.py**: Plik zawiera wszystkie stałe wartości używane w grze.
 - **damageText.py**: Wyświetla ilość zadanych obrażeń wrogowi przez gracza.
-- **enemies.py**: Obsługuje wszystkie rodzaje wrogów, takie jak Orki czy Boski. Ich ruch i sztuczną inteligencję.
+- **enemies.py**: Obsługuje wszystkie rodzaje wrogów, takie jak Orki czy Bossowie. Ich ruch i sztuczną inteligencję.
 - **HUD.py**: Obsługuje wyświetlanie informacji o zdrowiu, złocie i innych statystykach gracza.
 - **items.py**: Obsługuje interakcje z graczem dla wszystkich rodzajów przedmiotów, takich jak mikstury zdrowia czy złoto.
 - **load.py**: Obsługuje ładowanie konfiguracji, zasobów i zapisywanie konfiguracji.
@@ -106,7 +106,7 @@ Możesz dostosować ustawienia gry, takie jak rozdzielczość ekranu, dźwięk c
 
 ## Wersje Gry:
 
-- **0.0.1**: Działa główne menu, ustawienia, napisy końcowe. Krótki poziom gry z kilkoma Orkami i Szamanem - Bossem. Brak możliwości zakończenia gry. Jest to krótka wersja demonstracyjna, pokazująca możliwości gry.
+- **0.0.1**: Działa główne menu, ustawienia, o autorze. Krótki poziom gry z kilkoma Orkami i Szamanem - Bossem. Brak możliwości zakończenia gry. Jest to krótka wersja demonstracyjna, pokazująca możliwości gry.
 
 ## Autorzy:
 
