@@ -1,24 +1,35 @@
-Dungeon Crawler
-Dungeon Crawler to prosta gra stworzona w Pythonie przy użyciu biblioteki Pygame. Gra oferuje klasyczny system dungeon crawl, gdzie gracz eksploruje lochy, walczy z przeciwnikami, zbiera przedmioty i zdobywa doświadczenie.
+# Dungeon Crawler
 
-Funkcje:
-Postać gracza: Gracz kontroluje postać poruszającą się po lochach, korzystając z broni dystansowej.
-Wrogowie: Gra zawiera różnorodne przeciwniki, w tym orków i potężnych bossów.
-Walka: System walki obejmuje strzelanie do wrogów za pomocą łuku oraz unikanie ataków przeciwników.
-Zbieranie przedmiotów: Gracz może zdobywać złoto, mikstury zdrowia i inne przedmioty.
-HUD (Heads-Up Display): Wyświetla informacje o zdrowiu, złocie, oraz innych statystykach gracza.
-Menu główne: Prosta obsługa menu głównego, umożliwiająca rozpoczęcie nowej gry i sterowanie ustawieniami.
-Instrukcje uruchomienia:
-Zainstaluj Python i Pygame.
-Uruchom plik main.py.
-Konfiguracja:
-Możesz dostosować ustawienia gry, takie jak rozdzielczość ekranu, dźwięk, czy tryb pełnoekranowy, edytując plik config.txt.
+Dungeon Crawler is a simple game created in Python using the Pygame library. The game offers a classic dungeon crawl system where the player explores dungeons, fights enemies, collects items, and gains experience.
 
-Struktura projektu:
-scripts: Folder zawierający moduły i klasy, takie jak postać, broń, tło, przeciwnicy, HUD, przedmioty, muzyka i menu.
-levels: Folder zawierający pliki CSV z danymi dotyczącymi poziomów gry.
-assets: Folder zawierający pliki graficzne i dźwiękowe używane w grze.
-Autorzy:
-[Twoje imię/nick]
-Licencja:
-Ten projekt jest udostępniany na licencji [rodzaj licencji].
+## Features:
+
+- **Player Character**: Control a character navigating through dungeons, utilizing ranged weapons.
+- **Enemies**: The game includes various enemies, including orcs and powerful bosses.
+- **Combat**: Combat system involves shooting enemies with a bow and avoiding enemy attacks.
+- **Item Collection**: Players can acquire gold, health potions, and other items.
+- **HUD (Heads-Up Display)**: Displays information about health, gold, and other player stats.
+- **Main Menu**: Simple main menu handling, allowing for starting a new game and adjusting settings.
+
+## How to Run:
+
+1. Install Python and Pygame.
+2. Run the `main.py` file.
+
+## Configuration:
+
+You can customize game settings, such as screen resolution, sound, or fullscreen mode, by editing the `config.txt` file.
+
+## Project Structure:
+
+- **scripts**: Folder containing modules and classes, such as character, weapon, background, enemies, HUD, items, music, and menu.
+- **levels**: Folder containing CSV files with level data.
+- **assets**: Folder containing graphic and audio files used in the game.
+
+## Authors:
+
+- [Your Name/Nickname]
+
+## License:
+
+This project is licensed under the [Type of License].
