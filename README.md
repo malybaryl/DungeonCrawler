@@ -1,1 +1,1 @@
-([WEBSITE]https://malybaryl.github.io/DungeonCrawler/)
+[WEBSITE](https://malybaryl.github.io/DungeonCrawler/)
