@@ -1,0 +1,8 @@
+scipts writed by: malybaryl
+spirtes drew by: malybaryl
+game develop by: malybaryl
+audio comes from: www.zapsplat.com
+part of sprites comes from: craftpix.net
+font comes from: Google Fonts
+more of my project: https://github.com/malybaryl
+open sorce code: https://github.com/malybaryl/DungeonCrawler
