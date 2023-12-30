@@ -13,53 +13,96 @@
     </script>
 </head>
 <body>
-    <div id="logo">Dungeon Crawler</div>
+   
+    <div id = languageHandler>
+        <a href="index.html"><img id="eng" src="img/en.png" alt=""></a>
+        <a href="indexpl.html"><img id="pol" src="img/pl.png" alt=""></a>
+    </div>
+    <div id="logo">
+        Dungeon Crawler  
+        <div id="navbar">
+            <a class="nav" href="#WelcomeToDungeonCrawler">Welcome</a></class> | 
+            <a class="nav" href="#features">Features</a></class> | 
+            <a class="nav" href="#howToPlay">How to Play</a></class> | 
+            <a class="nav" href="#versions">Versions</a> | 
+            <a class="nav" href="#configuration">Configuration</a></class> | 
+            <a class="nav" href="#projectStructure">Project Structure</a></class> | 
+            <a class="nav" href="#sourceCode">Source Code</a></class> | 
+            <a class="nav" href="#authors">Authors</a></class> | 
+            <a class="nav" href="#license">License</a></class>
+    
+    </div>
+    
     <div id="container">
         <div id="contents">
+            </div>
             <h2 id="WelcomeToDungeonCrawler">Welcome to Dungeon Crawler - A Python Pygame Adventure!</h2>
                 <img id="img01" src="img/01.png" alt="Description"><br/>
                 Embark on an exciting journey through mysterious dungeons filled with treacherous enemies, 
                 hidden treasures, and epic battles in this classic dungeon crawler game created with Python
                 and Pygame.
-            <h3>Features:</h3>
-                <br>Player Character: Take control of a courageous character armed with 
-                ranged weapons, navigating through challenging dungeons.</br>
-                <br>Enemies: Encounter a variety of foes, from menacing orcs to powerful bosses, each with 
-                unique challenges and strategies.</br>
-                <br>Combat System: Engage in thrilling combat by utilizing your bow to take down enemies while 
-                dodging their attacks. Master the art of precision and timing to emerge victorious.</br>
-                <br>Item Collection: Collect valuable loot such as gold, health potions, and other items 
-                that will aid you on your perilous journey.</br>
-                <br>HUD (Heads-Up Display): Keep track of your vital statistics, including health, gold, and 
-                more, with a user-friendly heads-up display.</br>
-                <br>Menu: Navigate through a simple and intuitive main menu that allows you to start a new
-                game and adjust settings with ease.</br>
-                <br>Settings: Your preferences are saved, ensuring a seamless gaming experience every time 
-                you return to the adventure.</br>
-            <h3>How to Play:</h3>
-                <br>Python and Pygame: Ensure you have the required software installed on your system.</br>
-                <br>Run the Game: Execute the main.py file to launch the Dungeon Crawler and begin your quest.</br>
-            <h3>Configuration:</h3>
+            <h3 id="features">Features:</h3>
+                <br>- Player Character: </br>
+                    <br>Take control of a courageous character armed with 
+                    ranged weapons, navigating through challenging dungeons.</br>
+                    <img id="img02"src="img/02.png" alt="">
+                </br>- Enemies:</br> 
+                    </br>A variety of foes, from menacing orcs to powerful bosses, each with 
+                    unique challenges and strategies.</br>
+                    <img id="img03"src="img/03.png" alt="">
+                <br>- Combat System: </br>
+                    </br>Engage in thrilling combat by utilizing your bow to take down enemies while 
+                    dodging their attacks. Master the art of precision and timing to emerge victorious.</br>
+                <br>- Item Collection:</br>
+                    </br> Collect valuable loot such as gold, health potions, and other items 
+                    that will aid you on your perilous journey.</br>
+                    <img id="img04" src="img/04.png" alt="">
+                <br>- HUD (Heads-Up Display):</br>
+                    </br>Keep track of your vital statistics, including health, gold, and 
+                    more, with a user-friendly heads-up display.</br>
+                    <img id="img05" src="img/05.png" alt="">
+                <br>- Menu:</br>
+                    </br>Navigate through a simple and intuitive main menu that allows you to start a new
+                    game and adjust settings with ease.</br>
+                    <img id="img06" src="img/06.png" alt="">
+                <br>-Settings:</br>
+                    </br> Your preferences are saved, ensuring a seamless gaming experience every time 
+                    you return to the adventure.</br>
+                    <img id="img07" src="img/07.png" alt="">
+            <h3 id="howToPlay">How to Play:</h3>
+            1. <a id="link" href="https://drive.google.com/drive/u/1/folders/1Uz3CJjd0bmCYxR7gjI6tQjMSmoOglLof">Download Dungeon Crawler</a></br>
+            2. In the upper right corner, click "Download All" or select all files, right-click, and choose "Download."</br>
+            3. Unpack the game.</br>
+            4. Open the main.exe file.</br>
+                <h3 id="versions">Versions:</h3>
+                    <div id="versions_">
+                        <br>0.0.1:</br>
+                        Demo showcasing the main menu, settings, credits, and a short game level featuring
+                        orcs and a powerful Shaman Orc Boss. Although it's a brief glimpse, it demonstrates the exciting
+                        possibilities of the game.</br>
+                        <br>0.0.2:</br>
+                        - game icon</br>
+                        - playable exe file</br>
+                </div>
+            <h3 id="configuration">Configuration:</h3>
                 <br>Customize your gaming experience by adjusting settings such as screen resolution, sound, and 
                 fullscreen mode either in-game or by editing the config/config.txt file.</br>
-            <h3>Project Structure:</h3>
+            <h3 id="projectStructure">Project Structure:</h3>
                 <br>Explore a well-organized project structure with folders containing modules and classes for 
                 characters, weapons, backgrounds, enemies, HUD, items, music, and menus. The game's levels are 
                 defined in CSV files, and assets like graphics and audio files are neatly organized.</br>
-            <h3>Versions:</h3>
-                <br>0.0.1: A demo showcasing the main menu, settings, credits, and a short game level featuring
-                 orcs and a powerful Shaman Orc Boss. Although it's a brief glimpse, it demonstrates the exciting
-                  possibilities of the game.</br>
-            <h3>Authors:</h3>
+            <h3 id="sourceCode">Source Code:</h3>
+                </br> The open source code you can check up at my Github: <a id="link" href="https://github.com/malybaryl/DungeonCrawler">DungeonCrawler</a>
+            <h3 id="authors">Authors:</h3>
                 <br>Kacper Baryłowicz ("malybaryl"): The creative mind behind the scripts and much of the game's
                  assets. Feel free to use and enjoy the game while giving credit to the author.</br>
-            <h3>License:</h3>
+            <h3 id="license">License:</h3>
                 <br>The scripts are generously shared for free use, with a request for attribution. Some assets 
                 are also provided, and further details can be found in the credits/credits.txt file.</br>
-            <h3>Dive into the world of Dungeon Crawler, where adventure awaits at every turn!a</h3>
+            <h3 id="end">Dive into the world of Dungeon Crawler, where adventure awaits at every turn!</h3>
         </div>
     <div id="footer">
-        <h6>2023 &copy; Kacper Baryłowicz. Contact: kacper.barylowicz@outlook.com. For more information look at my Github <a href="https://github.com/malybaryl">malybaryl</a> or my brief <a href="https://malybaryl.github.io/KacperBarylowicz/">Kacper Baryłowicz</a>.
+        <h6>2023 &copy; Kacper Baryłowicz. Contact: kacper.barylowicz@outlook.com. For more information look at my Github <a href="https://github.com/malybaryl">malybaryl</a>.
         </h6>
     </div>
 </body>
