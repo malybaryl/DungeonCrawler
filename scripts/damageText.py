@@ -9,7 +9,10 @@ class DamageText(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.counter = 0
 
-    def update(self):
+    def update(self, screen_scroll):
+        # reposition based on screen scrool
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
         # move damage text up
         self.rect.y -= 1
         # delete the counter after few seconds

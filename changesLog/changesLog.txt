@@ -1,0 +1,8 @@
+VERSION: 0.0.2
+- game icon
+- playable exe file
+
+VERSION: 0.0.3
+- the effect (player is on fire). When fireball hits player, he is on fire and gets damage in time.
+- new map (could cause some optimalisation problens but it will solve soon)
+- now you can press esc to open main menu while you in game
