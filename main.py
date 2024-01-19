@@ -31,7 +31,7 @@ display = pygame.Surface((scripts.constants.DISPLAY_WIDTH, scripts.constants.DIS
 fade = False
 
 # defining aplications name etc. and clock
-pygame.display.set_caption('Dungeon Clawler')
+pygame.display.set_caption('Dungeon Crawler')
 icon = pygame.image.load("assets/icon/icon.png")
 pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
