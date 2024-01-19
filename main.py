@@ -59,10 +59,12 @@ world_data = []
 world_mobs_data = []
 boss_list=[]
 generate_world = True  # zmienna, która informuje, czy należy wygenerować świat na początku
+exit_tiles=[]
+world_level = 1
 
 # create background and HUD
 background = Bg()
-hud = HUD(player)
+hud = HUD(player,world_level)
 main_menu = Menu()
 
 
@@ -74,9 +76,9 @@ magic_ball_group = pygame.sprite.Group()
 
 # loading levels
 world_data=world.generate(False)
-player, enemy_list, boss_list= world.process_date(world_data, "castle")
+player, enemy_list, boss_list, exit_tiles= world.process_date(world_data, "castle")
 world_mobs_data=world.generate(True)
-player, enemy_list, boss_list= world.process_date(world_mobs_data, "castle")
+player, enemy_list, boss_list, exit_tiles= world.process_date(world_mobs_data, "castle")
 
 fade = True
 # main game loop
@@ -137,7 +139,7 @@ while game_is_on:
         
         if generate_world:
             world_data = world.generate()  # generuj nowy świat
-            player, enemy_list, boss_list = world.process_date(world_data, "castle")
+            player, enemy_list, boss_list, exit_tiles = world.process_date(world_data, "castle")
             generate_world = False  # ustaw, aby świat nie był generowany więcej niż raz
         # move player
         scroll_map = player.move(dx,dy, world.obstacle_tile)
@@ -151,7 +153,7 @@ while game_is_on:
         # update 
         world.update(scroll_map)
         player.update(is_flipped, moving, player.health, player.gold)
-        hud.update(player)
+        hud.update(player, world_level)
         arrow = bow.update(player)
         if arrow:
             arrow_group.add(arrow)
@@ -192,6 +194,7 @@ while game_is_on:
             draw_grid(display)
         for items in item_group:
             items.draw(display)
+        world.draw_src(display,exit_tiles)
         damage_text_group.draw(display)
         for enemy in enemy_list:
             enemy.draw(display)

@@ -12,7 +12,7 @@ class Menu:
             "font1": pygame.font.Font("assets/fonts/font.ttf",8),
             "font2": pygame.font.Font("assets/fonts/font.ttf",24)
         }
-        self.version = "0.0.3"
+        self.version = "0.0.4"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False
