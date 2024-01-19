@@ -11,3 +11,4 @@ VERSION: 0.0.4
 - exit tile
 - presing tab opening info where is all HUD now
 - info now shows world level
+- red screen effect when player has low health

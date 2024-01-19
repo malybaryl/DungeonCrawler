@@ -104,6 +104,8 @@ while game_is_on:
                     moving_down = True
                 if event.key == pygame.K_ESCAPE:
                     game = False
+                if event.key == pygame.K_TAB:
+                    hud.info_show()
                     
                     
 
@@ -212,6 +214,7 @@ while game_is_on:
         hud.draw(display)
         if fade:
             fade = hud.draw_fade(display)
+        hud.draw_red_fade(display,player)
 
     # main menu handler    
     elif not game:

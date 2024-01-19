@@ -28,6 +28,7 @@ class HUD:
         self.y_fade = 0
         self.draw_x_right = True
         self.draw_y_down = True
+        self.draw_red_fade_= True
     
     def update(self, player, world_level):
         self.pos = pygame.mouse.get_pos()
@@ -38,6 +39,13 @@ class HUD:
         self.image_player_hp = self.font.render(str(self.health)+'/'+str(self.full_health), True, scripts.constants.WHITE)
         self.image_world_level = self.font.render("WORLD LEVEL: "+str(self.world_level), True, scripts.constants.WHITE)
         self.player_alive = player.alive
+
+    def info_show(self):
+        if self.info:
+            self.info = False
+        elif not self.info:
+            self.info = True
+
 
     def draw_boss_hp(self,display, hp, hp_max, boss_name="BOOS"):
         if self.player_alive:
@@ -104,4 +112,11 @@ class HUD:
             display.blit(pygame.transform.scale(self.assets["coursor"][3],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
         if not self.player_alive:
             display.blit(self.image_died,(50, scripts.constants.DISPLAY_HEIGHT/2-20))
+
+    def draw_red_fade(self,display,player):
+        if player.health < (player.health_max/2):
+            pass # zrobic rysunek czerwonego przezroczystego rysunku
+        elif player.health < (player.health_max*0.9):
+            pass
+
        

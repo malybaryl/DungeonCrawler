@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.inlineSuggest.showToolbar": "onHover"
+	}
 }
