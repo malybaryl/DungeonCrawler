@@ -1,5 +1,4 @@
 import pygame
-import csv
 import scripts.constants
 from scripts.character import Character
 from scripts.weapon import Bow, Magicball
@@ -46,7 +45,7 @@ moving = False
 is_flipped = False
 
 # create player and player wepon
-player = Character(120,135,100)
+player = Character(120,300,100)
 bow = Bow("classicBow",100,100)
 
 #define game varibles
@@ -60,7 +59,8 @@ world_mobs_data = []
 boss_list=[]
 generate_world = True  # zmienna, która informuje, czy należy wygenerować świat na początku
 exit_tiles=[]
-world_level = 1
+enemy_list=[]
+world_level = 0
 
 # create background and HUD
 background = Bg()
@@ -74,11 +74,8 @@ arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 magic_ball_group = pygame.sprite.Group()
 
-# loading levels
-world_data=world.generate(False)
-player, enemy_list, boss_list, exit_tiles= world.process_date(world_data, "castle")
-world_mobs_data=world.generate(True)
-player, enemy_list, boss_list, exit_tiles= world.process_date(world_mobs_data, "castle")
+# generate level
+generate_world = True
 
 fade = True
 # main game loop
@@ -87,6 +84,41 @@ game = False
 while game_is_on:
 
     if game:
+        
+        # check if new level
+        new_level = world.check_if_new_level(exit_tiles, player)
+        if new_level:
+            generate_world = True
+            player_hp, player_max_hp, player_gold = world.new_level(player)
+            fade = True
+            new_level = True
+        
+        # generate new world
+        if generate_world:
+            # clear world data 
+            world_data.clear()
+            enemy_list.clear()
+            boss_list.clear()
+            exit_tiles.clear()
+            world_mobs_data.clear()
+            world.obstacle_tile.clear()
+            world.map_tiles.clear()
+            world.boss_list.clear()
+            # generete new level
+            world_data = world.generate(False)  
+            player, enemy_list, boss_list, exit_tiles = world.process_date(world_data, "castle")
+            world_mobs_data=world.generate(True)
+            player, enemy_list, boss_list, exit_tiles= world.process_date(world_mobs_data, "castle")
+            generate_world = False 
+            world_level += 1 
+            # restore player statistic
+            if new_level:
+                player.health = player_hp
+                player.health_max = player_max_hp
+                player.gold = player_gold
+                new_level = False
+
+        
         # event handler
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -94,14 +126,15 @@ while game_is_on:
 
             # take keyboard presses
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    moving_left = True
-                if event.key == pygame.K_d:
-                    moving_right = True
-                if event.key == pygame.K_w:
-                    moving_up = True
-                if event.key == pygame.K_s:
-                    moving_down = True
+                if player.alive:
+                    if event.key == pygame.K_a:
+                        moving_left = True
+                    if event.key == pygame.K_d:
+                        moving_right = True
+                    if event.key == pygame.K_w:
+                        moving_up = True
+                    if event.key == pygame.K_s:
+                        moving_down = True
                 if event.key == pygame.K_ESCAPE:
                     game = False
                 if event.key == pygame.K_TAB:
@@ -120,6 +153,7 @@ while game_is_on:
                 if event.key == pygame.K_s:
                     moving_down = False
 
+        
         # calculate player movement
         dx = 0
         dy = 0
@@ -139,51 +173,50 @@ while game_is_on:
             dy = scripts.constants.SPEED
             moving = True
         
-        if generate_world:
-            world_data = world.generate()  # generuj nowy świat
-            player, enemy_list, boss_list, exit_tiles = world.process_date(world_data, "castle")
-            generate_world = False  # ustaw, aby świat nie był generowany więcej niż raz
+        
         # move player
         scroll_map = player.move(dx,dy, world.obstacle_tile)
 
         # move enemies 
-        for enemy in enemy_list:
-            enemy.move(world.obstacle_tile, player, scroll_map)
-        for boss in boss_list:
-            boss.move(world.obstacle_tile, player, scroll_map)
+        if player.alive:
+            for enemy in enemy_list:
+                enemy.move(world.obstacle_tile, player, scroll_map)
+            for boss in boss_list:
+                boss.move(world.obstacle_tile, player, scroll_map)
         
         # update 
         world.update(scroll_map)
         player.update(is_flipped, moving, player.health, player.gold)
         hud.update(player, world_level)
-        arrow = bow.update(player)
-        if arrow:
-            arrow_group.add(arrow)
-        for arrow in arrow_group:
-            damage, damage_pos = arrow.update(enemy_list, scroll_map, world.obstacle_tile, boss_list)
-            if damage:
-                damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
-                damage_text_group.add(damage_text)
-        damage_text_group.update(scroll_map)
-        for enemy in enemy_list:
-            enemy.hit_player(10,player)
-            gold_, potion_, enemy_alive = enemy.update(player, world.obstacle_tile)
-            if enemy.delete:
-                if gold_:
-                    item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
-                if potion_:
-                    item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"health_potion"))
-                enemy_list.remove(enemy)
-        for item in item_group:
-            item.update(player, scroll_map)
-        background.update()
-        draw_hp_boss, magic_ball = boss.update(player,world.obstacle_tile)
-        if magic_ball:
-            magic_ball_group.add(magic_ball)
-        for magic_ball in magic_ball_group:
-            player.is_on_fire = magic_ball.update(scroll_map, player)
-        if player.is_on_fire:
-            player.on_fire()
+        if player.alive:
+            arrow = bow.update(player)
+            if arrow:   
+                arrow_group.add(arrow)
+            for arrow in arrow_group:
+                damage, damage_pos = arrow.update(enemy_list, scroll_map, world.obstacle_tile, boss_list)
+                if damage:
+                    damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
+                    damage_text_group.add(damage_text)
+            damage_text_group.update(scroll_map)
+            for enemy in enemy_list:
+                enemy.hit_player(10,player)
+                gold_, potion_, enemy_alive = enemy.update(player, world.obstacle_tile)
+                if enemy.delete:
+                    if gold_:
+                        item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
+                    if potion_:
+                        item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"health_potion"))
+                    enemy_list.remove(enemy)
+            for item in item_group:
+                item.update(player, scroll_map)
+            background.update()
+            draw_hp_boss, magic_ball = boss.update(player,world.obstacle_tile)
+            if magic_ball:
+                magic_ball_group.add(magic_ball)
+            for magic_ball in magic_ball_group:
+                player.is_on_fire = magic_ball.update(scroll_map, player)
+            if player.is_on_fire:
+                player.on_fire()
         if not player.alive:
             end = player.died()
             if end:

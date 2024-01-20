@@ -2,11 +2,13 @@ import pygame
 import scripts.constants
 from scripts.load import loadImage, loadImages
 
+
 class HUD:
     def __init__(self, player, world_level):
         self.assets={
             "coursor": loadImages("HUD/coursor"),
-            "gold": pygame.transform.scale(loadImage("coin/0.png"),(16,16))
+            "gold": pygame.transform.scale(loadImage("coin/0.png"),(16,16)),
+            "red_fade": loadImage("effects/redfade/0.png")
         }
         pygame.mouse.set_visible(False)    
         self.pos = None
@@ -114,9 +116,7 @@ class HUD:
             display.blit(self.image_died,(50, scripts.constants.DISPLAY_HEIGHT/2-20))
 
     def draw_red_fade(self,display,player):
-        if player.health < (player.health_max/2):
-            pass # zrobic rysunek czerwonego przezroczystego rysunku
-        elif player.health < (player.health_max*0.9):
-            pass
+        if player.health < (player.health_max*0.2):
+            display.blit(self.assets["red_fade"],(0,0))
 
        

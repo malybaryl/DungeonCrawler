@@ -12,3 +12,6 @@ VERSION: 0.0.4
 - presing tab opening info where is all HUD now
 - info now shows world level
 - red screen effect when player has low health
+- bug fixes
+- generating new level (now you can play infinity (unless you die...))
+- better optimalisation
