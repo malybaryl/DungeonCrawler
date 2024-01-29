@@ -15,3 +15,9 @@ VERSION: 0.0.4
 - bug fixes
 - generating new level (now you can play infinity (unless you die...))
 - better optimalisation
+
+VERSION: 0.0.5
+- info (tab) update
+- town added
+- now you can build in town
+- health potion and health bar bug fix 

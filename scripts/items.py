@@ -22,8 +22,12 @@ class Item(pygame.sprite.Sprite):
         # check if item has been colleted
         if self.item_type == "health_potion":
             if self.rect.colliderect(player.rect):
-                player.health = 100
-                self.kill()
+                if player.health < player.health_max:
+                    if player.health >= player.health_max/2:
+                        player.health = player.health_max
+                    else:
+                        player.health += player.health_max/2
+                    self.kill()
         if self.item_type == "coin":
             if self.rect.colliderect(player.rect):
                 player.gold += 1
