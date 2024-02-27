@@ -2,8 +2,9 @@ import pygame
 import scripts.constants
 from scripts.load import loadImages
 from scripts.character import Character
-from scripts.enemies import Orc, Orc_Shaman_Boss
+from scripts.enemies import Enemy
 import random
+import csv
 
 def draw_grid(display):
         for x in range(30):
@@ -14,213 +15,554 @@ def draw_grid(display):
 class World():
     def __init__(self):
         self.assets={
-            "castle": loadImages("tilemap/castle")
+            "castle": loadImages("tilemap/castle"),
+            "grassland": loadImages("tilemap/grassland")
         }
         self.map_tiles = []
         self.obstacle_tile = []
+        self.decorations_up_tiles = []
         self.exit_tile = None
         self.player = None
         self.boss_list = []
         self.character_list = []
         self.gate_tiles = []
+        self.world_data = []
+        self.world_mobs_data = []
+        self.world_objects_data = []
+        self.world_decorations_down = []
+        self.world_decorations_up = []
+        
 
+    def proced_csv_file(self,rows=50, cols=50):
+        
+        for row in range(rows):
+            r = [-1] * cols
+            self.world_data.append(r)
+        with open("assets/levels/grassland_ground.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_data[x][y]= int(tile)
+        
+        for row in range(rows):
+            r = [-1] * cols
+            self.world_mobs_data.append(r)
+        with open("assets/levels/grassland_mobs.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_mobs_data[x][y]= int(tile)
+    
+        for row in range(rows):
+            r = [-1] * cols
+            self.world_objects_data.append(r)
+        with open("assets/levels/grassland_objects.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_objects_data[x][y]= int(tile)
+        
+        for row in range(rows):
+            r = [-1] * cols
+            self.world_decorations_up.append(r)
+        with open("assets/levels/grassland_decorationsup.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_decorations_up[x][y]= int(tile)
+        
+        for row in range(rows):
+            r = [-1] * cols
+            self.world_decorations_down.append(r)
+        with open("assets/levels/grassland_decorationsdown.csv", newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    self.world_decorations_down[x][y]= int(tile)
+        
+    
     def process_date(self, data, type):
         self.level_lenght = len(data)
         # iterate throught each value in level data file
         for y, row in enumerate(data):
              for x, tile in enumerate(row):
-                image = self.assets[type][tile]
-                image_rect = image.get_rect()
-                image_x = x * scripts.constants.TILE_SIZE 
-                image_y = y * scripts.constants.TILE_SIZE 
-                image_rect.x= image_x
-                image_rect.y= image_y       
-                tile_data = [image, image_rect, image_x, image_y]
 
+                if type == 'grassland':
                 # add image date to main tiles list
-                if tile >= 0:
-                    self.map_tiles.append(tile_data)
-                
-                if tile == 0 or tile == 1 or tile == 2 or tile == 3 or tile == 4 or tile == 5 or tile == 21 or tile == 22 or tile == 23 or tile == 24 or tile == 27:
-                    self.obstacle_tile.append(tile_data) 
-                if tile == 26:
-                    self.player = Character(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
-                    self.map_tiles.pop()
-                if tile == 25:
-                    self.character_list.append(Orc(tile_data[2],tile_data[3],scripts.constants.ORC_HP))
-                    self.map_tiles.pop()
-                if tile == 28:
-                    self.boss_list.append(Orc_Shaman_Boss(tile_data[2],tile_data[3],scripts.constants.ORC_SHAMAN_HP))
-                    self.map_tiles.pop()
-                if tile == 29:
-                    self.gate_tiles.append(tile_data)
-                    
-
+                    if tile >= 0:
+                        if tile == 82:
+                            image = self.assets[type][0]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 83:
+                            image = self.assets[type][1]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 84:
+                            image = self.assets[type][2]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 72:
+                            image = self.assets[type][3]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 73:
+                            image = self.assets[type][4]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 74:
+                            image = self.assets[type][5]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 92:
+                            image = self.assets[type][6]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 93:
+                            image = self.assets[type][7]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 94:
+                            image = self.assets[type][8]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 91:
+                            image = self.assets[type][9]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 95:
+                            image = self.assets[type][10]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 81:
+                            image = self.assets[type][11]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 71:
+                            image = self.assets[type][12]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 61:
+                            image = self.assets[type][13]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 41:
+                            image = self.assets[type][14]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 31:
+                            image = self.assets[type][15]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 75:
+                            image = self.assets[type][16]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 65:
+                            image = self.assets[type][17]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 45:
+                            image = self.assets[type][18]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 35:
+                            image = self.assets[type][19]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 22:
+                            image = self.assets[type][20]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 23:
+                            image = self.assets[type][21]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 24:
+                            image = self.assets[type][22]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 0:
+                            pass
+                            #image = self.assets[type][23] closed chest
+                            # image_rect = image.get_rect()
+                            # image_x = x * scripts.constants.TILE_SIZE 
+                            # image_y = y * scripts.constants.TILE_SIZE 
+                            # image_rect.x= image_x
+                            # image_rect.y= image_y       
+                            # tile_data = [image, image_rect, image_x, image_y]
+                            #image = self.assets[type][24] open chest
+                        if tile == 2:
+                            image = self.assets[type][25]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 3:
+                            image = self.assets[type][26]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 10:
+                            image = self.assets[type][27]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 11:
+                            image = self.assets[type][28]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 12:
+                            image = self.assets[type][29]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 13:
+                            image = self.assets[type][30]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 20:
+                            image = self.assets[type][31]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.decorations_up_tiles.append(tile_data)
+                        if tile == 21:
+                            image = self.assets[type][32]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 25:
+                            image = self.assets[type][33]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                        if tile == 30:
+                            image = self.assets[type][34]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.gate_tiles.append(tile_data) 
+                        if tile == 96:
+                            image = self.assets[type][35]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 85:
+                            image = self.assets[type][49]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 97:
+                            image = self.assets[type][36]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 98:
+                            image = self.assets[type][37]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 90:
+                            image = self.assets[type][38]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.obstacle_tile.append(tile_data)
+                        if tile == 80:
+                            image = self.assets[type][39]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.decorations_up_tiles.append(tile_data)
+                        if tile == 70:
+                            image = self.assets[type][40]
+                            image_rect = image.get_rect()
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE 
+                            image_rect.x= image_x
+                            image_rect.y= image_y       
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.map_tiles.append(tile_data)
+                            self.decorations_up_tiles.append(tile_data)
+                        if tile == 40:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.player = Character(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP,scripts.constants.HERO)
+                               
+                        if tile == 50:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('slime',tile_data[2],tile_data[3],scripts.constants.SLIME_HP))
+                        if tile == 60:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('wolf',tile_data[2],tile_data[3],scripts.constants.WOLF_HP))
+                        if tile == 51:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('troll',tile_data[2],tile_data[3],scripts.constants.TROLL_HP))
+                        if tile == 52:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('goblin',tile_data[2],tile_data[3],scripts.constants.GOBLIN_HP))
+                        if tile == 53:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('ent',tile_data[2],tile_data[3],scripts.constants.ENT_HP))
+                        if tile == 54:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Enemy('slime_fire_wizard',tile_data[2],tile_data[3],scripts.constants.SLIME_FIRE_WIZARD_HP))
+        
+ 
         return self.player, self.character_list, self.boss_list, self.gate_tiles
         
     def generate(self, mobs = False):  
-        if not mobs:
-            data = [[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,0,2,2,2,4,4,4,4,2,2,2,0,2,2,2,-1,-1,2,2,2,0,2,2,2,4,4,4,4,2,2,2,0,2,2,2,-1,-1,2,2,20,2,2,2,4,4,4,4,2,2,2,0,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,1,3,3,3,5,5,5,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,5,5,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,5,5,5,3,3,3,1,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,2,2,2,2,2,2,2,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,3,3,3,3,3,3,3,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,6,7,8,7,8,6,7,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,9,10,10,10,10,10,11,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,12,13,13,13,13,13,14,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,12,13,13,13,13,13,14,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,12,13,13,13,13,13,14,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,15,16,16,16,16,16,17,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [24,2,2,2,2,2,2,2,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,3,3,3,3,3,3,3,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1,-1,2,2,2,0,2,2,2,4,13,13,4,2,2,2,0,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1,-1,3,3,3,1,3,3,3,5,18,18,5,3,3,3,1,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,13,13,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22,24,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,22],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,2,2,2,2,4,4,4,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,4,4,4,2,2,2,2,2,2,2,-1,-1,2,2,2,2,2,2,2,4,18,18,4,2,2,2,2,2,2,2,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,3,3,3,3,5,5,5,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,5,5,5,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,5,13,13,5,3,3,3,3,3,3,3,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,4,18,18,4,-1,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,5,18,18,5,-1,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,24,9,10,10,11,22,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,24,12,13,13,14,22,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,24,12,13,13,14,22,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,24,15,16,16,17,22,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,2,2,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
-                [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3,3,3,3,-1,-1,-1,-1,-1,-1,-1,-1]]
-        
-        if mobs:
-            data= [ [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, 25, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, 25, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, 25, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1,26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],    
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],   
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],  
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],    
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, 25, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, 25, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, 25, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 28, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 29, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]]
-        
-        
-        
-        
-        return data
+        pass
     
     def update(self, screen_scroll):
         for tile in self.map_tiles:
             tile[2] += screen_scroll[0]
             tile[3] += screen_scroll[1]
             tile[1].center = (tile[2], tile[3])
-
+        for tile in self.gate_tiles:
+            tile[2] += screen_scroll[0]
+            tile[3] += screen_scroll[1]
+            tile[1].center = (tile[2], tile[3])
 
     def draw(self,surface):
         for tile in self.map_tiles:
-            if tile[0]!=25 or tile[0]!=26:
-                surface.blit(tile[0], tile[1])
+            surface.blit(tile[0], tile[1])
     
     def draw_src(self,surface, source):
         for tile in source:

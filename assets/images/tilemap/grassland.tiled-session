@@ -1,0 +1,41 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "grassland.tsx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "grassland.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "untitled.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 608,
+                "y": 951
+            }
+        }
+    },
+    "last.exportedFilePath": "C:/Users/kacpe/Desktop/programing/python/DungeonCrawler/assets",
+    "last.imagePath": "C:/Users/kacpe/Desktop/programing/python/DungeonCrawler/assets/images/tilemap",
+    "map.height": 50,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 50,
+    "openFiles": [
+        "grassland.tsx",
+        "untitled.tmx"
+    ],
+    "project": "grassland.tiled-project",
+    "recentFiles": [
+        "untitled.tmx",
+        "grassland.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

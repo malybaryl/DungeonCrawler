@@ -3,6 +3,7 @@ import scripts.constants
 from scripts.load import loadImages, loadCredits, change_values_of_config
 from scripts.music import Music
 from scripts.changeResolution import changeResolution
+import math
 
 class Menu:
     def __init__(self):
@@ -10,20 +11,21 @@ class Menu:
             "buttons": loadImages("HUD/button"),
             "coursor": loadImages("HUD/coursor"),
             "font1": pygame.font.Font("assets/fonts/font.ttf",8),
-            "font2": pygame.font.Font("assets/fonts/font.ttf",24)
+            "font2": pygame.font.Font("assets/fonts/font.ttf",24),
+            "logo": loadImages("HUD/logo")
         }
-        self.version = "0.0.5"
+        self.version = "0.0.6"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False
         self.credits_menu = False
+        self.logo_x = 256
+        self.logo_y = 64
+        self.logo = pygame.transform.scale(self.assets["logo"][0],(self.logo_x,self.logo_y))
         self.answer_YES="YES"
         self.answer_NO="NO"
         self.answer_YES_caption = self.assets["font1"].render(self.answer_YES ,True, scripts.constants.WHITE)
         self.answer_NO_caption = self.assets["font1"].render(self.answer_NO ,True, scripts.constants.WHITE)
-        self.logo = "DUNGEON CRAWLER"
-        self.game_logo = self.assets["font2"].render(self.logo ,True, scripts.constants.WHITE)
-        self.game_logo_shadow = self.assets["font2"].render(self.logo ,True, scripts.constants.BLACK)
         self.play = "PLAY"
         self.play_caption = self.assets["font1"].render(self.play ,True, scripts.constants.WHITE)
         self.play_cliked = False
@@ -98,6 +100,8 @@ class Menu:
         self.music_volume_clicked = False
         self.fullscreen_clicked = False
         self.effects_volume_clicked = False
+        self.raise_up = False
+        
     
     def update(self, music, screen, player, bow, enemy_list, boss_list, magic_ball_group):
         self.pos = pygame.mouse.get_pos()
@@ -116,6 +120,21 @@ class Menu:
             self.read_once = False
 
         if self.main_menu:
+            # logo animation handler
+            self.logo = pygame.transform.scale(self.assets["logo"][0],(math.floor(self.logo_x), math.floor(self.logo_y)))
+            if self.raise_up:
+                self.logo_y += 0.1
+                self.logo_x += 0.3
+            else:
+                self.logo_y -= 0.1 
+                self.logo_x -= 0.3
+            if self.logo_x >= 266:
+                self.raise_up = False
+            elif self.logo_x <= 246:
+                self.raise_up = True
+            
+            
+            
             if pygame.mouse.get_pressed()[0]:
                 # if play button is clicked
                 if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32:
@@ -360,8 +379,7 @@ class Menu:
         
         if self.main_menu:
             # drawing logo
-            surface.blit(self.game_logo_shadow,(scripts.constants.DISPLAY_WIDTH/2-180+5,scripts.constants.DISPLAY_HEIGHT/4+5))
-            surface.blit(self.game_logo,(scripts.constants.DISPLAY_WIDTH/2-180,scripts.constants.DISPLAY_HEIGHT/4))
+            surface.blit(self.logo,(scripts.constants.DISPLAY_WIDTH/2-self.logo_x//2,scripts.constants.DISPLAY_HEIGHT/4-self.logo_y//2))
 
             # drawing buttons
             surface.blit(self.play_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2))

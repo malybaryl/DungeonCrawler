@@ -21,3 +21,22 @@ VERSION: 0.0.5
 - town added
 - now you can build in town
 - health potion and health bar bug fix 
+- now when you died you can come back to town and start a new game
+
+VERSION: 0.0.6
+- new system of health bar
+- new map 'grass land'
+- slingshot
+- particikles system
+- now wepon flips when you aim left
+- new spirtes
+- some of spirtes has been replaced 
+- new playable character (wizard)
+- wizard tower
+- added slime
+- added slime wizard
+- added troll
+- added wolf
+- added goblin
+- bugs fixes
+- some preparations for further update (new kinds od wepons, new characters, chests system, bosses)

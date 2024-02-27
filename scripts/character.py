@@ -5,20 +5,26 @@ from scripts.load import loadImages
 import random
 
 class Character():
-    def __init__(self, x, y, health):
+    def __init__(self, x, y, health, type):
+        self.type = type
         self.rect = pygame.Rect(0,0,16,30)
         self.rect.center = (x,y)
         self.image_to_show = 0
-        self.animation_index = [["idle",0], ["run",0], ["dead",0], ["onFire",0]]
+        self.animation_index = [["idle",0],
+                                ["run",0],
+                                ["dead",0],
+                                ["onFire",0]]
         self.assets = {
-        "player_idle": loadImages("char/player1/idle"),
-        "player_run": loadImages("char/player1/run"),
-        "player_dead": loadImages("char/player1/dead"),
+        "player_idle": loadImages(f"char/{self.type}/idle"),
+        "player_run": loadImages(f"char/{self.type}/run"),
+        "player_dead": loadImages(f"char/{self.type}/dead"),
         "player_on_fire": loadImages("effects/onFire"),
         "walk_sound": pygame.mixer.Sound("assets/audio/walk.mp3")
         }
         self.assets["walk_sound"].set_volume(scripts.constants.FX_VOLUME)
         self.health = health
+        self.old_health = health
+        self.new_health = health
         self.health_max = scripts.constants.PLAYER_HP
         self.alive = True
         self.gold = 0
@@ -28,7 +34,9 @@ class Character():
         self.image_on_fire = self.assets["player_on_fire"][0]
         self.on_fire_counter = pygame.time.get_ticks()
         self.on_fire_counter_end = pygame.time.get_ticks()
-
+        self.player_was_hit = False
+        self.player_was_heal = False
+   
     def move(self, dx, dy, obstacle_tile):
         # screen scroll
         screen_scroll = [0,0]
@@ -111,6 +119,19 @@ class Character():
                     self.animation_index[1][1] = 0
         # health update
         self.health = health
+        if self.player_was_hit:
+            if self.old_health <= self.health:
+                self.player_was_hit = False
+            else:
+                self.old_health -= 0.1
+        if self.player_was_heal:
+            if self.health >= self.new_health:
+                self.health = self.new_health
+                self.player_was_heal = False
+            else:
+                self.health += 1
+        else:
+            self.new_health = health
         # gold update
         self.gold = gold
         # is alive?
@@ -126,6 +147,9 @@ class Character():
                 if self.animation_index[2][1] >= 5:
                     self.animation_index[2][1] = 5
             self.alive = False
+
+
+        
 
     def died(self):
         end = False

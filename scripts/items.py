@@ -1,16 +1,20 @@
 from typing import Any
 import pygame
 import scripts.constants
-from scripts.load import loadImage
+from scripts.load import loadImage, loadImages
+import math
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, x, y, item_type):
         pygame.sprite.Sprite.__init__(self)
         self.assets ={
-            "coin": pygame.transform.scale(loadImage("coin/0.png"),(16,16)),
+            "coin": loadImages("coin"),
             "health_potion": pygame.transform.scale(loadImage("potion/0.png"),(16,16))
         }
         self.item_type = item_type # coin, health_potion
+        self.index = {
+            "coin": 0
+        }
         self.rect = pygame.Rect(0,0,16,16)
         self.rect.center = (x,y)
 
@@ -24,9 +28,10 @@ class Item(pygame.sprite.Sprite):
             if self.rect.colliderect(player.rect):
                 if player.health < player.health_max:
                     if player.health >= player.health_max/2:
-                        player.health = player.health_max
+                        player.new_health = player.health_max
                     else:
-                        player.health += player.health_max/2
+                        player.new_health += player.health_max/2
+                    player.player_was_heal = True
                     self.kill()
         if self.item_type == "coin":
             if self.rect.colliderect(player.rect):
@@ -34,6 +39,14 @@ class Item(pygame.sprite.Sprite):
                 self.kill()
 
     def draw(self, display):
-        display.blit(self.assets[self.item_type],(self.rect.center[0]-8,self.rect.center[1]-8))
-        if scripts.constants.SHOW_HITBOX:
-            pygame.draw.rect(display, scripts.constants.RED, self.rect, 1)
+        if self.item_type == "health_potion": 
+            display.blit(self.assets[self.item_type],(self.rect.center[0]-8,self.rect.center[1]-8))
+            if scripts.constants.SHOW_HITBOX:
+                pygame.draw.rect(display, scripts.constants.RED, self.rect, 1)
+        elif self.item_type == "coin":
+            display.blit(self.assets[self.item_type][math.floor(self.index[self.item_type])],(self.rect.center[0]-16,self.rect.center[1]-16))
+            self.index[self.item_type] += 0.1
+            if self.index[self.item_type] > 6:
+                self.index[self.item_type] = 0
+            if scripts.constants.SHOW_HITBOX:
+                pygame.draw.rect(display, scripts.constants.RED, self.rect, 1)

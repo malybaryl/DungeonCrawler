@@ -7,7 +7,7 @@ class HUD:
     def __init__(self, player, world_level):
         self.assets={
             "coursor": loadImages("HUD/coursor"),
-            "gold": pygame.transform.scale(loadImage("coin/0.png"),(16,16)),
+            "gold": loadImage("coin/0.png"),
             "red_fade": loadImage("effects/redfade/0.png"),
             "buttons": loadImages("HUD/button")
         }
@@ -18,7 +18,11 @@ class HUD:
         self.world_level = world_level
         self.full_health = player.health_max
         self.health = player.health
+        self.old_health = player.old_health
+        self.new_health = player.new_health
         self.gold = player.gold
+        self.was_hit = player.player_was_hit
+        self.was_heal = player.player_was_heal
         self.font = pygame.font.Font("assets/fonts/font.ttf",8)
         self.font2 = pygame.font.Font("assets/fonts/font.ttf",48)
         self.font3 = pygame.font.Font("assets/fonts/font.ttf",16)
@@ -45,6 +49,10 @@ class HUD:
         self.world_level = world_level
         self.health = player.health
         self.gold = player.gold
+        self.was_hit = player.player_was_hit
+        self.old_health = player.old_health
+        self.new_health = player.new_health
+        self.was_heal = player.player_was_heal
         self.image = self.font.render(str(self.gold), True, scripts.constants.WHITE)
         self.image_player_hp = self.font.render(str(self.health)+'/'+str(self.full_health), True, scripts.constants.WHITE)
         self.image_world_level = self.font.render("WORLD LEVEL: "+str(self.world_level), True, scripts.constants.WHITE)
@@ -60,7 +68,7 @@ class HUD:
                 if (pygame.time.get_ticks() - self.time) >= 100:
                     back_to_town = True
                     # adding gold to town
-                    town.gold += self.gold + (self.gold*self.world_level*0.1)
+                    scripts.constants.GOLD += self.gold + (self.gold*self.world_level*0.1)
                     # button handler
                     self.back_to_town_button_clicked = False
                     self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(112,26))
@@ -74,11 +82,18 @@ class HUD:
         elif not self.info:
             self.info = True
 
+            
+            
+            
+            
+            
+        
+
 
     def draw_boss_hp(self,display, hp, hp_max, boss_name="BOOS"):
         if self.player_alive:
             if hp > 0:
-                pygame.draw.rect(display,scripts.constants.BLACK,(scripts.constants.DISPLAY_WIDTH/2-150,scripts.constants.DISPLAY_HEIGHT/10-1,230,18))
+                pygame.draw.rect(display,scripts.constants.BLACK,(scripts.constants.DISPLAY_WIDTH/2-150,scripts.constants.DISPLAY_HEIGHT/10-1,300,18))
                 pygame.draw.rect(display,scripts.constants.DARKRED,(scripts.constants.DISPLAY_WIDTH/2-149,scripts.constants.DISPLAY_HEIGHT/10,298,16))
                 pygame.draw.rect(display,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH/2-1,scripts.constants.DISPLAY_HEIGHT/10,(hp/hp_max)*150,16))
                 pygame.draw.rect(display,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH/2 - ((hp/hp_max)*150)+1,scripts.constants.DISPLAY_HEIGHT/10,(hp/hp_max)*150,16))
@@ -126,8 +141,8 @@ class HUD:
                 # drawing info world level
                 display.blit(self.image_world_level,(2,2))
                 # drawing info gold
-                display.blit(self.assets["gold"],(2,scripts.constants.DISPLAY_HEIGHT-18))
-                display.blit(self.image,(18,scripts.constants.DISPLAY_HEIGHT-13))
+                display.blit(self.assets["gold"],(2-8,scripts.constants.DISPLAY_HEIGHT-18-8))
+                display.blit(self.image,(20,scripts.constants.DISPLAY_HEIGHT-13))
                 # drawing player image
                 pygame.draw.rect(display,scripts.constants.MAINMENU_COLOR_DARKER,((scripts.constants.DISPLAY_WIDTH/6),(scripts.constants.DISPLAY_HEIGHT/6)+((scripts.constants.DISPLAY_HEIGHT/6)/2),64,64))
                 display.blit(self.player_image,((scripts.constants.DISPLAY_WIDTH/6),(scripts.constants.DISPLAY_HEIGHT/6)+((scripts.constants.DISPLAY_HEIGHT/6)/2)))
@@ -144,6 +159,15 @@ class HUD:
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
 
             else:
+                pygame.draw.rect(display,scripts.constants.BLACK,(2,2,102,12))
+                pygame.draw.rect(display,scripts.constants.DARKRED,(2,2,100,10))
+                if self.was_hit:
+                    pygame.draw.rect(display,scripts.constants.YELLOW,(2,2,(self.old_health/self.full_health)*100,10))
+                if self.was_heal:
+                    pygame.draw.rect(display,scripts.constants.GREEN,(2,2,(self.new_health/self.full_health)*100,10))
+                pygame.draw.rect(display,scripts.constants.RED,(2,2,(self.health/self.full_health)*100,10))
+
+                # drawing healthbar
                 # drawing coursor
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
                 display.blit(pygame.transform.scale(self.assets["coursor"][1],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 

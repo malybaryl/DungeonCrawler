@@ -8,7 +8,7 @@ import random
 class Bow:
     def __init__(self,type_of_bow,x,y):
         self.assets = {
-            "bow": loadImages(f"wepons/bow/{type_of_bow}"),
+            "bow": loadImages(f"wepons/bows/{type_of_bow}"), # 'slingshot' , 'classic_bow', 'composite_bow', 'crossbow'
             "sound": pygame.mixer.Sound("assets/audio/bow.mp3")
                 
         }
@@ -21,6 +21,7 @@ class Bow:
         self.rect.center = (x,y)
         self.fired = False
         self.last_shot = pygame.time.get_ticks()
+        self.flip = False
     
     def update(self,player):
         self.rect.center = player.rect.center
@@ -32,10 +33,21 @@ class Bow:
         x_dist = (pos_x - self.rect.centerx) 
         y_dist = -(pos_y - self.rect.centery)  # negative because y coordinates increase down the screen
         self.angle = math.degrees(math.atan2(y_dist,x_dist)) 
+        if pos_x < self.rect.centerx:
+            self.flip = True
+        else:
+            self.flip = False
        
         # get mouseclick
         if pygame.mouse.get_pressed()[0] and not self.fired and (pygame.time.get_ticks()- self.last_shot) >= shot_cooldown:
-            arrow = Arrow("classicArrow",self)
+            if self.type_of_bow == "slingshot":
+                arrow = Arrow('rock',self)
+            elif self.type_of_bow == 'bow':
+                arrow = Arrow('classic_arrow',self)
+            elif self.type_of_bow == 'composite_bow':
+                arrow = Arrow("composite_arrow",self)
+            elif self.type_of_bow == 'crossbow':
+                arrow = Arrow("bolt",self)
             self.fired = True
             self.last_shot = pygame.time.get_ticks()
             self.assets["sound"].play()
@@ -50,8 +62,25 @@ class Bow:
         self.assets["sound"].set_volume(scripts.constants.FX_VOLUME)
 
     def draw(self, surface):
-        self.image_to_show= pygame.transform.rotate(self.original_image, self.angle)
-        surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2),self.rect.center[1]-int(self.image_to_show.get_height()/2)))
+        if self.type_of_bow == 'slingshot' or self.type_of_bow == 'crossbow':
+            if not self.flip:
+                self.image_to_show= pygame.transform.rotate(self.original_image, self.angle)
+            else:
+                if self.type_of_bow == 'slingshot':
+                    self.image_to_show= pygame.transform.flip(pygame.transform.rotate(self.original_image, self.angle),True,True)
+                elif self.type_of_bow == 'crossbow':
+                    self.image_to_show= pygame.transform.flip(pygame.transform.rotate(self.original_image, -self.angle),False,True)
+                    
+        else:
+            self.image_to_show= pygame.transform.rotate(self.original_image, self.angle)
+            
+        
+        if self.type_of_bow == "slingshot":
+            surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)+1,self.rect.center[1]-int(self.image_to_show.get_height()/2)-5))
+        elif self.type_of_bow == 'crossbow':
+            surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)+3,self.rect.center[1]-int(self.image_to_show.get_height()/2)-3))
+        else:  
+            surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)-1,self.rect.center[1]-int(self.image_to_show.get_height()/2)-2))
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
 
@@ -62,9 +91,9 @@ class Arrow(pygame.sprite.Sprite):
         self.y_cord = bow.rect.center[1]
         self.angle = -bow.angle
         self.assets = {
-            "arrow": loadImages(f"wepons/arrow/{type_of_arrow}")
+            "arrow": loadImages(f"wepons/arrows/{type_of_arrow}")
         }
-        self.original_image = self.assets["arrow"][0]
+        self.original_image = pygame.transform.flip(self.assets["arrow"][0], True, False)
         self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = pygame.Rect(0,0,16,16)
         self.rect.center = (self.x_cord,self.y_cord)
@@ -116,12 +145,22 @@ class Arrow(pygame.sprite.Sprite):
 class Magicball(pygame.sprite.Sprite):
     def __init__(self, type_of_magicball, x, y, target_x, target_y):
         pygame.sprite.Sprite.__init__(self)
-        self.assets = {
-            "magicball": loadImages(f"effects/{type_of_magicball}"),
-            "audio": pygame.mixer.Sound(f"assets/audio/{type_of_magicball}.mp3")
-        }
-        self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
-        self.sound_counter= pygame.time.get_ticks()
+        self.type = type_of_magicball
+        if self.type == 'fireball':
+            self.assets = {
+                "magicball": loadImages("effects/fireball"),
+                "audio": pygame.mixer.Sound(f"assets/audio/{type_of_magicball}.mp3")
+            }
+            self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
+            self.sound_counter= pygame.time.get_ticks()
+        elif self.type == 'troll_rock':
+            self.assets = {
+                "magicball": loadImages("effects/rock_troll"),
+            }
+        elif self.type == 'attack_ent':
+            self.assets = {
+                "magicball": loadImages("effects/attack_ent"),
+            }
         self.original_image = self.assets["magicball"][0]
         self.animation_index = 0
         self.x_cord = x
@@ -137,22 +176,43 @@ class Magicball(pygame.sprite.Sprite):
         self.dx = math.cos(math.radians(self.angle)) * scripts.constants.MAGIC_BALL_SPEED
         self.dy = -(math.sin(math.radians(self.angle)) * scripts.constants.MAGIC_BALL_SPEED)
         
-    def update(self, screen_scroll, player):
+    def update(self, screen_scroll, player, obstacle_tiles):
         #handle audio
+        
         player_on_fire = False
-        current_time = pygame.time.get_ticks()
-        if current_time - self.sound_counter >= 100:
-            self.assets["audio"].play()
-            self.sound_counter = current_time
+        # current_time = pygame.time.get_ticks()
+        # if self.type == 'fireball':
+        #     if current_time - self.sound_counter >= 100:
+        #         self.assets["audio"].play()
+        #         self.sound_counter = current_time
 
         #handle animation
-        self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
-        self.animation_index += 0.2
-        if self.animation_index >= 7:
-            self.animation_index = 5
+       
+        if self.type == 'fireball':
+            self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
+            self.animation_index += 0.2
+            if self.animation_index >= 7:
+                self.animation_index = 5
+        elif self.type == 'troll_rock':
+            self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
+            self.angle += 1
+            
+            # checking colision
+            for obstacle in obstacle_tiles:
+                if obstacle[1].colliderect(self.rect):
+                    self.kill()
+        elif self.type == 'attack_ent':
+            self.image_to_show = pygame.transform.flip(pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle),True,True)
+            self.animation_index += 0.2
+            if self.animation_index >= 2:
+                self.animation_index = 0
+            
+            # checking colision
+            for obstacle in obstacle_tiles:
+                if obstacle[1].colliderect(self.rect):
+                    self.kill()
+            
 
-        # reset variables
-        damage = 0
 
         #reposition based on speed and screen scroll
         self.rect.x += screen_scroll[0] + self.dx
@@ -164,8 +224,16 @@ class Magicball(pygame.sprite.Sprite):
 
         # check collision between magicball and enemies
         if player.rect.colliderect(self.rect) and player.alive:
-                player_on_fire = True
-                self.kill()
+                if self.type == 'fireball':
+                    player_on_fire = True
+                    self.kill()
+                elif self.type == 'troll_rock':
+                    player.health -= scripts.constants.TROLL_DAMAGE
+                    self.kill()
+                elif self.type == 'attack_ent':
+                    player.health -= scripts.constants.ENT_DAMAGE
+                    self.kill()
+        
         return player_on_fire
     
     def change_fx_volume(self):
@@ -175,3 +243,316 @@ class Magicball(pygame.sprite.Sprite):
         surface.blit(self.image_to_show, (self.rect.centerx-16,self.rect.centery-16))
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+            
+            
+class TwoHandedSword():
+    def __init__(self, type_of_sword, x,y):
+        self.assets={
+            'sword': loadImages(f'wepons/two_handed_swords/{type_of_sword}') # 'wooden_sword', 'rusted_sword', 'sword', 'great_sword', 'katana'
+        }
+        self.type_of_sword = type_of_sword
+        self.image_to_show = pygame.transform.rotate(self.assets['sword'][0], -30)
+        self.rect = self.image_to_show.get_rect()
+        self.rect.center = (x,y)
+        self.is_fliped = False
+        self.min_damage = 10
+        self.max_damage = 20
+        self.attack = False
+        self.angle = 15
+        self.attack_trigger = pygame.time.get_ticks()
+        self.can_attack = True
+        
+        
+    def update(self, player, player_is_fliped, mobs):
+        self.rect.center = player.rect.center
+        damage = 0
+        damage_pos = None
+        
+        if pygame.time.get_ticks() - self.attack_trigger >= 700:
+            self.can_attack = True
+        else:
+            self.can_attack = False
+            
+        if pygame.mouse.get_pressed()[0] and not self.attack and self.can_attack:
+            self.attack = True
+            self.attack_trigger = pygame.time.get_ticks()
+        
+        if self.attack:
+            self.rect.y += 32
+            self.angle = -90
+            if not player_is_fliped:
+                self.rect.x += 16
+                self.rect = pygame.Rect(self.rect.x, self.rect.y -32, 50,32)
+            else:
+                self.rect.x -= 32
+                self.rect = pygame.Rect(self.rect.x+16, self.rect.y -32, 50,32)
+            if pygame.time.get_ticks() - self.attack_trigger >= 200:
+                for mob in mobs:
+                    if self.rect.colliderect(mob.rect):
+                        if mob.alive:
+                            damage = random.randint(self.min_damage,self.max_damage)
+                            mob.health -= damage
+                            damage_pos = mob.rect
+                self.angle = 15
+                self.rect.center = player.rect.center 
+                self.attack = False
+            
+        
+        if player_is_fliped:
+            self.is_fliped = True
+        else:
+            self.is_fliped = False
+        
+        if not self.is_fliped:
+            self.image_to_show = pygame.transform.rotate(self.assets['sword'][0], self.angle)
+        else:
+            self.image_to_show = pygame.transform.flip(pygame.transform.rotate(self.assets['sword'][0], self.angle), True, False)
+    
+        return damage, damage_pos
+            
+    def draw(self, surface):
+        if self.attack:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx-8,self.rect.centery))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx-24,self.rect.centery))
+        else:
+            surface.blit(self.image_to_show, (self.rect.centerx-8,self.rect.centery-32))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+            
+class Mace():
+    def __init__(self, type_of_mace, x,y):
+        self.assets={
+            'mace': loadImages(f'wepons/maces/{type_of_mace}') # 'stick', 'stick_with_nail', 'club_with_spikes', 'mace'
+        }
+        self.type_of_mace = type_of_mace
+        self.image_to_show = pygame.transform.rotate(self.assets['mace'][0], -30)
+        self.rect = pygame.Rect(0,0,32,32)
+        self.rect.center = (x,y)
+        self.is_fliped = False
+        self.min_damage = 15
+        self.max_damage = 30
+        self.attack = False
+        self.angle = 30
+        self.attack_trigger = pygame.time.get_ticks()
+        self.can_attack = True
+        
+        
+    def update(self, player, player_is_fliped, mobs):
+        self.rect.center = player.rect.center
+        damage = 0
+        damage_pos = None
+        
+        if pygame.time.get_ticks() - self.attack_trigger >= 1500:
+            self.can_attack = True
+        else:
+            self.can_attack = False
+            
+        if pygame.mouse.get_pressed()[0] and not self.attack and self.can_attack:
+            self.attack = True
+            self.attack_trigger = pygame.time.get_ticks()
+        
+        if self.attack:
+            self.rect.y += 32
+            self.angle = -90
+            if not player_is_fliped:
+                self.rect.x += 16
+                self.rect = pygame.Rect(self.rect.x, self.rect.y -32, 40,40)
+            else:
+                self.rect.x -= 32
+                self.rect = pygame.Rect(self.rect.x+16, self.rect.y -32, 40,40)
+            if pygame.time.get_ticks() - self.attack_trigger >= 200:
+                for mob in mobs:
+                    if self.rect.colliderect(mob.rect):
+                        if mob.alive:
+                            damage = random.randint(self.min_damage,self.max_damage)
+                            mob.health -= damage
+                            damage_pos = mob.rect
+                self.angle = 30
+                self.rect.center = player.rect.center 
+                self.attack = False
+            
+        
+        if player_is_fliped:
+            self.is_fliped = True
+        else:
+            self.is_fliped = False
+        
+        if not self.is_fliped:
+            self.image_to_show = pygame.transform.rotate(self.assets['mace'][0], self.angle)
+        else:
+            self.image_to_show = pygame.transform.flip(pygame.transform.rotate(self.assets['mace'][0], self.angle), True, False)
+    
+        return damage, damage_pos
+            
+    def draw(self, surface):
+        if self.attack:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx-8,self.rect.centery))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx-24,self.rect.centery))
+        else:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx-16,self.rect.centery-32))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx-8,self.rect.centery-32))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+
+class OneHandedAxe():
+    def __init__(self, type_of_axe, x,y):
+        self.assets={
+            'axe': loadImages(f'wepons/one_handed_axes/{type_of_axe}') # 'rusted_axe', 'axe'
+        }
+        self.type_of_mace = type_of_axe
+        self.image_to_show = pygame.transform.rotate(self.assets['axe'][0], -30)
+        self.rect = pygame.Rect(0,16,16,48)
+        self.rect.center = (x,y)
+        self.is_fliped = False
+        self.min_damage = 9
+        self.max_damage = 18
+        self.attack = False
+        self.angle = -45
+        self.attack_trigger = pygame.time.get_ticks()
+        self.can_attack = True
+        
+        
+    def update(self, player, player_is_fliped, mobs):
+        self.rect.center = player.rect.center
+        damage = 0
+        damage_pos = None
+        
+        if pygame.time.get_ticks() - self.attack_trigger >= 400:
+            self.can_attack = True
+        else:
+            self.can_attack = False
+            
+        if pygame.mouse.get_pressed()[0] and not self.attack and self.can_attack:
+            self.attack = True
+            self.attack_trigger = pygame.time.get_ticks()
+        
+        if self.attack:
+            self.rect.y += 32
+            self.angle = -90
+            if not player_is_fliped:
+                self.rect.x += 16
+                self.rect = pygame.Rect(self.rect.x + 8, self.rect.y -32, 16,48)
+            else:
+                self.rect.x -= 32
+                self.rect = pygame.Rect(self.rect.x+ 8, self.rect.y -32, 16, 48)
+            if pygame.time.get_ticks() - self.attack_trigger >= 200:
+                for mob in mobs:
+                    if self.rect.colliderect(mob.rect):
+                        if mob.alive:
+                            damage = random.randint(self.min_damage,self.max_damage)
+                            mob.health -= damage
+                            damage_pos = mob.rect
+                self.angle = -45
+                self.rect.center = player.rect.center 
+                self.attack = False
+            
+        
+        if player_is_fliped:
+            self.is_fliped = True
+        else:
+            self.is_fliped = False
+        
+        if not self.is_fliped:
+            self.image_to_show = pygame.transform.rotate(self.assets['axe'][0], self.angle)
+        else:
+            self.image_to_show = pygame.transform.flip(pygame.transform.rotate(self.assets['axe'][0], self.angle), True, False)
+    
+        return damage, damage_pos
+            
+    def draw(self, surface):
+        if self.attack:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx-24,self.rect.centery))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx,self.rect.centery))
+        else:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx,self.rect.centery-16))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx-20,self.rect.centery-16))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+
+class OneHandedHammer():
+    def __init__(self, type_of_hammer, x,y):
+        self.assets={
+            'hammer': loadImages(f'wepons/one_handed_hammers/{type_of_hammer}') # 'hammer'
+        }
+        self.type_of_mace = type_of_hammer
+        self.image_to_show = pygame.transform.rotate(self.assets['hammer'][0], -30)
+        self.rect = pygame.Rect(-8,-8,48, 48)
+        self.rect.center = (x,y)
+        self.is_fliped = False
+        self.min_damage = 9
+        self.max_damage = 18
+        self.attack = False
+        self.angle = -45
+        self.attack_trigger = pygame.time.get_ticks()
+        self.can_attack = True
+        
+        
+    def update(self, player, player_is_fliped, mobs):
+        self.rect.center = player.rect.center
+        damage = 0
+        damage_pos = None
+        
+        if pygame.time.get_ticks() - self.attack_trigger >= 400:
+            self.can_attack = True
+        else:
+            self.can_attack = False
+            
+        if pygame.mouse.get_pressed()[0] and not self.attack and self.can_attack:
+            self.attack = True
+            self.attack_trigger = pygame.time.get_ticks()
+        
+        if self.attack:
+            self.angle = -90
+            if not player_is_fliped:
+                self.rect = pygame.Rect(self.rect.x -8, self.rect.y -8, 48,48)
+            else:
+                self.rect = pygame.Rect(self.rect.x-8, self.rect.y -8, 48, 48)
+            if pygame.time.get_ticks() - self.attack_trigger >= 200:
+                for mob in mobs:
+                    if self.rect.colliderect(mob.rect):
+                        if mob.alive:
+                            damage = random.randint(self.min_damage,self.max_damage)
+                            mob.health -= damage
+                            damage_pos = mob.rect
+                self.angle = -45
+                self.rect.center = player.rect.center 
+                self.attack = False
+            
+        
+        if player_is_fliped:
+            self.is_fliped = True
+        else:
+            self.is_fliped = False
+        
+        if not self.is_fliped:
+            self.image_to_show = pygame.transform.rotate(self.assets['hammer'][0], self.angle)
+        else:
+            self.image_to_show = pygame.transform.flip(pygame.transform.rotate(self.assets['hammer'][0], self.angle), True, False)
+    
+        return damage, damage_pos
+            
+    def draw(self, surface):
+        if self.attack:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx-24,self.rect.centery))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx,self.rect.centery))
+        else:
+            if not self.is_fliped:
+                surface.blit(self.image_to_show, (self.rect.centerx,self.rect.centery-16))
+            else:
+                surface.blit(self.image_to_show, (self.rect.centerx-20,self.rect.centery-16))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+            
+        
