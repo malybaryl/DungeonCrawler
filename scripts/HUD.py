@@ -9,7 +9,8 @@ class HUD:
             "coursor": loadImages("HUD/coursor"),
             "gold": loadImage("coin/0.png"),
             "red_fade": loadImage("effects/redfade/0.png"),
-            "buttons": loadImages("HUD/button")
+            "buttons": loadImages("HUD/button"),
+            "health_bar": loadImage("HUD/health_bar/0.png")
         }
         pygame.mouse.set_visible(False)    
         self.pos = None
@@ -159,15 +160,16 @@ class HUD:
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
 
             else:
-                pygame.draw.rect(display,scripts.constants.BLACK,(2,2,102,12))
-                pygame.draw.rect(display,scripts.constants.DARKRED,(2,2,100,10))
-                if self.was_hit:
-                    pygame.draw.rect(display,scripts.constants.YELLOW,(2,2,(self.old_health/self.full_health)*100,10))
-                if self.was_heal:
-                    pygame.draw.rect(display,scripts.constants.GREEN,(2,2,(self.new_health/self.full_health)*100,10))
-                pygame.draw.rect(display,scripts.constants.RED,(2,2,(self.health/self.full_health)*100,10))
-
                 # drawing healthbar
+                pygame.draw.rect(display,scripts.constants.DARKRED,(2,2,80,7))
+                pygame.draw.rect(display,scripts.constants.BLACK,(2,10,70,3))
+                if self.was_hit:
+                    pygame.draw.rect(display,scripts.constants.YELLOW,(2,2,(self.old_health/self.full_health)*80,7))
+                if self.was_heal:
+                    pygame.draw.rect(display,scripts.constants.GREEN,(2,2,(self.new_health/self.full_health)*80,7))
+                pygame.draw.rect(display,scripts.constants.RED,(2,2,(self.health/self.full_health)*80,7))
+                display.blit(self.assets["health_bar"], (0,0))
+
                 # drawing coursor
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
                 display.blit(pygame.transform.scale(self.assets["coursor"][1],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
