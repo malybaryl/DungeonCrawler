@@ -45,6 +45,7 @@ moving_up = False
 moving_down = False
 moving = False
 is_flipped = False
+E_pressed = False
 
 # create player and player wepon
 player = Character(120,300,100,"player1")
@@ -162,6 +163,7 @@ while game_is_on:
                 world.decorations_up_tiles.clear()
                 world.map_tiles.clear()
                 world.boss_list.clear()
+                world.objects.clear()
                 world.proced_csv_file()
                 # generete new level
                 #world_data = world.generate()  
@@ -202,6 +204,8 @@ while game_is_on:
                         game = False
                     if event.key == pygame.K_TAB:
                         hud.info_show()
+                    if event.key == pygame.K_e:
+                        E_pressed = True
                         
                         
 
@@ -215,6 +219,8 @@ while game_is_on:
                         moving_up = False
                     if event.key == pygame.K_s:
                         moving_down = False
+                    if event.key == pygame.K_e:
+                        E_pressed = False
 
             
             # calculate player movement
@@ -252,6 +258,9 @@ while game_is_on:
             world.update(scroll_map)
             player.update(is_flipped, moving, player.health, player.gold)
             parcticle_system.update()
+            for object in world.objects:
+                if object.type == 'chest':
+                    object.update(scroll_map, E_pressed, player)
             in_town = hud.update(player, world_level, town)
             if player.alive:
                 # sword
@@ -315,6 +324,8 @@ while game_is_on:
             if player.alive:
                 #sword.draw(display)
                 bow.draw(display)
+            for object in world.objects:
+                object.draw(display)
             for arrow in arrow_group:
                 arrow.draw(display)
             for magic_ball in magic_ball_group:

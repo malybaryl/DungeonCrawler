@@ -40,3 +40,7 @@ VERSION: 0.0.6
 - added goblin
 - bugs fixes
 - some preparations for further update (new kinds od wepons, new characters, chests system, bosses)
+- title of game changed
+
+VERSION 0.0.7
+- chest

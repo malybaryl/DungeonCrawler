@@ -3,6 +3,7 @@ import scripts.constants
 from scripts.load import loadImages
 from scripts.character import Character
 from scripts.enemies import Enemy
+from scripts.objects import Chest
 import random
 import csv
 
@@ -31,6 +32,7 @@ class World():
         self.world_objects_data = []
         self.world_decorations_down = []
         self.world_decorations_up = []
+        self.objects = []
         
 
     def proced_csv_file(self,rows=50, cols=50):
@@ -317,7 +319,8 @@ class World():
                             self.map_tiles.append(tile_data)
                             self.obstacle_tile.append(tile_data)
                         if tile == 0:
-                            pass
+                            self.objects.append(Chest(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE, closed_chest_img = self.assets[type][23], opened_chest_img = self.assets[type][24]))
+                            
                             #image = self.assets[type][23] closed chest
                             # image_rect = image.get_rect()
                             # image_x = x * scripts.constants.TILE_SIZE 
