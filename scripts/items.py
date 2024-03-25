@@ -1,4 +1,3 @@
-from typing import Any
 import pygame
 import scripts.constants
 from scripts.load import loadImage, loadImages

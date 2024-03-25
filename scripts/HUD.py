@@ -44,8 +44,17 @@ class HUD:
         self.draw_x_right = True
         self.draw_y_down = True
         self.draw_red_fade_= True
+        self.counter = pygame.time.get_ticks()
+        self.image_counter = self.font.render("TIME: 00:00:00", True, scripts.constants.WHITE)
+        self.hours = 0
+        self.minutes = 0
+        self.seconds = 0
+        self.hours_str = str(self.hours)
+        self.minutes_str = str(self.minutes)
+        self.seconds_str = str(self.seconds)
+        
     
-    def update(self, player, world_level, town):
+    def update(self, player, world_level, town, game_counter):
         self.pos = pygame.mouse.get_pos()
         self.world_level = world_level
         self.health = player.health
@@ -58,6 +67,38 @@ class HUD:
         self.image_player_hp = self.font.render(str(self.health)+'/'+str(self.full_health), True, scripts.constants.WHITE)
         self.image_world_level = self.font.render("WORLD LEVEL: "+str(self.world_level), True, scripts.constants.WHITE)
         self.player_alive = player.alive
+        
+        # game counter
+        if game_counter - self.counter >= 1000:
+            self.counter = game_counter
+            self.seconds += 1
+            if self.seconds >= 60:
+                self.seconds = 0
+                self.minutes += 1
+                if self.minutes >= 60:
+                    self.minutes = 0
+                    self.hours += 1
+                    
+        self.hours_str = str(self.hours)
+        self.minutes_str = str(self.minutes)
+        self.seconds_str = str(self.seconds)
+        
+        if self.hours < 10:
+            self.hours_str = '0' + str(self.hours)
+        else:
+            self.hours_str = str(self.hours)
+        if self.minutes < 10:
+            self.minutes_str = '0' + str(self.minutes)
+        else:
+            self.minutes_str = str(self.minutes)
+        if self.seconds < 10:
+            self.seconds_str = '0' + str(self.seconds)
+        else:
+            self.seconds_str = str(self.seconds)
+        
+        self.image_counter = self.font.render(f"TIME: {self.hours_str}:{self.minutes_str}:{self.seconds_str}", True, scripts.constants.WHITE)
+        
+               
         back_to_town = False
         if not self.player_alive: 
             if pygame.mouse.get_pressed()[0]:
@@ -82,14 +123,6 @@ class HUD:
             self.info = False
         elif not self.info:
             self.info = True
-
-            
-            
-            
-            
-            
-        
-
 
     def draw_boss_hp(self,display, hp, hp_max, boss_name="BOOS"):
         if self.player_alive:
@@ -156,6 +189,8 @@ class HUD:
                 pygame.draw.rect(display,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH*5/6-128+1,scripts.constants.DISPLAY_HEIGHT/8+16+4-2+5-2,(self.health/self.full_health)*100,10))
                 display.blit(self.image_player_hp,(scripts.constants.DISPLAY_WIDTH*5/6-128+24,scripts.constants.DISPLAY_HEIGHT/8+16+6))
                 display.blit(self.damege_text,(scripts.constants.DISPLAY_WIDTH*5/6-128,scripts.constants.DISPLAY_HEIGHT/8+16+4+16))
+                # drawing counter
+                display.blit(self.image_counter, (scripts.constants.DISPLAY_WIDTH - 116,2))
                 # drawing coursor
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
 

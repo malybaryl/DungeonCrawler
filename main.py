@@ -1,7 +1,7 @@
 import pygame
 import scripts.constants
 from scripts.character import Character
-from scripts.weapon import Bow, TwoHandedSword, Mace, OneHandedAxe, OneHandedHammer
+from scripts.weapon import Bow #, TwoHandedSword, Mace, OneHandedAxe, OneHandedHammer
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
 from scripts.background import Bg
@@ -37,6 +37,8 @@ pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 music = Music()
 time = 0
+counter = None
+E_pressed_counter = pygame.time.get_ticks()
 
 # define player movement variables
 moving_left = False
@@ -45,10 +47,11 @@ moving_up = False
 moving_down = False
 moving = False
 is_flipped = False
+E_pressed = False
 
-# create player and player wepon
+# create player and player weapon
 player = Character(120,300,100,"player1")
-bow = Bow("crossbow",100,100)
+weapon = Bow(0,0,'bows','classic_bow')
 #sword = OneHandedHammer('hammer',100,100)
 magic_ball = None
 
@@ -87,6 +90,9 @@ damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 magic_ball_group = pygame.sprite.Group()
+
+# chest item
+chest_items = []
 
 # generate level
 generate_world = True
@@ -136,12 +142,17 @@ while game_is_on:
             
             # check if new level
             new_level = world.check_if_new_level(exit_tiles, player)
+            counter = pygame.time.get_ticks()
+            
             
             if fight_town_button_pressed:
                 generate_world = True
                 fade = True
                 fight_town_button_pressed = False
                 world_level = 0
+                hud.seconds = 0
+                hud.minutes = 0
+                hud.hours = 0 
                 
         
             if new_level:
@@ -162,10 +173,14 @@ while game_is_on:
                 world.decorations_up_tiles.clear()
                 world.map_tiles.clear()
                 world.boss_list.clear()
+                world.objects.clear()
                 world.proced_csv_file()
+                damage_text_group.remove()
+                arrow_group.remove()
+                item_group.remove()
+                magic_ball_group.remove()
+                chest_items.clear()
                 # generete new level
-                #world_data = world.generate()  
-                #world_mobs_data=world.generate()
                 player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_data, "grassland")
                 player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_mobs_data, "grassland")
                 player, enemy_list, boss_list, exit_tiles = world.process_date(world.world_objects_data, "grassland")
@@ -202,6 +217,12 @@ while game_is_on:
                         game = False
                     if event.key == pygame.K_TAB:
                         hud.info_show()
+                    if event.key == pygame.K_e:
+                        if pygame.time.get_ticks() - E_pressed_counter >= 1500:
+                            E_pressed = True
+                            E_pressed_counter = pygame.time.get_ticks()
+                        else:
+                            E_pressed = False
                         
                         
 
@@ -215,6 +236,8 @@ while game_is_on:
                         moving_up = False
                     if event.key == pygame.K_s:
                         moving_down = False
+                    if event.key == pygame.K_e:
+                        E_pressed = False
 
             
             # calculate player movement
@@ -252,14 +275,9 @@ while game_is_on:
             world.update(scroll_map)
             player.update(is_flipped, moving, player.health, player.gold)
             parcticle_system.update()
-            in_town = hud.update(player, world_level, town)
+            in_town = hud.update(player, world_level, town, counter)
             if player.alive:
-                # sword
-                # damage, damage_pos = sword.update(player, is_flipped, enemy_list)
-                # if damage:
-                #     damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
-                #     damage_text_group.add(damage_text)
-                arrow = bow.update(player)
+                arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed)
                 if arrow:   
                     arrow_group.add(arrow)
                 for arrow in arrow_group:
@@ -268,6 +286,14 @@ while game_is_on:
                         damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
                         damage_text_group.add(damage_text)
                 damage_text_group.update(scroll_map)
+                for object in world.objects:
+                    if object.type == 'chest':
+                        chest_weapon = object.update(scroll_map, E_pressed, player)
+                        if chest_weapon:
+                            chest_items.append(chest_weapon)
+                if chest_items:
+                    for chest_item in chest_items:
+                        arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed)
                 for enemy in enemy_list:
                     magic_ball = enemy.move(world.obstacle_tile, player, scroll_map)
                     if magic_ball:
@@ -301,7 +327,9 @@ while game_is_on:
                 draw_grid(display)
             for items in item_group:
                 items.draw(display)
-            
+            if chest_items:
+                for chest_item in chest_items:
+                        chest_item.draw(display)
             world.draw_src(display,exit_tiles)
             damage_text_group.draw(display)
             for enemy in enemy_list:
@@ -314,7 +342,9 @@ while game_is_on:
             player.draw(display)
             if player.alive:
                 #sword.draw(display)
-                bow.draw(display)
+                weapon.draw(display)
+            for object in world.objects:
+                object.draw(display)
             for arrow in arrow_group:
                 arrow.draw(display)
             for magic_ball in magic_ball_group:
@@ -329,7 +359,7 @@ while game_is_on:
 
     # main menu handler    
     elif not game:
-        game = main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
+        game = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
         main_menu.draw(display)
         
         # event handler

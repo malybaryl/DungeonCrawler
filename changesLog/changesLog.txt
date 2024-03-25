@@ -40,6 +40,11 @@ VERSION: 0.0.6
 - added goblin
 - bugs fixes
 - some preparations for further update (new kinds od wepons, new characters, chests system, bosses)
+- title of the game changed
 
 VERSION: 0.0.7
 - health bar changes
+- chests
+- time counter
+- now you can pick up weapons from the ground
+- if you can use event button "E", the E button image will show up

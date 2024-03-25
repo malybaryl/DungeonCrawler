@@ -3,7 +3,8 @@ import scripts.constants
 from scripts.load import loadImages
 from scripts.character import Character
 from scripts.enemies import Enemy
-import random
+from scripts.objects import Chest
+from random import randint
 import csv
 
 def draw_grid(display):
@@ -31,54 +32,103 @@ class World():
         self.world_objects_data = []
         self.world_decorations_down = []
         self.world_decorations_up = []
+        self.objects = []
         
 
     def proced_csv_file(self,rows=50, cols=50):
         
-        for row in range(rows):
-            r = [-1] * cols
-            self.world_data.append(r)
-        with open("assets/levels/grassland_ground.csv", newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter= ",")
-            for x, row in enumerate(reader):
-                for y, tile in enumerate(row):
-                    self.world_data[x][y]= int(tile)
+        choice = randint(0,1)
+        if choice == 0:
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_data.append(r)
+            with open("assets/levels/001/grassland_ground.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_mobs_data.append(r)
+            with open("assets/levels/001/grassland_mobs.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_mobs_data[x][y]= int(tile)
         
-        for row in range(rows):
-            r = [-1] * cols
-            self.world_mobs_data.append(r)
-        with open("assets/levels/grassland_mobs.csv", newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter= ",")
-            for x, row in enumerate(reader):
-                for y, tile in enumerate(row):
-                    self.world_mobs_data[x][y]= int(tile)
-    
-        for row in range(rows):
-            r = [-1] * cols
-            self.world_objects_data.append(r)
-        with open("assets/levels/grassland_objects.csv", newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter= ",")
-            for x, row in enumerate(reader):
-                for y, tile in enumerate(row):
-                    self.world_objects_data[x][y]= int(tile)
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_objects_data.append(r)
+            with open("assets/levels/001/grassland_objects.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_objects_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_up.append(r)
+            with open("assets/levels/001/grassland_decorationsup.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_up[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_down.append(r)
+            with open("assets/levels/001/grassland_decorationsdown.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_down[x][y]= int(tile)
         
-        for row in range(rows):
-            r = [-1] * cols
-            self.world_decorations_up.append(r)
-        with open("assets/levels/grassland_decorationsup.csv", newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter= ",")
-            for x, row in enumerate(reader):
-                for y, tile in enumerate(row):
-                    self.world_decorations_up[x][y]= int(tile)
+        elif choice == 1:
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_data.append(r)
+            with open("assets/levels/002/grassland_ground.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_mobs_data.append(r)
+            with open("assets/levels/002/grassland_mobs.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_mobs_data[x][y]= int(tile)
         
-        for row in range(rows):
-            r = [-1] * cols
-            self.world_decorations_down.append(r)
-        with open("assets/levels/grassland_decorationsdown.csv", newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter= ",")
-            for x, row in enumerate(reader):
-                for y, tile in enumerate(row):
-                    self.world_decorations_down[x][y]= int(tile)
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_objects_data.append(r)
+            with open("assets/levels/002/grassland_objects.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_objects_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_up.append(r)
+            with open("assets/levels/002/grassland_decorationsup.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_up[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_down.append(r)
+            with open("assets/levels/002/grassland_decorationsdown.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_down[x][y]= int(tile)
         
     
     def process_date(self, data, type):
@@ -317,15 +367,7 @@ class World():
                             self.map_tiles.append(tile_data)
                             self.obstacle_tile.append(tile_data)
                         if tile == 0:
-                            pass
-                            #image = self.assets[type][23] closed chest
-                            # image_rect = image.get_rect()
-                            # image_x = x * scripts.constants.TILE_SIZE 
-                            # image_y = y * scripts.constants.TILE_SIZE 
-                            # image_rect.x= image_x
-                            # image_rect.y= image_y       
-                            # tile_data = [image, image_rect, image_x, image_y]
-                            #image = self.assets[type][24] open chest
+                            self.objects.append(Chest(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE, closed_chest_img = self.assets[type][23], opened_chest_img = self.assets[type][24]))
                         if tile == 2:
                             image = self.assets[type][25]
                             image_rect = image.get_rect()
