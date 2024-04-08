@@ -76,7 +76,7 @@ class Chest(Object):
     def diseaper(self):
         if pygame.time.get_ticks() - self.time >= 2000:
             self.not_draw = True
-        
+            
          
     def draw(self, surface):
         if not self.not_draw:

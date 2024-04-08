@@ -14,7 +14,7 @@ class Menu:
             "font2": pygame.font.Font("assets/fonts/font.ttf",24),
             "logo": loadImages("HUD/logo")
         }
-        self.version = "0.0.7"
+        self.version = "0.0.8"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False
@@ -428,4 +428,4 @@ class Menu:
                 surface.blit(text[0],text[1])
 
         # drawing coursor
-        surface.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+        surface.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 

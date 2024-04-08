@@ -8,21 +8,42 @@
         "."
     ],
     "fileStates": {
+        "Castle.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "castle.tmx": {
+            "scale": 1.08775,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 399.908067111009,
+                "y": 399.44840266605377
+            }
+        },
         "grassland.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
             "scaleInEditor": 2
         },
-        "untitled.tmx": {
-            "scale": 0.5,
+        "map01.tmx": {
+            "scale": 3,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 883,
-                "y": 820
+                "x": 637,
+                "y": 1068.1666666666665
+            }
+        },
+        "untitled.tmx": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 712,
+                "y": 726.5
             }
         }
     },
-    "last.exportedFilePath": "C:/Users/kacpe/Desktop/nowa mapa",
+    "last.exportedFilePath": "C:/Users/kacpe/Desktop/programing/python/DungeonCrawler/assets/levels/druid",
     "last.imagePath": "C:/Users/kacpe/Desktop/programing/python/DungeonCrawler/assets/images/tilemap",
     "map.height": 50,
     "map.lastUsedExportFilter": "CSV files (*.csv)",
@@ -30,11 +51,17 @@
     "map.width": 50,
     "openFiles": [
         "grassland.tsx",
+        "map01.tmx",
+        "castle.tmx",
+        "Castle.tsx",
         "untitled.tmx"
     ],
     "project": "grassland.tiled-project",
     "recentFiles": [
         "grassland.tsx",
+        "map01.tmx",
+        "castle.tmx",
+        "Castle.tsx",
         "untitled.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"

@@ -52,6 +52,7 @@ class HUD:
         self.hours_str = str(self.hours)
         self.minutes_str = str(self.minutes)
         self.seconds_str = str(self.seconds)
+        self.healthbar_boss = HealthBarBoss(None, None)
         
     
     def update(self, player, world_level, town, game_counter):
@@ -192,7 +193,7 @@ class HUD:
                 # drawing counter
                 display.blit(self.image_counter, (scripts.constants.DISPLAY_WIDTH - 116,2))
                 # drawing coursor
-                display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+                display.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
 
             else:
                 # drawing healthbar
@@ -204,6 +205,10 @@ class HUD:
                     pygame.draw.rect(display,scripts.constants.GREEN,(2,2,(self.new_health/self.full_health)*80,7))
                 pygame.draw.rect(display,scripts.constants.RED,(2,2,(self.health/self.full_health)*80,7))
                 display.blit(self.assets["health_bar"], (0,0))
+                
+                # drawing boss healthbar
+            
+                self.healthbar_boss.draw(display)
 
                 # drawing coursor
                 display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
@@ -214,10 +219,44 @@ class HUD:
             display.blit(self.image_died,(50, scripts.constants.DISPLAY_HEIGHT/2-20))
             display.blit(self.back_to_town_button_to_show,(scripts.constants.DISPLAY_WIDTH//2-56,3*scripts.constants.DISPLAY_HEIGHT//4))
             display.blit(self.back_to_town_text,(scripts.constants.DISPLAY_WIDTH//2-49,3*scripts.constants.DISPLAY_HEIGHT//4+10))
-            display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
+            display.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
 
     def draw_red_fade(self,display,player):
         if player.health < (player.health_max*0.2):
             display.blit(self.assets["red_fade"],(0,0))
 
-       
+class HealthBarBoss:
+    def __init__(self, name, health):
+        self.assets={
+            'health_bar': loadImages('HUD/health_bar_boss')
+        }
+        self.font = pygame.font.Font("assets/fonts/font.ttf",8)
+        self.name = name
+        self.name_text = ''
+        self.full_health = health
+        self.health = health
+        self.show = False
+        self.show_name = self.font.render(name, True, scripts.constants.WHITE)
+    
+    def update(self, health):
+        self.health = health
+        
+    def set_max_health(self, max_health):
+        self.full_health = max_health
+        
+    def set_name(self, name):
+        self.name = name
+        self.show_name = self.font.render(name, True, scripts.constants.WHITE)
+        
+    def set_show(self, bool):
+        self.show = bool
+    
+    def draw(self, surface):
+        if self.show:
+            if self.health >= 0:
+                surface.blit(self.assets['health_bar'][0],(scripts.constants.DISPLAY_WIDTH - 167, 0))
+                pygame.draw.rect(surface ,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH - 154, 4,(self.health/self.full_health) * 148,10))
+                surface.blit(self.assets['health_bar'][1],(scripts.constants.DISPLAY_WIDTH - 167, 0))
+                if self.name == 'DRUID':
+                    surface.blit(self.show_name,(scripts.constants.DISPLAY_WIDTH - 100, 6))
+        

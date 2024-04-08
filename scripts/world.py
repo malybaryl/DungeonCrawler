@@ -2,7 +2,7 @@ import pygame
 import scripts.constants
 from scripts.load import loadImages
 from scripts.character import Character
-from scripts.enemies import Enemy
+from scripts.enemies import Slime, Wolf, Troll, Goblin, Ent, SlimeFireWizard, Druid
 from scripts.objects import Chest
 from random import randint
 import csv
@@ -35,9 +35,13 @@ class World():
         self.objects = []
         
 
-    def proced_csv_file(self,rows=50, cols=50):
+    def proced_csv_file(self, rows=50, cols=50, world_level = 1):
         
-        choice = randint(0,1)
+        if world_level % 3 == 0:
+            choice = 3
+        else:
+            choice = randint(0,1)
+            
         if choice == 0:
             for row in range(rows):
                 r = [-1] * cols
@@ -125,6 +129,52 @@ class World():
                 r = [-1] * cols
                 self.world_decorations_down.append(r)
             with open("assets/levels/002/grassland_decorationsdown.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_down[x][y]= int(tile)
+                        
+        elif choice == 3:
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_data.append(r)
+            with open("assets/levels/druid/grassland_ground.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_mobs_data.append(r)
+            with open("assets/levels/druid/grassland_mobs.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_mobs_data[x][y]= int(tile)
+        
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_objects_data.append(r)
+            with open("assets/levels/druid/grassland_objects.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_objects_data[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_up.append(r)
+            with open("assets/levels/druid/grassland_decorationsup.csv", newline="") as csvfile:
+                reader = csv.reader(csvfile, delimiter= ",")
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        self.world_decorations_up[x][y]= int(tile)
+            
+            for row in range(rows):
+                r = [-1] * cols
+                self.world_decorations_down.append(r)
+            with open("assets/levels/druid/grassland_decorationsdown.csv", newline="") as csvfile:
                 reader = csv.reader(csvfile, delimiter= ",")
                 for x, row in enumerate(reader):
                     for y, tile in enumerate(row):
@@ -549,42 +599,49 @@ class World():
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('slime',tile_data[2],tile_data[3],scripts.constants.SLIME_HP))
+                            self.character_list.append(Slime(tile_data[2],tile_data[3],scripts.constants.SLIME_HP))
                         if tile == 60:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('wolf',tile_data[2],tile_data[3],scripts.constants.WOLF_HP))
+                            self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP))
                         if tile == 51:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('troll',tile_data[2],tile_data[3],scripts.constants.TROLL_HP))
+                            self.character_list.append(Troll(tile_data[2],tile_data[3],scripts.constants.TROLL_HP))
                         if tile == 52:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('goblin',tile_data[2],tile_data[3],scripts.constants.GOBLIN_HP))
+                            self.character_list.append(Goblin(tile_data[2],tile_data[3],scripts.constants.GOBLIN_HP))
                         if tile == 53:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('ent',tile_data[2],tile_data[3],scripts.constants.ENT_HP))
+                            self.character_list.append(Ent(tile_data[2],tile_data[3],scripts.constants.ENT_HP))
                         if tile == 54:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Enemy('slime_fire_wizard',tile_data[2],tile_data[3],scripts.constants.SLIME_FIRE_WIZARD_HP))
+                            self.character_list.append(SlimeFireWizard(tile_data[2],tile_data[3],scripts.constants.SLIME_FIRE_WIZARD_HP))
+                        if tile == 55:
+                            image = None
+                            image_rect = None
+                            image_x = x * scripts.constants.TILE_SIZE 
+                            image_y = y * scripts.constants.TILE_SIZE        
+                            tile_data = [image, image_rect, image_x, image_y]
+                            self.character_list.append(Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP))
         
  
         return self.player, self.character_list, self.boss_list, self.gate_tiles

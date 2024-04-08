@@ -197,6 +197,72 @@ class Arrow(pygame.sprite.Sprite):
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
 
+class MagicAttactDruid(pygame.sprite.Sprite):
+    def __init__(self, x, y, direction):
+        pygame.sprite.Sprite.__init__(self)
+        self.direction = direction
+        self.assets={
+            'bolt': loadImages('char/druid_boss/druid_bolt')
+        }
+        self.rect = pygame.Rect(0,0,32,32)
+        self.rect.center = (x,y)
+        self.index = 0
+        self.image_to_show = self.assets['bolt'][self.index]
+        self.type = 'druid_bolt'
+        self.time = pygame.time.get_ticks()
+    
+    def update(self, screen_scroll, player):
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        # reset variables
+        dx = 0
+        dy = 0
+        
+        # handle animation
+        self.index += 0.1
+        if self.index >= 5:
+            self.index = 0
+        self.image_to_show = self.assets['bolt'][math.floor(self.index)]
+        
+        # define variables and move bolt
+        if self.direction == 0:
+            dy = -scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 1:
+            dy = -scripts.constants.MAGIC_BALL_SPEED
+            dx = scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 2:
+            dx = scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 3:
+            dy = scripts.constants.MAGIC_BALL_SPEED
+            dx = scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 4:
+            dy = scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 5:
+            dy = scripts.constants.MAGIC_BALL_SPEED
+            dx = -scripts.constants.MAGIC_BALL_SPEED
+        elif self.direction == 6:
+            dx = -scripts.constants.MAGIC_BALL_SPEED
+        else:
+            dy = -scripts.constants.MAGIC_BALL_SPEED
+            dx = -scripts.constants.MAGIC_BALL_SPEED
+            
+        self.rect.x += dx
+        self.rect.y += dy
+        
+        if self.rect.colliderect(player.rect):
+            player.health -= 20
+            self.kill()
+            
+        if pygame.time.get_ticks() - self.time >= 5000:
+            self.kill()
+        
+            
+    
+    def draw(self, surface):
+        surface.blit(self.image_to_show, (self.rect.x, self.rect.y))
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
+    
 class Magicball(pygame.sprite.Sprite):
     def __init__(self, type_of_magicball, x, y, target_x, target_y):
         pygame.sprite.Sprite.__init__(self)
@@ -224,7 +290,7 @@ class Magicball(pygame.sprite.Sprite):
         y_dist = -(target_y - y)
         self.angle = math.degrees(math.atan2(y_dist,x_dist))
         self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
-        self.rect = pygame.Rect(0,0,32,16)
+        self.rect = pygame.Rect(0,0,16,16)
         self.rect.center = (self.x_cord, self.y_cord)
 
         #calculate the horizontal and vertical speeds based on the angle

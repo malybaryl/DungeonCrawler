@@ -36,6 +36,7 @@ class Character():
         self.on_fire_counter_end = pygame.time.get_ticks()
         self.player_was_hit = False
         self.player_was_heal = False
+        self.level = 1
    
     def move(self, dx, dy, obstacle_tile):
         # screen scroll

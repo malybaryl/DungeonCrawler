@@ -57,4 +57,5 @@ TROLL_HP = 65
 GOBLIN_HP = 75
 ENT_HP = 30
 SLIME_FIRE_WIZARD_HP = 300
+DRUID_HP = 1000
 BOWS = ['slingshot' , 'classic_bow', 'composite_bow', 'crossbow']

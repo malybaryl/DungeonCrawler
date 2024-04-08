@@ -453,5 +453,5 @@ class Town():
                 
                 
         # drawing coursor
-        display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+        display.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
         

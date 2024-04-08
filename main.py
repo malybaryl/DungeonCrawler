@@ -1,7 +1,7 @@
 import pygame
 import scripts.constants
 from scripts.character import Character
-from scripts.weapon import Bow #, TwoHandedSword, Mace, OneHandedAxe, OneHandedHammer
+from scripts.weapon import Bow
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
 from scripts.background import Bg
@@ -295,11 +295,35 @@ while game_is_on:
                     for chest_item in chest_items:
                         arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed)
                 for enemy in enemy_list:
-                    magic_ball = enemy.move(world.obstacle_tile, player, scroll_map)
+                    if enemy.type == 'druid':
+                        bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = enemy.move(world.obstacle_tile, player, scroll_map)
+                        if bolt1:
+                            magic_ball_group.add(bolt1)
+                        if bolt2:
+                            magic_ball_group.add(bolt2)
+                        if bolt3:
+                            magic_ball_group.add(bolt3)
+                        if bolt4:
+                            magic_ball_group.add(bolt4)
+                        if bolt5:
+                            magic_ball_group.add(bolt5)
+                        if bolt6:
+                            magic_ball_group.add(bolt6)
+                        if bolt7:
+                            magic_ball_group.add(bolt7)
+                        if bolt8:
+                            magic_ball_group.add(bolt8) 
+                        if mob:
+                            enemy_list.append(mob)   
+                    else:
+                        magic_ball = enemy.move(world.obstacle_tile, player, scroll_map)
                     if magic_ball:
                         magic_ball_group.add(magic_ball)
                     enemy.hit_player(enemy.damage, player)
-                    gold_, potion_, enemy_alive, show_hp = enemy.update(player, world.obstacle_tile)
+                    if enemy.type == 'druid':
+                        gold_, potion_, enemy_alive = enemy.update(player, world.obstacle_tile, hud)
+                    else:
+                        gold_, potion_, enemy_alive, show_hp = enemy.update(player, world.obstacle_tile)
                     if enemy.delete:
                         if gold_:
                             item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
@@ -309,9 +333,11 @@ while game_is_on:
                 for item in item_group:
                     item.update(player, scroll_map)
                 background.update()
-                #draw_hp_boss, magic_ball = boss.update(player,world.obstacle_tile)
                 for magic_ball in magic_ball_group:
-                    player.is_on_fire = magic_ball.update(scroll_map, player, world.obstacle_tile)
+                    if magic_ball.type == 'druid_bolt':
+                        magic_ball.update(scroll_map, player)
+                    else:
+                        player.is_on_fire = magic_ball.update(scroll_map, player, world.obstacle_tile)
                 if player.is_on_fire:
                     player.on_fire()
             if not player.alive:
@@ -334,14 +360,9 @@ while game_is_on:
             damage_text_group.draw(display)
             for enemy in enemy_list:
                 enemy.draw(display)
-            # for boss in boss_list:
-            #     boss.draw(display)
-            if show_hp:
-                hud.draw_boss_hp(display,enemy.health, enemy.max_health, enemy.name)
             parcticle_system.draw(display)
             player.draw(display)
             if player.alive:
-                #sword.draw(display)
                 weapon.draw(display)
             for object in world.objects:
                 object.draw(display)
@@ -376,3 +397,4 @@ while game_is_on:
     pygame.display.update()
     clock.tick(60)
     screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))
+    

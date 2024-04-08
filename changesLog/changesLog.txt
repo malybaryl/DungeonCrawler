@@ -48,3 +48,10 @@ VERSION: 0.0.7
 - time counter
 - now you can pick up weapons from the ground
 - if you can use event button "E", the E button image will show up
+
+VERSION: 0.0.8
+- new Boss "Shaman"
+- new coursor
+- bugs fixes
+- new boss healthbar
+- every 3 world level will be a boss fight now 
