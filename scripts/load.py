@@ -1,6 +1,8 @@
 import pygame
 import os
+import re
 import scripts.constants
+
 
 BASE_IMG_PATH = "assets/images/"
 
@@ -72,6 +74,45 @@ def loadCredits():
             lines.append(line.strip())
     
     return lines
+
+def loadScoreTable():
+    lines = []
+
+    with open("scoretable/scoretable.txt", encoding="UTF-8") as f:
+        for line in f:
+            lines.append(line.strip())
+    
+    return lines
+
+def save_score_to_score_table(name, hours, minutes, seconds, world_level):
+    name = re.sub(r'^(.{0,10})$', lambda match: match.group(1).ljust(10, '_'), name)
+
+    # Odczytaj zawartość pliku
+    lines = loadScoreTable()
+    # Dodaj nowy wynik
+    hours_str = str(hours)
+    minutes_str = str(minutes)
+    seconds_str = str(seconds)
+    
+    if seconds < 10:
+       seconds_str = '0' + seconds_str
+    if minutes < 10:
+        minutes_str = '0' + minutes_str
+    if hours < 10:
+        hours_str = '0' + hours_str
+    
+    time_str = f"TIME: {hours_str}:{minutes_str}:{seconds_str}"
+    
+    lines.append( name + '   ' + time_str + '   ' + 'WORLD LEVEL: ' + str(world_level))
+    # Posortuj wyniki
+    lines.sort(key=lambda x: (-int(re.search(r'WORLD LEVEL: (\d+)', x).group(1)), 
+                              *[int(part) for part in re.search(r'TIME: (\d+):(\d+):(\d+)', x).groups()]))
+    
+    # Zapisz posortowane wyniki do pliku
+    with open("scoretable/scoretable.txt", encoding="UTF-8", mode='w') as f:
+        for line in lines:
+            f.write(line + '\n')
+        
 
         
     

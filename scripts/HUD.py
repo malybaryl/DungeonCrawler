@@ -1,6 +1,6 @@
 import pygame
 import scripts.constants
-from scripts.load import loadImage, loadImages
+from scripts.load import loadImage, loadImages, save_score_to_score_table
 
 
 class HUD:
@@ -35,9 +35,9 @@ class HUD:
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
         self.statistic_text = self.font.render("STATISTICS", True, scripts.constants.WHITE)
         self.damege_text = self.font.render("Damage: 5-15", True, scripts.constants.WHITE)
-        self.back_to_town_text = self.font.render("BACK TO TOWN", True, scripts.constants.WHITE)
+        self.back_to_town_text = self.font.render("SAVE & BACK TO TOWN", True, scripts.constants.WHITE)
         self.back_to_town_button_clicked = False
-        self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(112,26)) 
+        self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(166,26)) 
         # fade transition varibles
         self.x_fade = 0
         self.y_fade = 0
@@ -53,9 +53,23 @@ class HUD:
         self.minutes_str = str(self.minutes)
         self.seconds_str = str(self.seconds)
         self.healthbar_boss = HealthBarBoss(None, None)
+        self.input_text = ''
+        self.input_rect = pygame.Rect(scripts.constants.DISPLAY_WIDTH//2 - 45, scripts.constants.DISPLAY_HEIGHT * 3//4 - 32, 90, 18)
+        self.keys_index = 0
+        self.prev_keys_pressed_len = 0
+        self.cooldown_death = True
+        self.cooldown_death_clock = 0
+        self.cooldown_death_do_once = True
+        self.text_input_image_to_show = self.font.render('Enter your nickname and save your score', True, scripts.constants.WHITE)
+        self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+        self.cliked = True
+        self.cliked_cooldown = 0
+    
+    def refresh_player_image(self, player):
+        self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
         
     
-    def update(self, player, world_level, town, game_counter):
+    def update(self, player, world_level, town, game_counter, keys_pressed):
         self.pos = pygame.mouse.get_pos()
         self.world_level = world_level
         self.health = player.health
@@ -102,19 +116,49 @@ class HUD:
                
         back_to_town = False
         if not self.player_alive: 
+            
+            if self.cooldown_death_do_once:
+                self.cooldown_death_clock = pygame.time.get_ticks()
+                self.cooldown_death = True
+                self.cooldown_death_do_once = False
+                
+            # drawing text imput
+            if len(keys_pressed) > 0:
+                if len(self.input_text) < 11:
+                    if len(keys_pressed) > self.prev_keys_pressed_len:
+                        if keys_pressed[self.keys_index] != 8:
+                            self.input_text += chr(keys_pressed[self.keys_index]).upper()
+                            self.keys_index += 1
+                            self.prev_keys_pressed_len = len(keys_pressed)
+                        else:
+                            self.input_text = self.input_text[:-1]
+                            self.keys_index += 1
+                            self.prev_keys_pressed_len = len(keys_pressed)
+                else:
+                    self.input_text = self.input_text[:-1]
+                
+                
             if pygame.mouse.get_pressed()[0]:
+                self.cliked = True
+                self.cliked_cooldown = pygame.time.get_ticks()
+                self.coursor = pygame.transform.scale(self.assets["coursor"][5],(24,24))
                 if scripts.constants.DISPLAY_WIDTH//2-56 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH//2-56+112 and 3*scripts.constants.DISPLAY_HEIGHT//4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < 3*scripts.constants.DISPLAY_HEIGHT//4+26:
-                        self.back_to_town_button_clicked = True
-                        self.time = pygame.time.get_ticks()
+                    self.back_to_town_button_clicked = True
+                    self.time = pygame.time.get_ticks()
             if self.back_to_town_button_clicked:
-                self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][1],(112,26))
+                self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][1],(166,26))
                 if (pygame.time.get_ticks() - self.time) >= 100:
                     back_to_town = True
+                    save_score_to_score_table(self.input_text, self.hours, self.minutes, self.seconds, world_level)
                     # adding gold to town
                     scripts.constants.GOLD += self.gold + (self.gold*self.world_level*0.1)
                     # button handler
                     self.back_to_town_button_clicked = False
-                    self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(112,26))
+                    self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(166,26))
+            if self.cliked:
+                if pygame.time.get_ticks() - self.cliked_cooldown > 100:
+                    self.cliked = False
+                    self.coursor_to_show = self.assets['coursor'][4]
         return back_to_town
     
 
@@ -193,7 +237,7 @@ class HUD:
                 # drawing counter
                 display.blit(self.image_counter, (scripts.constants.DISPLAY_WIDTH - 116,2))
                 # drawing coursor
-                display.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+                display.blit(self.coursor,(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
 
             else:
                 # drawing healthbar
@@ -215,15 +259,33 @@ class HUD:
                 display.blit(pygame.transform.scale(self.assets["coursor"][1],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
                 display.blit(pygame.transform.scale(self.assets["coursor"][2],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
                 display.blit(pygame.transform.scale(self.assets["coursor"][3],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
-        if not self.player_alive:
-            display.blit(self.image_died,(50, scripts.constants.DISPLAY_HEIGHT/2-20))
-            display.blit(self.back_to_town_button_to_show,(scripts.constants.DISPLAY_WIDTH//2-56,3*scripts.constants.DISPLAY_HEIGHT//4))
-            display.blit(self.back_to_town_text,(scripts.constants.DISPLAY_WIDTH//2-49,3*scripts.constants.DISPLAY_HEIGHT//4+10))
-            display.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
+        
+        else:
+            if self.cooldown_death:
+                display.blit(self.image_died,(50, scripts.constants.DISPLAY_HEIGHT/2-20))
+                if pygame.time.get_ticks() - self.cooldown_death_clock >= 2000:
+                    self.cooldown_death = False
+            else:
+                display.fill(scripts.constants.BROWN)
+                display.blit(self.image_died,(50, 16))
+                display.blit(self.text_input_image_to_show, (90, 80))
+                display.blit(self.back_to_town_button_to_show,(scripts.constants.DISPLAY_WIDTH//2- 83,3*scripts.constants.DISPLAY_HEIGHT//4))
+                display.blit(self.back_to_town_text,(scripts.constants.DISPLAY_WIDTH//2- 76,3*scripts.constants.DISPLAY_HEIGHT//4+10))
+                self.draw_text_input(display, self.input_text, self.input_rect, scripts.constants.WHITE)
+                display.blit(self.coursor,(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
 
+    def draw_text_input(self, display, input_text, rect, font_color):
+        pygame.draw.rect(display, scripts.constants.BLACK, rect, 2)
+        if input_text != "":
+            text_surface = self.font.render(input_text, True, font_color)
+            display.blit(text_surface, (rect.x + 5, rect.y + 5))
+        
     def draw_red_fade(self,display,player):
-        if player.health < (player.health_max*0.2):
+        if not self.cooldown_death:
+            pass  
+        elif player.health < (player.health_max*0.2):
             display.blit(self.assets["red_fade"],(0,0))
+        
 
 class HealthBarBoss:
     def __init__(self, name, health):

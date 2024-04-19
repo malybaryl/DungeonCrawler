@@ -1,6 +1,6 @@
 import pygame
 import scripts.constants
-from scripts.character import Character
+from scripts.character import Peasant
 from scripts.weapon import Bow
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
@@ -50,7 +50,7 @@ is_flipped = False
 E_pressed = False
 
 # create player and player weapon
-player = Character(120,300,100,"player1")
+player = Peasant(120,300,100)
 weapon = Bow(0,0,'bows','classic_bow')
 #sword = OneHandedHammer('hammer',100,100)
 magic_ball = None
@@ -90,6 +90,7 @@ damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 magic_ball_group = pygame.sprite.Group()
+keys_pressed = []
 
 # chest item
 chest_items = []
@@ -154,6 +155,7 @@ while game_is_on:
                 hud.minutes = 0
                 hud.hours = 0 
                 
+                
         
             if new_level:
                 generate_world = True
@@ -174,7 +176,7 @@ while game_is_on:
                 world.map_tiles.clear()
                 world.boss_list.clear()
                 world.objects.clear()
-                world.proced_csv_file()
+                world.proced_csv_file(world_level=world_level + 1)
                 damage_text_group.remove()
                 arrow_group.remove()
                 item_group.remove()
@@ -189,6 +191,7 @@ while game_is_on:
                 
                 generate_world = False 
                 world_level += 1 
+                hud.refresh_player_image(player)
                 # restore player statistic
                 if new_level:
                     player.health = player_hp
@@ -213,6 +216,12 @@ while game_is_on:
                             moving_up = True
                         if event.key == pygame.K_s:
                             moving_down = True
+                    else:
+                        if event.unicode.isalpha():
+                            keys_pressed.append(event.key)
+                        elif event.key == pygame.K_BACKSPACE:
+                            keys_pressed.append(event.key)
+                            
                     if event.key == pygame.K_ESCAPE:
                         game = False
                     if event.key == pygame.K_TAB:
@@ -223,8 +232,9 @@ while game_is_on:
                             E_pressed_counter = pygame.time.get_ticks()
                         else:
                             E_pressed = False
-                        
-                        
+
+                
+                          
 
                 # keyboard button relaeased
                 if event.type == pygame.KEYUP:
@@ -273,9 +283,9 @@ while game_is_on:
             
             # update 
             world.update(scroll_map)
-            player.update(is_flipped, moving, player.health, player.gold)
+            player.update(is_flipped, moving, player.health, player.gold, hud)
             parcticle_system.update()
-            in_town = hud.update(player, world_level, town, counter)
+            in_town = hud.update(player, world_level, town, counter, keys_pressed)
             if player.alive:
                 arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed)
                 if arrow:   
@@ -321,7 +331,7 @@ while game_is_on:
                         magic_ball_group.add(magic_ball)
                     enemy.hit_player(enemy.damage, player)
                     if enemy.type == 'druid':
-                        gold_, potion_, enemy_alive = enemy.update(player, world.obstacle_tile, hud)
+                        gold_, potion_, enemy_alive, exit_tiles  = enemy.update(player, world.obstacle_tile, hud, town, exit_tiles)
                     else:
                         gold_, potion_, enemy_alive, show_hp = enemy.update(player, world.obstacle_tile)
                     if enemy.delete:
@@ -337,7 +347,7 @@ while game_is_on:
                     if magic_ball.type == 'druid_bolt':
                         magic_ball.update(scroll_map, player)
                     else:
-                        player.is_on_fire = magic_ball.update(scroll_map, player, world.obstacle_tile)
+                        magic_ball.update(scroll_map, player, world.obstacle_tile)
                 if player.is_on_fire:
                     player.on_fire()
             if not player.alive:
@@ -390,6 +400,7 @@ while game_is_on:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game = True
+                
     
         
 

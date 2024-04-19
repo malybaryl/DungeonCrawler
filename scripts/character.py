@@ -5,7 +5,7 @@ from scripts.load import loadImages
 import random
 
 class Character():
-    def __init__(self, x, y, health, type):
+    def __init__(self, x, y, health, type, max_idle_animation, max_run_animation, max_dead_animation):
         self.type = type
         self.rect = pygame.Rect(0,0,16,30)
         self.rect.center = (x,y)
@@ -14,6 +14,9 @@ class Character():
                                 ["run",0],
                                 ["dead",0],
                                 ["onFire",0]]
+        self.max_idle_animation = max_idle_animation
+        self.max_run_animation = max_run_animation
+        self.max_dead_animation = max_dead_animation
         self.assets = {
         "player_idle": loadImages(f"char/{self.type}/idle"),
         "player_run": loadImages(f"char/{self.type}/run"),
@@ -37,6 +40,12 @@ class Character():
         self.player_was_hit = False
         self.player_was_heal = False
         self.level = 1
+        self.on_fire_time = None
+        self.on_fire_tics = None
+        self.fire_damage = None
+        self.on_fire_damage_cooldown = None
+        self.on_fire_how_long = None
+        self.is_on_fire = False
    
     def move(self, dx, dy, obstacle_tile):
         # screen scroll
@@ -94,29 +103,29 @@ class Character():
                         self.rect.y = old_dy + 1
         return screen_scroll
 
-    def update(self, flip, moving, health, gold):
+    def update(self, flip, moving, health, gold, hud):
         if self.alive:
             # handle animation
             # update image
             if not moving and not flip:
                 self.image_to_show = self.assets["player_idle"][math.floor(self.animation_index[0][1])]
                 self.animation_index[0][1] += 0.1
-                if self.animation_index[0][1] >= 4:
+                if self.animation_index[0][1] >= self.max_idle_animation:
                     self.animation_index[0][1] = 0
             if not moving and flip:
                 self.image_to_show = pygame.transform.flip(self.assets["player_idle"][math.floor(self.animation_index[0][1])],True,False)
                 self.animation_index[0][1] += 0.1
-                if self.animation_index[0][1] >= 4:
+                if self.animation_index[0][1] >= self.max_idle_animation:
                     self.animation_index[0][1] = 0
             if moving and flip:
                 self.image_to_show = pygame.transform.flip(self.assets["player_run"][math.floor(self.animation_index[1][1])],True,False)
                 self.animation_index[1][1] += 0.1
-                if self.animation_index[1][1] >= 4:
+                if self.animation_index[1][1] >= self.max_run_animation:
                     self.animation_index[1][1] = 0
             if moving and not flip:
                 self.image_to_show = self.assets["player_run"][math.floor(self.animation_index[1][1])]
                 self.animation_index[1][1] += 0.1
-                if self.animation_index[1][1] >= 4:
+                if self.animation_index[1][1] >= self.max_run_animation:
                     self.animation_index[1][1] = 0
         # health update
         self.health = health
@@ -136,18 +145,22 @@ class Character():
         # gold update
         self.gold = gold
         # is alive?
+        if self.is_on_fire:
+            self.on_fire()
+            
         if self.health <= 0:
             if not flip:
                 self.image_to_show = self.assets["player_dead"][math.floor(self.animation_index[2][1])]
                 self.animation_index[2][1] += 0.05
-                if self.animation_index[2][1] >= 5:
-                    self.animation_index[2][1] = 5
+                if self.animation_index[2][1] >= self.max_dead_animation:
+                    self.animation_index[2][1] = self.max_dead_animation
             else:
                 self.image_to_show = pygame.transform.flip(self.assets["player_dead"][math.floor(self.animation_index[2][1])],True,False)
                 self.animation_index[2][1] += 0.05
-                if self.animation_index[2][1] >= 5:
-                    self.animation_index[2][1] = 5
+                if self.animation_index[2][1] >= self.max_dead_animation:
+                    self.animation_index[2][1] = self.max_dead_animation
             self.alive = False
+            hud.healthbar_boss.set_show(False)
 
 
         
@@ -162,23 +175,33 @@ class Character():
     def change_fx_volume(self):
         self.assets["walk_sound"].set_volume(scripts.constants.FX_VOLUME)
 
-    def on_fire(self):
+    def on_fire_trigger(self, damage, time, tics):
+        self.on_fire_time = pygame.time.get_ticks()
+        self.on_fire_tics = tics
+        self.fire_damage = damage
+        self.on_fire_damage_cooldown = pygame.time.get_ticks()
+        self.on_fire_how_long = time
         self.is_on_fire = True
+        
+    def on_fire(self):
+        
         if self.is_on_fire:
             # handle animation
             self.image_on_fire = self.assets["player_on_fire"][math.floor(self.animation_index[3][1])]
             self.animation_index[3][1] += 0.2
-            if self.animation_index[3][1] >= 11:
+            if self.animation_index[3][1] >= 3:
                 self.animation_index[3][1] = 0
-            if pygame.time.get_ticks() - self.on_fire_counter >= 1000:
-                damage = random.randint(1,5)
-                self.health -= damage
-                self.on_fire_counter = pygame.time.get_ticks()
             if pygame.time.get_ticks() - self.on_fire_counter_end >= 50000:
                 self.is_on_fire = False
                 self.on_fire_counter_end = pygame.time.get_ticks()
                 self.on_fire_counter = pygame.time.get_ticks()
-
+                
+            if pygame.time.get_ticks() - self.on_fire_damage_cooldown >= self.on_fire_tics * 1000:
+                self.health -= self.fire_damage
+                self.on_fire_damage_cooldown = pygame.time.get_ticks()
+                
+            if pygame.time.get_ticks() - self.on_fire_time >= self.on_fire_how_long * 1000:
+                self.is_on_fire = False
 
 
     def draw(self, surface):
@@ -189,4 +212,43 @@ class Character():
                 pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
         
         
+class Peasant(Character):
+    def __init__(self, x, y, health):
+        type = 'player1'
+        super().__init__(x, y, health, type, 4,3,5)
         
+class Wizard(Character):
+    def __init__(self, x, y, health):
+        type = 'wizard'
+        super().__init__(x, y, health, type, 3,3,6)
+        
+class Dwarf(Character):
+    def __init__(self, x, y, health):
+        type = 'dwarf'
+        super().__init__(x, y, health, type, 3, 3, 3)
+
+class Knight(Character):
+    def __init__(self, x, y, health):
+        type = 'knight'
+        super().__init__(x, y, health, type, 3, 3, 3)
+
+class Pikemen(Character):
+    def __init__(self, x, y, health):
+        type = 'pikemen'
+        super().__init__(x, y, health, type, 3, 3, 3)
+
+class Elf(Character):
+    def __init__(self, x, y, health):
+        type = 'elf'
+        super().__init__(x, y, health, type, 3, 3, 3)
+
+class Paladin(Character):
+    def __init__(self, x, y, health):
+        type = 'paladin'
+        super().__init__(x, y, health, type, 3, 3, 3)
+
+class Druid(Character):
+    def __init__(self, x, y, health):
+        type = 'druid'
+        super().__init__(x, y, health, type, 3, 3, 3)
+               

@@ -2,7 +2,7 @@ import pygame
 import scripts.constants
 import math
 import random
-from scripts.load import loadImages
+from scripts.load import loadImages, loadImage
 from scripts.weapon import Magicball, MagicAttactDruid
 from scripts.HUD import HealthBarBoss
  
@@ -829,66 +829,63 @@ class SlimeFireWizard(Enemy):
                         self.walk_right = True
                     self.wander_timer = pygame.time.get_ticks() + 5000
 
-        if self.chaise:
-                
-            # reset values
-            self.dx = 0
-            self.dy = 0
-  
-            if self.rect.centerx > player.rect.centerx:
-                self.dx = -scripts.constants.SLIME_SPEED
-                self.is_fliped = False
-            if self.rect.centerx < player.rect.centerx:
-                self.dx = scripts.constants.SLIME_SPEED
-                self.is_fliped = True
-            if self.rect.centery > player.rect.centery:
-                self.dy = -scripts.constants.SLIME_SPEED
-            if self.rect.centery < player.rect.centery:
-                self.dy = scripts.constants.SLIME_SPEED
-                
-                
-        
-            actuall_time = pygame.time.get_ticks()
-                
-            if actuall_time - self.fireball_trigger >= 5000:
-                self.stunned = True
-                if self.is_fliped:
-                    self.image_to_show = pygame.transform.flip(self.assets["slime_fire_wizard_hit"][math.floor(self.animation_index[1][1])],True,False)
-                elif not self.is_fliped:
-                    self.image_to_show = self.assets["slime_fire_wizard_hit"][math.floor(self.animation_index[1][1])]
-                self.animation_index[1][1] += 0.1
-                if self.animation_index[1][1] >= 4:
-                    self.fireball_trigger = actuall_time
-                    #magicball = self.fireball(player)
-                    self.animation_index[1][1] = 0
-                    self.stunned = False
+            if self.chaise:
+                    
+                # reset values
+                self.dx = 0
+                self.dy = 0
     
+                if self.rect.centerx > player.rect.centerx:
+                    self.dx = -scripts.constants.SLIME_SPEED
+                    self.is_fliped = False
+                if self.rect.centerx < player.rect.centerx:
+                    self.dx = scripts.constants.SLIME_SPEED
+                    self.is_fliped = True
+                if self.rect.centery > player.rect.centery:
+                    self.dy = -scripts.constants.SLIME_SPEED
+                if self.rect.centery < player.rect.centery:
+                    self.dy = scripts.constants.SLIME_SPEED
+                    
+                    
+            
+                actuall_time = pygame.time.get_ticks()
+                    
+                if actuall_time - self.fireball_trigger >= 4000:
+                    self.stunned = True
+                    self.attack = True
+                    if self.animation_index[1][1] >= 4:
+                        self.fireball_trigger = actuall_time
+                        magicball = self.magic_ball(player)
+                        self.animation_index[1][1] = 0
+                        self.stunned = False
+                        self.attack = False
+        
 
-                # update x position
-            if not self.stunned:
-                self.rect.x += self.dx
+                    # update x position
+                if not self.stunned:
+                    self.rect.x += self.dx
 
-                # checking colision x
-            for obstacle in obstacle_tile:
-                if obstacle[1].colliderect(self.rect):
+                    # checking colision x
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                            # checking from which side is collision
+                        if self.dx > 0:
+                            self.rect.right = obstacle[1].left - 1
+                        if self.dx < 0:
+                            self.rect.left = obstacle[1].right + 1
+
+                    # update y position
+                if not self.stunned:    
+                        self.rect.y += self.dy
+
+                    # checking colision y
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
                         # checking from which side is collision
-                    if self.dx > 0:
-                        self.rect.right = obstacle[1].left - 1
-                    if self.dx < 0:
-                        self.rect.left = obstacle[1].right + 1
-
-                # update y position
-            if not self.stunned:    
-                    self.rect.y += self.dy
-
-                # checking colision y
-            for obstacle in obstacle_tile:
-                if obstacle[1].colliderect(self.rect):
-                    # checking from which side is collision
-                    if self.dy > 0:
-                        self.rect.bottom = obstacle[1].top - 1
-                    if self.dy < 0:
-                        self.rect.top = obstacle[1].bottom + 1
+                        if self.dy > 0:
+                            self.rect.bottom = obstacle[1].top - 1
+                        if self.dy < 0:
+                            self.rect.top = obstacle[1].bottom + 1
         return magicball  
     
     def update(self, player, obstacle_tile):
@@ -907,11 +904,19 @@ class SlimeFireWizard(Enemy):
             
             # handle animation
             # walk 
-
-            self.image_to_show = self.assets["slime_fire_wizard_run"][math.floor(self.animation_index[0][1])]
-            self.animation_index[0][1] += 0.1
-            if self.animation_index[0][1] >= 9.4:
-                self.animation_index[0][1] = 0
+            if not self.attack:
+                self.image_to_show = self.assets["slime_fire_wizard_run"][math.floor(self.animation_index[0][1])]
+                self.animation_index[0][1] += 0.1
+                if self.animation_index[0][1] >= 9.4:
+                    self.animation_index[0][1] = 0
+            else:
+                if self.is_fliped:
+                    self.image_to_show = pygame.transform.flip(self.assets["slime_fire_wizard_hit"][math.floor(self.animation_index[1][1])],True,False)
+                elif not self.is_fliped:
+                    self.image_to_show = self.assets["slime_fire_wizard_hit"][math.floor(self.animation_index[1][1])]
+                self.animation_index[1][1] += 0.1
+                if self.animation_index[1][1] >= 4.4:
+                    self.animation_index[1][1] = 0
                     
             if self.chaise:
                 show_hp = True
@@ -1332,95 +1337,95 @@ class Druid(Enemy):
                 colision_x = False
                 colision_y = False
      
-        if self.chaise:
-            
-            self.dx = 0
-            self.dy = 0
-            colision_x = False
-            colision_y = False
-            
-            if self.walk_left:
-                self.dx = -scripts.constants.SLIME_SPEED
-                self.is_fliped = False
-            if self.walk_right:
-                self.dx = scripts.constants.SLIME_SPEED
-                self.is_fliped = True
-            if self.walk_down:
-                self.dy = scripts.constants.SLIME_SPEED
-            if self.walk_up:
-                self.dy = -scripts.constants.SLIME_SPEED
+            if self.chaise:
+                
+                self.dx = 0
+                self.dy = 0
+                colision_x = False
+                colision_y = False
+                
+                if self.walk_left:
+                    self.dx = -scripts.constants.SLIME_SPEED
+                    self.is_fliped = False
+                if self.walk_right:
+                    self.dx = scripts.constants.SLIME_SPEED
+                    self.is_fliped = True
+                if self.walk_down:
+                    self.dy = scripts.constants.SLIME_SPEED
+                if self.walk_up:
+                    self.dy = -scripts.constants.SLIME_SPEED
 
-            # update x position
-            if not self.stunned:
-                self.rect.x += self.dx
-                old_x = self.rect.x - self.dx
+                # update x position
+                if not self.stunned:
+                    self.rect.x += self.dx
+                    old_x = self.rect.x - self.dx
 
-            # checking colision x
-            for obstacle in obstacle_tile:
-                if obstacle[1].colliderect(self.rect):
-                    colision_x = True
-                    # checking from which side is collision
-                    if self.dx > 0:
-                        self.rect.x = old_x
-                    if self.dx < 0:
-                        self.rect.x = old_x
+                # checking colision x
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                        colision_x = True
+                        # checking from which side is collision
+                        if self.dx > 0:
+                            self.rect.x = old_x
+                        if self.dx < 0:
+                            self.rect.x = old_x
 
-            # update y position       
-            if not self.stunned:
-                self.rect.y += self.dy
-                old_y = self.rect.y - self.dy
+                # update y position       
+                if not self.stunned:
+                    self.rect.y += self.dy
+                    old_y = self.rect.y - self.dy
 
-            # checking colision y
-            for obstacle in obstacle_tile:
-                if obstacle[1].colliderect(self.rect):
-                    colision_y = True
-                    # checking from which side is collision
-                    if self.dy > 0:
-                        self.rect.y = old_y
-                    if self.dy < 0:
-                        self.rect.y = old_y
-            if pygame.time.get_ticks() - self.attack_trigger >= 3000:
-                bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = self.attact()
-                self.attack_trigger = pygame.time.get_ticks()
-                self.attack = True
-            # if collison or 5 second change diretion of moving
-            if colision_x or colision_y or pygame.time.get_ticks() > self.wander_timer:
-                self.walk_down = False
-                self.walk_up = False
-                self.walk_left = False
-                self.walk_right = False
-                self.walking = False
-                self.change_direction = random.randint(0, 4)
-                if self.change_direction == 0:
-                    self.walk_down = True
-                    self.walking = True
-                elif self.change_direction == 1:
-                    self.walk_up = True
-                    self.walking = True
-                elif self.change_direction == 2:
-                    self.walk_left = True
-                    self.walking = True
-                elif self.change_direction == 3:
-                    self.walk_right = True
-                    self.walking = True
-                elif self.change_direction == 4:
+                # checking colision y
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                        colision_y = True
+                        # checking from which side is collision
+                        if self.dy > 0:
+                            self.rect.y = old_y
+                        if self.dy < 0:
+                            self.rect.y = old_y
+                if pygame.time.get_ticks() - self.attack_trigger >= 3000:
+                    bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = self.attact()
+                    self.attack_trigger = pygame.time.get_ticks()
+                    self.attack = True
+                # if collison or 5 second change diretion of moving
+                if colision_x or colision_y or pygame.time.get_ticks() > self.wander_timer:
                     self.walk_down = False
+                    self.walk_up = False
                     self.walk_left = False
                     self.walk_right = False
-                    self.walk_up = False
                     self.walking = False
-                self.wander_timer = pygame.time.get_ticks() + 5000
-            
-            if self.attack:
-                self.walk_down = False
-                self.walk_up = False
-                self.walk_left = False
-                self.walk_right = False
-                self.walking = False
+                    self.change_direction = random.randint(0, 4)
+                    if self.change_direction == 0:
+                        self.walk_down = True
+                        self.walking = True
+                    elif self.change_direction == 1:
+                        self.walk_up = True
+                        self.walking = True
+                    elif self.change_direction == 2:
+                        self.walk_left = True
+                        self.walking = True
+                    elif self.change_direction == 3:
+                        self.walk_right = True
+                        self.walking = True
+                    elif self.change_direction == 4:
+                        self.walk_down = False
+                        self.walk_left = False
+                        self.walk_right = False
+                        self.walk_up = False
+                        self.walking = False
+                    self.wander_timer = pygame.time.get_ticks() + 5000
+                
+                if self.attack:
+                    self.walk_down = False
+                    self.walk_up = False
+                    self.walk_left = False
+                    self.walk_right = False
+                    self.walking = False
                 
         return bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob
     
-    def update(self, player, obstacle_tile, hud):
+    def update(self, player, obstacle_tile, hud, town, gate_tiles):
         # reset values
         gold = False
         health_potion = False
@@ -1501,7 +1506,8 @@ class Druid(Enemy):
             
         # when not alive
         if not self.alive:
-            hud.set_show(False)
+            hud.healthbar_boss.set_show(False)
+            town.crow_cost = 600
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -1514,10 +1520,12 @@ class Druid(Enemy):
                 self.animation_index[1][1] = 11
                 self.dead_counter += 1
             if self.dead_counter > 60:
+                gate_tiles = self.portal(gate_tiles)
+                scripts.constants.DRUID_DEFEAT = True
                 self.delete = True
             
                     
-        return gold, health_potion, self.alive
+        return gold, health_potion, self.alive, gate_tiles
     
     def attact(self):
         # reset values
@@ -1557,6 +1565,17 @@ class Druid(Enemy):
             mob.chaise = True
             
         return bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob
+    
+    def portal(self, gate_tiles):
+        image = loadImage('tilemap/grassland/34.png')
+        image_rect = image.get_rect()
+        image_x = self.rect.x
+        image_y = self.rect.y 
+        image_rect.x= image_x
+        image_rect.y= image_y       
+        tile_data = [image, image_rect, image_x, image_y]
+        gate_tiles.append(tile_data)
+        return gate_tiles
             
     
                     

@@ -55,3 +55,15 @@ VERSION: 0.0.8
 - bugs fixes
 - new boss healthbar
 - every 3 world level will be a boss fight now 
+
+VERSION: 0.0.9
+- score table
+- bugs fixes
+- new playable character "Dwarf"
+- new playable character "Knight"
+- new playable character "Pikemen"
+- new playable character "Elf"
+- new playable character "Paladin"
+- new playable character "Druid"
+- new structures in the town
+- bugs fixes releted with Boss "Shaman"

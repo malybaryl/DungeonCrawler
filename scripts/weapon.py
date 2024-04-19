@@ -269,7 +269,7 @@ class Magicball(pygame.sprite.Sprite):
         self.type = type_of_magicball
         if self.type == 'fireball':
             self.assets = {
-                "magicball": loadImages("effects/fireball"),
+                "magicball": loadImages("wepons/magica/fire_ball"),
                 "audio": pygame.mixer.Sound(f"assets/audio/{type_of_magicball}.mp3")
             }
             self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
@@ -300,7 +300,7 @@ class Magicball(pygame.sprite.Sprite):
     def update(self, screen_scroll, player, obstacle_tiles):
         #handle audio
         
-        player_on_fire = False
+       
         # current_time = pygame.time.get_ticks()
         # if self.type == 'fireball':
         #     if current_time - self.sound_counter >= 100:
@@ -312,8 +312,8 @@ class Magicball(pygame.sprite.Sprite):
         if self.type == 'fireball':
             self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
             self.animation_index += 0.2
-            if self.animation_index >= 7:
-                self.animation_index = 5
+            if self.animation_index >= 5:
+                self.animation_index = 2
         elif self.type == 'troll_rock':
             self.image_to_show = pygame.transform.rotate(self.assets["magicball"][math.floor(self.animation_index)],self.angle)
             self.angle += 1
@@ -346,7 +346,7 @@ class Magicball(pygame.sprite.Sprite):
         # check collision between magicball and enemies
         if player.rect.colliderect(self.rect) and player.alive:
                 if self.type == 'fireball':
-                    player_on_fire = True
+                    player.on_fire_trigger(5, 4, 1)
                     self.kill()
                 elif self.type == 'troll_rock':
                     player.health -= scripts.constants.TROLL_DAMAGE
@@ -355,8 +355,7 @@ class Magicball(pygame.sprite.Sprite):
                     player.health -= scripts.constants.ENT_DAMAGE
                     self.kill()
         
-        return player_on_fire
-    
+
     def change_fx_volume(self):
         self.assets["audio"].set_volume(scripts.constants.FX_VOLUME)
                 

@@ -1,7 +1,9 @@
 import pygame
+import scripts.character
 import scripts.constants
+import scripts.enemies
 from scripts.load import loadImages
-from scripts.character import Character
+from scripts.character import Peasant, Wizard, Dwarf, Knight, Pikemen, Elf, Paladin, Druid
 from scripts.enemies import Slime, Wolf, Troll, Goblin, Ent, SlimeFireWizard, Druid
 from scripts.objects import Chest
 from random import randint
@@ -16,7 +18,6 @@ def draw_grid(display):
 class World():
     def __init__(self):
         self.assets={
-            "castle": loadImages("tilemap/castle"),
             "grassland": loadImages("tilemap/grassland")
         }
         self.map_tiles = []
@@ -591,7 +592,24 @@ class World():
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.player = Character(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP,scripts.constants.HERO)
+                            if scripts.constants.HERO == 'player1':
+                                self.player = Peasant(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'wizard':
+                                self.player = Wizard(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'dwarf':
+                                self.player = Dwarf(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'knight':
+                                self.player = Knight(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'pikemen':
+                                self.player = Pikemen(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'elf':
+                                self.player = Elf(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'paladin':
+                                self.player = Paladin(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                            elif scripts.constants.HERO == 'druid':
+                                self.player = scripts.character.Druid(tile_data[2],tile_data[3],scripts.constants.PLAYER_HP)
+                                
+                                
                                
                         if tile == 50:
                             image = None
@@ -641,7 +659,7 @@ class World():
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP))
+                            self.character_list.append(scripts.enemies.Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP))
         
  
         return self.player, self.character_list, self.boss_list, self.gate_tiles

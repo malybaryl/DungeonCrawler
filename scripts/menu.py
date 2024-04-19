@@ -1,6 +1,6 @@
 import pygame
 import scripts.constants
-from scripts.load import loadImages, loadCredits, change_values_of_config
+from scripts.load import loadImages, loadCredits, change_values_of_config, loadScoreTable
 from scripts.music import Music
 from scripts.changeResolution import changeResolution
 import math
@@ -14,7 +14,7 @@ class Menu:
             "font2": pygame.font.Font("assets/fonts/font.ttf",24),
             "logo": loadImages("HUD/logo")
         }
-        self.version = "0.0.8"
+        self.version = "0.0.9"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False
@@ -40,6 +40,11 @@ class Menu:
         self.settings_caption = self.assets["font1"].render(self.settings ,True, scripts.constants.WHITE)
         self.settings_cliked = False
         self.settings_button_to_show = self.assets["buttons"][0]
+        self.score_table = "SCORES"
+        self.score_table_caption = self.assets["font1"].render(self.score_table ,True, scripts.constants.WHITE)
+        self.score_table_cliked = False
+        self.score_table_menu = False
+        self.score_table_button_to_show = self.assets["buttons"][0]
         self.back = "BACK"
         self.back_caption = self.assets["font1"].render(self.back ,True, scripts.constants.WHITE)
         self.back_button_to_show = self.assets["buttons"][0]
@@ -101,6 +106,16 @@ class Menu:
         self.fullscreen_clicked = False
         self.effects_volume_clicked = False
         self.raise_up = False
+        self.coursor_to_show = self.assets["coursor"][4]
+        self.cliked = True
+        self.cliked_cooldown = 0
+        self.score_table_to_show = []
+        self.load_score_table = True
+        self.y_score_table = 64
+        self.y_var = 0
+        self.last_y_score_table = None
+        self.index_score_table = 1
+        self.score_table_cooldown = pygame.time.get_ticks()
         
     
     def update(self, music, screen, player, bow, enemy_list, boss_list, magic_ball_group):
@@ -140,14 +155,19 @@ class Menu:
                 if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32:
                     self.play_cliked = True
                     self.time = pygame.time.get_ticks()
+                    
+                # if score table button is clicked
+                if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2+32 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 64:
+                    self.score_table_cliked = True
+                    self.time = pygame.time.get_ticks()
                 
                 # if settings button is clicked
-                if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2+32 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32 + 32:
+                if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2+64 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 96:
                     self.settings_cliked = True
                     self.time = pygame.time.get_ticks()
 
                 # if quit button is clicked
-                if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2+64 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32 +64:
+                if scripts.constants.DISPLAY_WIDTH/2-16 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16 and scripts.constants.DISPLAY_HEIGHT/2+96 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 128:
                     self.quit_cliked = True
                     self.time = pygame.time.get_ticks()
                 
@@ -155,7 +175,17 @@ class Menu:
                 if 2 < self.pos[0]/scripts.constants.SCALE_WIDTH < 34 and scripts.constants.DISPLAY_HEIGHT-34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT-2:
                     self.credits_cliked = True
                     self.time = pygame.time.get_ticks()
+                    
+                self.coursor_to_show = self.assets['coursor'][5]
+                self.cliked = True
+                self.cliked_cooldown = pygame.time.get_ticks()
             
+            # coursor animate handler
+            if self.cliked:
+                if pygame.time.get_ticks() - self.cliked_cooldown > 100:
+                    self.cliked = False
+                    self.coursor_to_show = self.assets['coursor'][4]
+                    
             # play button deley
             if self.play_cliked:
                 self.play_button_to_show = self.assets["buttons"][1]
@@ -163,6 +193,16 @@ class Menu:
                     game = True
                     self.play_cliked = False
                     self.play_button_to_show = self.assets["buttons"][0]
+            
+            # settings button deley
+            if self.score_table_cliked:
+                self.score_table_button_to_show = self.assets["buttons"][1]
+                if (pygame.time.get_ticks() - self.time) >= 100:
+                    self.y_score_table = 64
+                    self.main_menu = False
+                    self.score_table_menu = True
+                    self.score_table_cliked = False
+                    self.score_table_button_to_show = self.assets["buttons"][0]
             
             # settings button deley
             if self.settings_cliked:
@@ -190,12 +230,76 @@ class Menu:
                     self.credits_cliked = False
                     self.credits_button_to_show = self.assets["buttons"][2]
 
+        if self.score_table_menu:
+            # loading score table
+            if self.load_score_table:
+                self.score_table_to_show.clear()
+                self.lines = loadScoreTable()
+                for line in self.lines:
+                    text = self.assets["font1"].render(str(self.index_score_table) + '. ' + line.strip(), True, scripts.constants.WHITE)
+                    self.index_score_table += 1
+                    rect = text.get_rect(center=(scripts.constants.DISPLAY_WIDTH//2, self.y_score_table))
+                    self.y_score_table += 15
+                    self.score_table_to_show.append([text,rect])
+                    self.last_y_score_table = rect.y
+                self.load_score_table = False
+            else:
+                self.index_score_table = 1
+                
+            if pygame.time.get_ticks() - self.score_table_cooldown >= 100 and self.y_score_table >= scripts.constants.DISPLAY_HEIGHT*5//6:
+                for text in self.score_table_to_show:
+                    if self.y_var >= 1:
+                        self.y_var = 0
+                    self.y_var += 0.125
+                    text[1].centery -= 1
+                    if text[1].centery < 0:
+                        text[1].centery = self.last_y_score_table
+                self.score_table_cooldown = pygame.time.get_ticks()
+                    
+                
+                
+                
+            if pygame.mouse.get_pressed()[0]:
+            # if back button is clicked
+                if 4 < self.pos[0]/scripts.constants.SCALE_WIDTH < 36 and scripts.constants.DISPLAY_HEIGHT-32 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT:
+                    self.back_cliked = True
+                    self.time = pygame.time.get_ticks()
+                
+                self.coursor_to_show = self.assets['coursor'][5]
+                self.cliked = True
+                self.cliked_cooldown = pygame.time.get_ticks()
+            
+            # coursor animate handler
+            if self.cliked:
+                if pygame.time.get_ticks() - self.cliked_cooldown > 100:
+                    self.cliked = False
+                    self.coursor_to_show = self.assets['coursor'][4]
+                    
+            # back button delay      
+            if self.back_cliked:
+                self.back_button_to_show = self.assets["buttons"][1]
+                if (pygame.time.get_ticks() - self.time) >= 100:
+                    self.main_menu = True
+                    self.score_table_menu = False
+                    self.back_cliked = False
+                    self.load_score_table = True
+                    self.back_button_to_show = self.assets["buttons"][0]
+                    
         if self.settings_menu:
             if pygame.mouse.get_pressed()[0]:
                 # if back button is clicked
                 if scripts.constants.DISPLAY_WIDTH/2-16-48 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16-48 and scripts.constants.DISPLAY_HEIGHT/2+64 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32 +64:
                     self.back_cliked = True
                     self.time = pygame.time.get_ticks()
+                self.coursor_to_show = self.assets['coursor'][5]
+                self.cliked = True
+                self.cliked_cooldown = pygame.time.get_ticks()
+            
+            # coursor animate handler
+            if self.cliked:
+                if pygame.time.get_ticks() - self.cliked_cooldown > 100:
+                    self.cliked = False
+                    self.coursor_to_show = self.assets['coursor'][4]
                 
                 # if save button is clicked
                 if scripts.constants.DISPLAY_WIDTH/2-16+48 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/2+ 16+48 and scripts.constants.DISPLAY_HEIGHT/2+64 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/2 + 32 +64:
@@ -360,6 +464,15 @@ class Menu:
                 if 6 < self.pos[0]/scripts.constants.SCALE_WIDTH < 48 and scripts.constants.DISPLAY_HEIGHT - 34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT - 2:
                     self.back_credits_cliked = True
                     self.time = pygame.time.get_ticks()
+                self.coursor_to_show = self.assets['coursor'][5]
+                self.cliked = True
+                self.cliked_cooldown = pygame.time.get_ticks()
+            
+            # coursor animate handler
+            if self.cliked:
+                if pygame.time.get_ticks() - self.cliked_cooldown > 100:
+                    self.cliked = False
+                    self.coursor_to_show = self.assets['coursor'][4]
 
             if self.back_credits_cliked:
                 self.back_credits_button_to_show = self.assets["buttons"][1]
@@ -385,11 +498,14 @@ class Menu:
             surface.blit(self.play_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2))
             surface.blit(self.play_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/4),scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2))
             
-            surface.blit(self.settings_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2+32))
-            surface.blit(self.settings_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2)+4,scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2+32))
+            surface.blit(self.score_table_button_to_show,((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2+32))
+            surface.blit(self.score_table_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2)+8,scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2+32))
             
-            surface.blit(self.quit_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2+64))
-            surface.blit(self.quit_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/4),scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2+64))
+            surface.blit(self.settings_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2+64))
+            surface.blit(self.settings_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2)+4,scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2+64))
+            
+            surface.blit(self.quit_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2),scripts.constants.DISPLAY_HEIGHT/2+96))
+            surface.blit(self.quit_caption, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/4),scripts.constants.DISPLAY_HEIGHT/2 + (self.assets["buttons"][0].get_height()/3)+2+96))
             
             surface.blit(self.credits_button_to_show, (2,scripts.constants.DISPLAY_HEIGHT - 34))
             
@@ -397,6 +513,21 @@ class Menu:
             # drawing version
             surface.blit(self.version_caption, (scripts.constants.DISPLAY_WIDTH - 48,scripts.constants.DISPLAY_HEIGHT - 12))
         
+        if self.score_table_menu:
+            # drawing scores
+            for text in self.score_table_to_show:
+                surface.blit(text[0],text[1])
+                
+            # drawing rects
+            rect_1 = pygame.Rect(0, scripts.constants.DISPLAY_HEIGHT - 48, scripts.constants.DISPLAY_WIDTH, 48)
+            rect_2 = pygame.Rect(0, 0, scripts.constants.DISPLAY_WIDTH, 48)
+            pygame.draw.rect(surface, color=scripts.constants.COLORHUD, rect= rect_1)
+            pygame.draw.rect(surface, color=scripts.constants.COLORHUD, rect= rect_2)
+            
+            # drawing buttons
+            surface.blit(self.back_button_to_show, (4,scripts.constants.DISPLAY_HEIGHT-32))
+            surface.blit(self.back_caption, (20,scripts.constants.DISPLAY_HEIGHT-20))
+            
         if self.settings_menu:
             # drawing buttons
             surface.blit(self.back_button_to_show, ((scripts.constants.DISPLAY_WIDTH/2)-(self.assets["buttons"][0].get_width()/2) - 48,scripts.constants.DISPLAY_HEIGHT/2+64))
@@ -428,4 +559,4 @@ class Menu:
                 surface.blit(text[0],text[1])
 
         # drawing coursor
-        surface.blit(pygame.transform.scale(self.assets["coursor"][4],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+        surface.blit(pygame.transform.scale(self.coursor_to_show ,(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
