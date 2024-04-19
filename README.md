@@ -4,7 +4,7 @@
 Dungeon Crawler is a simple game created in Python using the Pygame library. The game offers a classic dungeon crawl system where players explore dungeons, battle enemies, collect items, and gain experience. For more information, visit the [website](https://malybaryl.github.io/DungeonCrawler/).
 
 ## Downloading the Game:
-1. [Download Dungeon Crawler](https://drive.google.com/drive/folders/1Uz3CJjd0bmCYxR7gjI6tQjMSmoOglLof?usp=sharing)
+1. [Download Dungeon Crawler](https://drive.google.com/drive/folders/1s4SoINu40bgqRMj91nf6p8cKYMN8akum?usp=sharing)
 2. In the upper right corner, click "Download All" or select all files, right-click, and choose "Download."
 3. Unpack the game.
 4. Open the main.exe file.
@@ -20,7 +20,7 @@ There is a possibility that your system may detect the exe file as a potential t
 Dungeon Crawler to prosta gra stworzona w Pythonie przy użyciu biblioteki Pygame. Gra oferuje klasyczny system dungeon crawl, gdzie gracz eksploruje lochy, walczy z przeciwnikami, zbiera przedmioty i zdobywa doświadczenie. Więcej informacji znajdziesz na [stronie internetowej](https://malybaryl.github.io/DungeonCrawler/).
 
 ## Pobranie gry:
-1. [Pobierz Dungeon Crawler](https://drive.google.com/drive/folders/1Uz3CJjd0bmCYxR7gjI6tQjMSmoOglLof?usp=sharing)
+1. [Pobierz Dungeon Crawler](https://drive.google.com/drive/folders/1s4SoINu40bgqRMj91nf6p8cKYMN8akum?usp=sharing)
 2. W prawym górnym roku kliknij "Pobierz wszystko" albo zaznacz wszystkie pliki, kliknij prawym przyciskiem myszy i kliknij "Pobierz."
 3. Rozpakuj grę.
 4. Otwórz plik main.exe.
