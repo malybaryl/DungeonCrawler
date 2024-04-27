@@ -49,6 +49,7 @@ class Town():
         self.no_hero_text_2_to_show = self.assets["font_8"].render(self.no_hero_text_2, True, scripts.constants.WHITE)
         self.characters = []
         # BUILDINGS
+        self.info_cliked = False
             # the_hut
         self.hut_builded = False
         self.hut_cost = 100
@@ -323,28 +324,51 @@ class Town():
             if pygame.mouse.get_pressed()[2]:
                 # add here +36 width & height!                                                                        #+ 22 here
                 if scripts.constants.DISPLAY_WIDTH/8+4+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+36+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_hut_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+40+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+62+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_smith_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+76+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+98+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_wizard_tower_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+112+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+134+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_dwarfs_house_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+148+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+170+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_knight_castle_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+184+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+206+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_pikemen_tower_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+220+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+242+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_canals_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+256+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+278+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_statue_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+292+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+314+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
-                    self.draw_crow_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+4+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+36+8 and scripts.constants.DISPLAY_HEIGHT/8+4+32+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40 + 32 + 4:
-                    self.draw_upgrade_town_info = True
-                if scripts.constants.DISPLAY_WIDTH/8+40+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+62+8 and scripts.constants.DISPLAY_HEIGHT/8+4+32+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40 + 32 + 4:
-                    self.draw_walls_info = True
+                    if not self.info_cliked:
+                        self.draw_hut_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+40+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+62+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_smith_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+76+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+98+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_wizard_tower_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+112+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+134+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_dwarfs_house_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+148+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+170+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_knight_castle_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+184+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+206+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_pikemen_tower_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+220+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+242+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_canals_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+256+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+278+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_statue_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+292+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+314+8 and scripts.constants.DISPLAY_HEIGHT/8+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40:
+                    if not self.info_cliked:
+                        self.draw_crow_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+4+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+36+8 and scripts.constants.DISPLAY_HEIGHT/8+4+32+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40 + 32 + 4:
+                    if not self.info_cliked:
+                        self.draw_upgrade_town_info = True
+                    self.info_cliked = True
+                elif scripts.constants.DISPLAY_WIDTH/8+40+8 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH/8+62+8 and scripts.constants.DISPLAY_HEIGHT/8+4+32+4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT/8+40 + 32 + 4:
+                    if not self.info_cliked:
+                        self.draw_walls_info = True
+                    self.info_cliked = True
             else:
+                self.info_cliked = False
                 self.draw_hut_info = False
                 self.draw_smith_info = False
                 self.draw_wizard_tower_info = False

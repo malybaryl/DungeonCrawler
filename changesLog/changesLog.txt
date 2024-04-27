@@ -67,3 +67,8 @@ VERSION: 0.0.9
 - new playable character "Druid"
 - new structures in the town
 - bugs fixes releted with Boss "Shaman"
+
+VERSION: 0.1.0
+- bugs fixes: 
+    - info show bug in town
+    - no more poping out error window

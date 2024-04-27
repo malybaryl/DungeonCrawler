@@ -102,14 +102,16 @@ fade = True
 # main game loop
 game_is_on = True
 game = False
+
 while game_is_on:
 
-    if game:
-        if in_town:
-            # event handler
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
+    # events system
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+                pygame.quit()
+        if game:
+            # in town events
+            if in_town:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         game = False
@@ -117,8 +119,57 @@ while game_is_on:
                         time = pygame.time.get_ticks()
                         build_button_pressed = True
                     if event.key == pygame.K_f:
-                        fight_key_town_button_pressed = True
-                
+                        fight_key_town_button_pressed = True 
+            else:
+                # in game events
+                # take keyboard presses
+                if event.type == pygame.KEYDOWN:
+                    if player.alive:
+                        if event.key == pygame.K_a:
+                            moving_left = True
+                        if event.key == pygame.K_d:
+                            moving_right = True
+                        if event.key == pygame.K_w:
+                            moving_up = True
+                        if event.key == pygame.K_s:
+                            moving_down = True
+                    else:
+                        # input box events
+                        if event.unicode.isalpha():
+                            keys_pressed.append(event.key)
+                        elif event.key == pygame.K_BACKSPACE:
+                            keys_pressed.append(event.key)
+                            
+                    if event.key == pygame.K_ESCAPE:
+                        game = False
+                    if event.key == pygame.K_TAB:
+                        hud.info_show()
+                    if event.key == pygame.K_e:
+                        if pygame.time.get_ticks() - E_pressed_counter >= 1500:
+                            E_pressed = True
+                            E_pressed_counter = pygame.time.get_ticks()
+                        else:
+                            E_pressed = False
+                # keyboard button relaeased
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_a:
+                        moving_left = False
+                    if event.key == pygame.K_d:
+                        moving_right = False
+                    if event.key == pygame.K_w:
+                        moving_up = False
+                    if event.key == pygame.K_s:
+                        moving_down = False
+                    if event.key == pygame.K_e:
+                        E_pressed = False
+        else:
+            # main menu events
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game = True
+                   
+    if game:
+        if in_town:       
             if build_button_pressed:
                 if (pygame.time.get_ticks() - time) >= 100:
                     if build_menu:
@@ -134,7 +185,6 @@ while game_is_on:
                     else:
                         fight_town_button_pressed = True
                     fight_key_town_button_pressed = False
-                    
                     
             in_town, build_menu, fight_town_button_pressed = town.update(build_menu, fight_town_button_pressed)
             town.clouds()     
@@ -155,8 +205,6 @@ while game_is_on:
                 hud.minutes = 0
                 hud.hours = 0 
                 
-                
-        
             if new_level:
                 generate_world = True
                 player_hp, player_max_hp, player_gold = world.new_level(player)
@@ -200,56 +248,6 @@ while game_is_on:
                     new_level = False
 
             
-            # event handler
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-
-                # take keyboard presses
-                if event.type == pygame.KEYDOWN:
-                    if player.alive:
-                        if event.key == pygame.K_a:
-                            moving_left = True
-                        if event.key == pygame.K_d:
-                            moving_right = True
-                        if event.key == pygame.K_w:
-                            moving_up = True
-                        if event.key == pygame.K_s:
-                            moving_down = True
-                    else:
-                        if event.unicode.isalpha():
-                            keys_pressed.append(event.key)
-                        elif event.key == pygame.K_BACKSPACE:
-                            keys_pressed.append(event.key)
-                            
-                    if event.key == pygame.K_ESCAPE:
-                        game = False
-                    if event.key == pygame.K_TAB:
-                        hud.info_show()
-                    if event.key == pygame.K_e:
-                        if pygame.time.get_ticks() - E_pressed_counter >= 1500:
-                            E_pressed = True
-                            E_pressed_counter = pygame.time.get_ticks()
-                        else:
-                            E_pressed = False
-
-                
-                          
-
-                # keyboard button relaeased
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_a:
-                        moving_left = False
-                    if event.key == pygame.K_d:
-                        moving_right = False
-                    if event.key == pygame.K_w:
-                        moving_up = False
-                    if event.key == pygame.K_s:
-                        moving_down = False
-                    if event.key == pygame.K_e:
-                        E_pressed = False
-
-            
             # calculate player movement
             dx = 0
             dy = 0
@@ -273,14 +271,9 @@ while game_is_on:
                 moving = True
                 parcticle_system.create_particle(player.rect.x+player.rect.width/2, player.rect.y+player.rect.height,scripts.constants.BROWN,'up')
                 
-            
-            
             # move player
             scroll_map = player.move(dx,dy, world.obstacle_tile)
-            
-                # for boss in boss_list:
-                #     boss.move(world.obstacle_tile, player, scroll_map)
-            
+                     
             # update 
             world.update(scroll_map)
             player.update(is_flipped, moving, player.health, player.gold, hud)
@@ -386,24 +379,11 @@ while game_is_on:
                 fade = hud.draw_fade(display)
             hud.draw_red_fade(display,player)
             
-            
-
     # main menu handler    
     elif not game:
         game = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
         main_menu.draw(display)
         
-        # event handler
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    game = True
-                
-    
-        
-
     # display all on screen
     pygame.display.update()
     clock.tick(60)
