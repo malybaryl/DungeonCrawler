@@ -1,7 +1,7 @@
 import pygame
 import scripts.constants
-from scripts.character import Peasant
-from scripts.weapon import Bow
+from scripts.character import Peasant, Wizard, Paladin, Pikemen, Dwarf, Elf, Knight
+from scripts.weapon import Bow, Throwable, TwoHandedSword, Spear
 from scripts.changeResolution import changeResolution
 from scripts.load import loadConfig
 from scripts.background import Bg
@@ -14,13 +14,16 @@ from scripts.menu import Menu
 from scripts.town import Town
 from scripts.particles import ParticleSystem
 
-# loading config
-loadConfig()
+
 
 # pygame init
 pygame.mixer.init()
 pygame.init()
+pygame.display.init()
 
+
+# loading config
+loadConfig()
 # display settings etc
 is_fullscreened = scripts.constants.FULLSCREEN
 if is_fullscreened == True:
@@ -29,6 +32,7 @@ else:
     screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),True)
 display = pygame.Surface((scripts.constants.DISPLAY_WIDTH, scripts.constants.DISPLAY_HEIGHT))
 fade = False
+pygame_quit = False
 
 # defining aplications name etc. and clock
 pygame.display.set_caption('Dungeon Crawler')
@@ -39,6 +43,7 @@ music = Music()
 time = 0
 counter = None
 E_pressed_counter = pygame.time.get_ticks()
+E_pressed = False
 
 # define player movement variables
 moving_left = False
@@ -47,13 +52,9 @@ moving_up = False
 moving_down = False
 moving = False
 is_flipped = False
-E_pressed = False
 
-# create player and player weapon
+# create player
 player = Peasant(120,300,100)
-weapon = Bow(0,0,'bows','classic_bow')
-#sword = OneHandedHammer('hammer',100,100)
-magic_ball = None
 
 #define game varibles
 scroll_map = [player.rect.x,player.rect.y]
@@ -80,6 +81,12 @@ build_menu = False
 build_button_pressed = False
 fight_key_town_button_pressed = False
 
+#weapons
+weapon = Bow(0,0,'bows','slingshot', player.level, hud)
+#weapon = Throwable(0,0,'throwables','crusader_throwing_axe', player.level, hud)
+#weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level, hud)
+#weapon = Spear(0,0,'spears','spear', player.level, hud)
+magic_ball = None
 
 #parciples
 parcticle_system = ParticleSystem()
@@ -107,7 +114,7 @@ while game_is_on:
 
     # events system
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or pygame_quit:
                 pygame.quit()
         if game:
             # in town events
@@ -187,6 +194,23 @@ while game_is_on:
                     fight_key_town_button_pressed = False
                     
             in_town, build_menu, fight_town_button_pressed = town.update(build_menu, fight_town_button_pressed)
+            if not in_town:
+                if scripts.constants.HERO == 'player1':
+                    player = Peasant(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'wizard':
+                    player = Wizard(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'dwarf':
+                     player = Dwarf(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'knight':
+                     player = Knight(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'pikemen':
+                    player = Pikemen(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'elf':
+                    player = Elf(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'paladin':
+                    player = Paladin(0,0,scripts.constants.PLAYER_HP)
+                elif scripts.constants.HERO == 'druid':
+                    player = scripts.character.Druid(0,0,scripts.constants.PLAYER_HP)
             town.clouds()     
             town.draw(display)
         else:  
@@ -204,10 +228,22 @@ while game_is_on:
                 hud.seconds = 0
                 hud.minutes = 0
                 hud.hours = 0 
-                
+                if player.type == 'player1':
+                    weapon = Bow(0,0,'bows','slingshot', player.level, hud)
+                    hud.visible_coursor(True)
+                elif player.type == 'elf':
+                    weapon = Throwable(0,0,'throwables','rock', player.level, hud)
+                    hud.visible_coursor(True)
+                elif player.type == 'knight':
+                    weapon = TwoHandedSword(0,0,'two_handed_swords','wooden_sword', player.level, hud)
+                    hud.visible_coursor(False)
+                elif player.type == 'pikemen':
+                    weapon = Spear(0,0,'spears',"wooden_spear", player.level, hud)
+                    hud.visible_coursor(False)
+                        
             if new_level:
                 generate_world = True
-                player_hp, player_max_hp, player_gold = world.new_level(player)
+                player_hp, player_max_hp, player_gold, player_level, player_current_experience, player_experience_to_gain_new_level = world.new_level(player)
                 fade = True
                 new_level = True
             
@@ -215,36 +251,51 @@ while game_is_on:
             if generate_world:
                 # clear world data 
                 world_data.clear()
-                enemy_list.clear()
+                world_mobs_data.clear()
                 boss_list.clear()
                 exit_tiles.clear()
-                world.world_mobs_data.clear()
-                world.obstacle_tile.clear()
-                world.decorations_up_tiles.clear()
-                world.map_tiles.clear()
-                world.boss_list.clear()
-                world.objects.clear()
-                world.proced_csv_file(world_level=world_level + 1)
+                enemy_list.clear()
+                keys_pressed.clear()
+                chest_items.clear()
+                
+                
                 damage_text_group.remove()
                 arrow_group.remove()
                 item_group.remove()
                 magic_ball_group.remove()
-                chest_items.clear()
+                
+                world.character_list.clear()
+                world.gate_tiles.clear()
+                world.world_data.clear()
+                world.world_mobs_data.clear()
+                world.world_objects_data.clear()
+                world.world_decorations_down.clear()
+                world.world_decorations_up.clear()
+                world.objects.clear()
+                world.map_tiles.clear()
+                world.obstacle_tile.clear()
+                world.decorations_up_tiles.clear()
+        
                 # generete new level
-                player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_data, "grassland")
-                player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_mobs_data, "grassland")
-                player, enemy_list, boss_list, exit_tiles = world.process_date(world.world_objects_data, "grassland")
-                player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_decorations_up, "grassland")
-                player, enemy_list, boss_list, exit_tiles= world.process_date(world.world_decorations_down, "grassland")
+                world.proced_csv_file(world_level=world_level + 1)
+                player, enemy_list, exit_tiles= world.process_date(world.world_data, "grassland")
+                player, enemy_list, exit_tiles= world.process_date(world.world_mobs_data, "grassland")
+                player, enemy_list, exit_tiles = world.process_date(world.world_objects_data, "grassland")
+                player, enemy_list, exit_tiles= world.process_date(world.world_decorations_up, "grassland")
+                player, enemy_list, exit_tiles= world.process_date(world.world_decorations_down, "grassland")
                 
                 generate_world = False 
                 world_level += 1 
+                
                 hud.refresh_player_image(player)
                 # restore player statistic
                 if new_level:
                     player.health = player_hp
                     player.health_max = player_max_hp
                     player.gold = player_gold
+                    player.level = player_level
+                    player.current_experience = player_current_experience
+                    player.experience_to_gain_new_level = player_experience_to_gain_new_level
                     new_level = False
 
             
@@ -280,23 +331,39 @@ while game_is_on:
             parcticle_system.update()
             in_town = hud.update(player, world_level, town, counter, keys_pressed)
             if player.alive:
-                arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed)
-                if arrow:   
-                    arrow_group.add(arrow)
-                for arrow in arrow_group:
-                    damage, damage_pos = arrow.update(enemy_list, scroll_map, world.obstacle_tile, boss_list)
+                if weapon.__class__ != TwoHandedSword and weapon.__class__ != Spear:
+                    arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud)
+                    if arrow:   
+                        arrow_group.add(arrow)
+                    for arrow in arrow_group:
+                        damage, damage_pos = arrow.update(weapon, enemy_list, scroll_map, world.obstacle_tile, boss_list)
+                        if damage:
+                            damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
+                            damage_text_group.add(damage_text)
+                else:
+                    damage, damage_pos, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
                     if damage:
                         damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
                         damage_text_group.add(damage_text)
                 damage_text_group.update(scroll_map)
                 for object in world.objects:
                     if object.type == 'chest':
-                        chest_weapon = object.update(scroll_map, E_pressed, player)
+                        chest_weapon = object.update(scroll_map, E_pressed, player, hud)
                         if chest_weapon:
                             chest_items.append(chest_weapon)
                 if chest_items:
                     for chest_item in chest_items:
-                        arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed)
+                        print(str(chest_item.__class__))
+                        if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
+                            try:
+                                arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud)
+                            except:
+                                pass
+                        else:
+                            try:
+                                damage, damage_pos, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
+                            except:
+                                pass
                 for enemy in enemy_list:
                     if enemy.type == 'druid':
                         bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = enemy.move(world.obstacle_tile, player, scroll_map)
@@ -381,10 +448,15 @@ while game_is_on:
             
     # main menu handler    
     elif not game:
-        game = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
+        game, pygame_quit = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
         main_menu.draw(display)
+        if pygame_quit:
+            pygame.quit()
         
     # display all on screen
+    if pygame.display.get_init():
+        pygame.display.update()
+        
     pygame.display.update()
     clock.tick(60)
     screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))

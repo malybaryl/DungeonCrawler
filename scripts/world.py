@@ -25,7 +25,6 @@ class World():
         self.decorations_up_tiles = []
         self.exit_tile = None
         self.player = None
-        self.boss_list = []
         self.character_list = []
         self.gate_tiles = []
         self.world_data = []
@@ -34,10 +33,11 @@ class World():
         self.world_decorations_down = []
         self.world_decorations_up = []
         self.objects = []
+        self.world_level = 1
         
 
     def proced_csv_file(self, rows=50, cols=50, world_level = 1):
-        
+        self.world_level = world_level
         if world_level % 3 == 0:
             choice = 3
         else:
@@ -617,52 +617,52 @@ class World():
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Slime(tile_data[2],tile_data[3],scripts.constants.SLIME_HP))
+                            self.character_list.append(Slime(tile_data[2],tile_data[3],scripts.constants.SLIME_HP, self.world_level))
                         if tile == 60:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP))
+                            self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
                         if tile == 51:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Troll(tile_data[2],tile_data[3],scripts.constants.TROLL_HP))
+                            self.character_list.append(Troll(tile_data[2],tile_data[3],scripts.constants.TROLL_HP, self.world_level))
                         if tile == 52:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Goblin(tile_data[2],tile_data[3],scripts.constants.GOBLIN_HP))
+                            self.character_list.append(Goblin(tile_data[2],tile_data[3],scripts.constants.GOBLIN_HP, self.world_level))
                         if tile == 53:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(Ent(tile_data[2],tile_data[3],scripts.constants.ENT_HP))
+                            self.character_list.append(Ent(tile_data[2],tile_data[3],scripts.constants.ENT_HP, self.world_level))
                         if tile == 54:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(SlimeFireWizard(tile_data[2],tile_data[3],scripts.constants.SLIME_FIRE_WIZARD_HP))
+                            self.character_list.append(SlimeFireWizard(tile_data[2],tile_data[3],scripts.constants.SLIME_FIRE_WIZARD_HP, self.world_level))
                         if tile == 55:
                             image = None
                             image_rect = None
                             image_x = x * scripts.constants.TILE_SIZE 
                             image_y = y * scripts.constants.TILE_SIZE        
                             tile_data = [image, image_rect, image_x, image_y]
-                            self.character_list.append(scripts.enemies.Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP))
+                            self.character_list.append(scripts.enemies.Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP, self.world_level))
         
  
-        return self.player, self.character_list, self.boss_list, self.gate_tiles
+        return self.player, self.character_list, self.gate_tiles
         
     def generate(self, mobs = False):  
         pass
@@ -686,7 +686,7 @@ class World():
             surface.blit(tile[0], tile[1])
 
     def new_level(self, player):
-        return player.health, player.health_max, player.gold
+        return player.health, player.health_max, player.gold, player.level, player.current_experience, player.experience_to_gain_new_level
     
     def check_if_new_level(self, exit_tiles, player):
         for exit_tile in exit_tiles:

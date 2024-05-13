@@ -3,7 +3,7 @@ import scripts.constants
 
 class Music:
     def __init__(self):
-        pygame.mixer.music.load('assets/audio/mainThemeMusic.mp3')
+        pygame.mixer.music.load('assets/audio/main_music_theme.wav')
         pygame.mixer.music.play(-1, 0.0, 5000)
         if not scripts.constants.MUSIC:
             self.turn_off()

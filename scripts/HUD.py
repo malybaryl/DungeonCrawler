@@ -34,7 +34,9 @@ class HUD:
         self.player_alive = player.alive
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
         self.statistic_text = self.font.render("STATISTICS", True, scripts.constants.WHITE)
-        self.damege_text = self.font.render("Damage: 5-15", True, scripts.constants.WHITE)
+        self.min_damage = 0
+        self.max_damage = 0
+        self.damege_text = self.font.render(f"Damage: {self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
         self.back_to_town_text = self.font.render("SAVE & BACK TO TOWN", True, scripts.constants.WHITE)
         self.back_to_town_button_clicked = False
         self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(166,26)) 
@@ -64,6 +66,7 @@ class HUD:
         self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
         self.cliked = True
         self.cliked_cooldown = 0
+        self.draw_coursor = True
     
     def refresh_player_image(self, player):
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
@@ -255,10 +258,11 @@ class HUD:
                 self.healthbar_boss.draw(display)
 
                 # drawing coursor
-                display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
-                display.blit(pygame.transform.scale(self.assets["coursor"][1],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
-                display.blit(pygame.transform.scale(self.assets["coursor"][2],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
-                display.blit(pygame.transform.scale(self.assets["coursor"][3],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+                if self.draw_coursor:
+                    display.blit(pygame.transform.scale(self.assets["coursor"][0],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
+                    display.blit(pygame.transform.scale(self.assets["coursor"][1],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
+                    display.blit(pygame.transform.scale(self.assets["coursor"][2],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT-24)) 
+                    display.blit(pygame.transform.scale(self.assets["coursor"][3],(24,24)),(self.pos[0]/scripts.constants.SCALE_WIDTH-24,self.pos[1]/scripts.constants.SCALE_HEIGHT)) 
         
         else:
             if self.cooldown_death:
@@ -274,6 +278,11 @@ class HUD:
                 self.draw_text_input(display, self.input_text, self.input_rect, scripts.constants.WHITE)
                 display.blit(self.coursor,(self.pos[0]/scripts.constants.SCALE_WIDTH,self.pos[1]/scripts.constants.SCALE_HEIGHT))
 
+
+    def visible_coursor(self, bool):
+        self.draw_coursor = bool
+    
+    
     def draw_text_input(self, display, input_text, rect, font_color):
         pygame.draw.rect(display, scripts.constants.BLACK, rect, 2)
         if input_text != "":

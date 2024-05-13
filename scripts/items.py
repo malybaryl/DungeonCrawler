@@ -8,8 +8,12 @@ class Item(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.assets ={
             "coin": loadImages("coin"),
-            "health_potion": pygame.transform.scale(loadImage("potion/0.png"),(16,16))
+            "health_potion": pygame.transform.scale(loadImage("potion/0.png"),(16,16)),
+            'pick_up_coin_sound': pygame.mixer.Sound("assets/audio/coin_pick.wav"),
+            'pick_up_potion_sound': pygame.mixer.Sound("assets/audio/potion_pick.wav")
         }
+        self.assets['pick_up_coin_sound'].set_volume(scripts.constants.FX_VOLUME)
+        self.assets['pick_up_potion_sound'].set_volume(scripts.constants.FX_VOLUME)
         self.item_type = item_type # coin, health_potion
         self.index = {
             "coin": 0
@@ -31,10 +35,12 @@ class Item(pygame.sprite.Sprite):
                     else:
                         player.new_health += player.health_max/2
                     player.player_was_heal = True
+                    self.assets['pick_up_potion_sound'].play()
                     self.kill()
         if self.item_type == "coin":
             if self.rect.colliderect(player.rect):
                 player.gold += 1
+                self.assets['pick_up_coin_sound'].play()
                 self.kill()
 
     def draw(self, display):

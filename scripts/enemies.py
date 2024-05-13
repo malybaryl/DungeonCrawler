@@ -7,7 +7,7 @@ from scripts.weapon import Magicball, MagicAttactDruid
 from scripts.HUD import HealthBarBoss
  
 class Enemy():
-    def __init__(self, type , x, y, health):
+    def __init__(self, type , x, y, health, world_level):
         self.type = type
         self.rect = pygame.Rect(8,8,16,16)
         self.rect.center = (x,y)
@@ -18,10 +18,11 @@ class Enemy():
                                 ["heal",0],
                                 ["attack",0]]
         self.show_danger_sign = False
-        self.lvl = 1 
+        self.lvl = world_level
         #self.assets["orc_hit_sound"].set_volume(scripts.constants.FX_VOLUME)
-        self.health = health
-        self.max_health = health
+        self.health = health * self.lvl
+        self.max_health = health * self.lvl
+        self.experience = self.init_experience()
         self.alive = True
         self.delete = False
         self.dead_counter = 0
@@ -44,18 +45,43 @@ class Enemy():
         self.stunned = False
         self.dist = None
         self.show_danger_sing = False
+        self.add_experience_once = True
+    
+    def init_experience(self):
+        experience = 1 + (0.1 * self.lvl)
         
-    def magic_ball(self, player):
+        if self.type == 'slime':
+            experience = 1 + (0.1 * self.lvl)
+        elif self.type == 'wolf':
+            experience = 2 + (0.1 * self.lvl)
+        elif self.type == 'goblin':
+            experience = 2 + (0.1 * self.lvl)
+        elif self.type == 'troll':
+            experience = 3 + (0.1 * self.lvl)
+        elif self.type == 'slime_fire_wizard':
+            experience = 10 + (0.12 * self.lvl)
+        elif self.type == 'ent':
+            experience = 4 + (0.1 * self.lvl)
+        elif self.type == 'druid':
+            experience = 50 + (0.25 * self.lvl)
+            
+        return experience
+            
+            
+    def magic_ball(self, player, enemy_level):
         if self.type == 'slime_fire_wizard':
-            return Magicball("fireball",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery)
+            return Magicball("fireball",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery, enemy_level)
         if self.type == 'troll':
-            return Magicball("troll_rock",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery)
+            return Magicball("troll_rock",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery, enemy_level)
         if self.type == 'ent':
-            return Magicball("attack_ent",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery)
+            return Magicball("attack_ent",self.rect.centerx,self.rect.centery, player.rect.centerx, player.rect.centery, enemy_level)
             
     def on_screen(self):
-        return -25 <= self.rect.right <= scripts.constants.DISPLAY_WIDTH + 25 and -25 <= self.rect.bottom <= scripts.constants.DISPLAY_HEIGHT +25
+        return -64 <= self.rect.right <= scripts.constants.DISPLAY_WIDTH + 64 and -64 <= self.rect.bottom <= scripts.constants.DISPLAY_HEIGHT +64
 
+    
+    def add_player_experience(self, player):
+        player.add_experience(self.experience)
     
     
     def hit_player(self, damage, player):
@@ -94,13 +120,15 @@ class Enemy():
             elif scripts.constants.SHOW_LINE_OF_SIGHT and self.chaise:
                 pygame.draw.line(surface, scripts.constants.RED, self.line_of_sight[0], self.line_of_sight[1])
   
+  
+  
 class Slime(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('slime', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('slime', x, y, health, world_level)
         self.assets = {
             "slime_run": loadImages("char/slime/idle,walk,hit"),
             "slime_dead": loadImages("char/slime/dead"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.attack = False
         self.damage = 2 * self.lvl
@@ -263,6 +291,11 @@ class Slime(Enemy):
                 
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -278,18 +311,20 @@ class Slime(Enemy):
                 self.delete = True
                     
         return gold, health_potion, self.alive, show_hp    
+    
+    
         
 class Wolf(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('wolf', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('wolf', x, y, health, world_level)
         self.assets = {
             "wolf_run": loadImages("char/wolf/walk"),
             "wolf_dead": loadImages("char/wolf/dead"),
             "wolf_attact": loadImages("char/wolf/attack"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.image_to_show = self.assets["wolf_run"][math.floor(self.animation_index[0][1])]
-        self.damage = 15
+        self.damage = 15 * self.lvl
         self.attack = False
         
     def move(self, obstacle_tile, player, screen_scroll):
@@ -466,6 +501,11 @@ class Wolf(Enemy):
                     self.stunned = False
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -481,16 +521,18 @@ class Wolf(Enemy):
                 self.delete = True
                            
         return gold, health_potion, self.alive, show_hp
+   
+   
           
 class Troll(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('troll', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('troll', x, y, health, world_level)
         self.assets = {
             "troll_run": loadImages("char/troll/walk"),
             "troll_dead": loadImages("char/troll/dead"),
             "troll_attact": loadImages("char/troll/attack"),
             "troll_idle": loadImages("char/troll/idle"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.image_to_show = self.assets["troll_run"][math.floor(self.animation_index[0][1])]
         self.damage = 0
@@ -622,7 +664,7 @@ class Troll(Enemy):
     
                 elif self.attack:
                     if self.animation_index[4][1] >= 8:
-                        magicball = self.magic_ball(player)
+                        magicball = self.magic_ball(player, self.lvl)
                         self.attack = False
                         self.animation_index[4][1] = 0
                 
@@ -724,6 +766,11 @@ class Troll(Enemy):
                     self.stunned = False
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -741,18 +788,20 @@ class Troll(Enemy):
             
                     
         return gold, health_potion, self.alive, show_hp
+   
+   
           
 class SlimeFireWizard(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('slime_fire_wizard', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('slime_fire_wizard', x, y, health, world_level)
         self.assets={
             "slime_fire_wizard_run": loadImages("char/slime_fire_wizard/walk,idle"),
             "slime_fire_wizard_hit": loadImages("char/slime_fire_wizard/attack"),
             "slime_fire_wizard_dead": loadImages("char/slime_fire_wizard/dead"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.image_to_show = self.assets["slime_fire_wizard_run"][math.floor(self.animation_index[0][1])]
-        self.damage = 25
+        self.damage = 25 * self.lvl
         self.name = "SLIME WIZARD"
         self.fireball_trigger = pygame.time.get_ticks()
         self.rect = pygame.Rect(32,32,48,48)
@@ -855,7 +904,7 @@ class SlimeFireWizard(Enemy):
                     self.attack = True
                     if self.animation_index[1][1] >= 4:
                         self.fireball_trigger = actuall_time
-                        magicball = self.magic_ball(player)
+                        magicball = self.magic_ball(player, self.lvl)
                         self.animation_index[1][1] = 0
                         self.stunned = False
                         self.attack = False
@@ -937,6 +986,11 @@ class SlimeFireWizard(Enemy):
         
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             if self.randgold <= 50:
                 gold = True
             if self.randpotion <= 10:
@@ -952,18 +1006,20 @@ class SlimeFireWizard(Enemy):
             
                     
         return gold, health_potion, self.alive, show_hp  
+    
+    
         
 class Goblin(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('goblin', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('goblin', x, y, health, world_level)
         self.assets = {
             "goblin_run": loadImages("char/goblin/walk"),
             "goblin_dead": loadImages("char/goblin/dead"),
             "goblin_attact": loadImages("char/goblin/attack"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.image_to_show = self.assets["goblin_run"][math.floor(self.animation_index[0][1])]
-        self.damage = 12
+        self.damage = 12 * self.lvl
         self.attack = False
         
     def move(self, obstacle_tile, player, screen_scroll):
@@ -1149,6 +1205,11 @@ class Goblin(Enemy):
                     self.stunned = False
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -1165,15 +1226,17 @@ class Goblin(Enemy):
             
                     
         return gold, health_potion, self.alive, show_hp
+  
+  
         
 class Ent(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('ent', x, y, health)
+    def __init__(self, x, y, health, world_level):
+        super().__init__('ent', x, y, health, world_level)
         self.assets = {
             "ent_idle": loadImages("char/ent/idle"),
             "ent_dead": loadImages("char/ent/dead"),
             "ent_attack": loadImages("char/ent/attack"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.time = pygame.time.get_ticks()
         self.image_to_show = self.assets["ent_idle"][math.floor(self.animation_index[0][1])]
@@ -1202,7 +1265,7 @@ class Ent(Enemy):
                     
                 if self.attack:
                      if self.trigger_magic_ball:
-                        magicball = self.magic_ball(player)
+                        magicball = self.magic_ball(player, self.lvl)
                         self.trigger_magic_ball = False
                         self.time = pygame.time.get_ticks()
                     
@@ -1279,6 +1342,11 @@ class Ent(Enemy):
             
         # when not alive
         if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -1295,15 +1363,17 @@ class Ent(Enemy):
                     
         return gold, health_potion, self.alive, show_hp 
     
+    
+    
 class Druid(Enemy):
-    def __init__(self, x, y, health):
-        super().__init__('druid', x, y, health)   
+    def __init__(self, x, y, health, world_level):
+        super().__init__('druid', x, y, health, world_level)   
         self.assets = {
             "druid_idle": loadImages("char/druid_boss/idle"),
             "druid_run": loadImages("char/druid_boss/walk"),
             "druid_dead": loadImages("char/druid_boss/dead"),
             "druid_attact": loadImages("char/druid_boss/attact"),
-            "orc_hit_sound": pygame.mixer.Sound("assets/audio/orcHit.mp3")
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
             }
         self.image_to_show = self.assets["druid_idle"][math.floor(self.animation_index[0][1])]
         self.damage = 0
@@ -1312,6 +1382,7 @@ class Druid(Enemy):
         self.rect.center = (x,y)
         self.walking = False
         self.attack_trigger = pygame.time.get_ticks()
+        
         
     def move(self, obstacle_tile, player, screen_scroll):
        # reposition depending on screen_scroll
@@ -1425,13 +1496,13 @@ class Druid(Enemy):
                 
         return bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob
     
+    
     def update(self, player, obstacle_tile, hud, town, gate_tiles):
         # reset values
         gold = False
         health_potion = False
         self.alive = True
         clipped_line = None
-        
         
         if self.alive:
             # check if mob has died
@@ -1440,9 +1511,7 @@ class Druid(Enemy):
                 self.alive = False
             
             # handle animation
-            # walk 
-            
-                
+            # walk   
             if not self.attack:
                 
                 if self.walking:
@@ -1508,6 +1577,11 @@ class Druid(Enemy):
         if not self.alive:
             hud.healthbar_boss.set_show(False)
             town.crow_cost = 600
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
             self.show_danger_sign = False
             if self.randgold <= 50:
                 gold = True
@@ -1523,9 +1597,9 @@ class Druid(Enemy):
                 gate_tiles = self.portal(gate_tiles)
                 scripts.constants.DRUID_DEFEAT = True
                 self.delete = True
-            
-                    
+                       
         return gold, health_potion, self.alive, gate_tiles
+    
     
     def attact(self):
         # reset values
@@ -1542,26 +1616,26 @@ class Druid(Enemy):
         # attacts
         choice = random.randint(0,1)
         if choice == 0:
-            bolt1 = MagicAttactDruid(self.rect.x, self.rect.y, 0)
-            bolt2 = MagicAttactDruid(self.rect.x, self.rect.y, 1)
-            bolt3 = MagicAttactDruid(self.rect.x, self.rect.y, 2)
-            bolt4 = MagicAttactDruid(self.rect.x, self.rect.y, 3)
-            bolt5 = MagicAttactDruid(self.rect.x, self.rect.y, 4)
-            bolt6 = MagicAttactDruid(self.rect.x, self.rect.y, 5)
-            bolt7 = MagicAttactDruid(self.rect.x, self.rect.y, 6)
-            bolt8 = MagicAttactDruid(self.rect.x, self.rect.y, 7)
+            bolt1 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 0)
+            bolt2 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 1)
+            bolt3 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 2)
+            bolt4 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 3)
+            bolt5 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 4)
+            bolt6 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 5)
+            bolt7 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 6)
+            bolt8 = MagicAttactDruid(self.rect.centerx, self.rect.centery, 7)
         elif choice == 1:
             mob_choice = random.choice(['wolf','troll','goblin','ent','slime'])
             if mob_choice == 'wolf':
-                mob = Wolf(self.rect.x, self.rect.y, scripts.constants.WOLF_HP)
+                mob = Wolf(self.rect.centerx, self.rect.centery, scripts.constants.WOLF_HP, self.lvl)
             elif mob_choice == 'troll':
-                mob = Troll(self.rect.x, self.rect.y, scripts.constants.TROLL_HP)
+                mob = Troll(self.rect.centerx, self.rect.centery, scripts.constants.TROLL_HP, self.lvl)
             elif mob_choice == 'goblin':
-                mob = Goblin(self.rect.x, self.rect.y, scripts.constants.GOBLIN_HP)
+                mob = Goblin(self.rect.centerx, self.rect.centery, scripts.constants.GOBLIN_HP, self.lvl)
             elif mob_choice == 'ent':
-                mob = Ent(self.rect.x, self.rect.y, scripts.constants.ENT_HP)
+                mob = Ent(self.rect.centerx, self.rect.centery, scripts.constants.ENT_HP, self.lvl)
             elif mob_choice == 'slime':
-                mob = Slime(self.rect.x, self.rect.y, scripts.constants.SLIME_HP)
+                mob = Slime(self.rect.centerx, self.rect.centery, scripts.constants.SLIME_HP, self.lvl)
             mob.chaise = True
             
         return bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob

@@ -122,7 +122,7 @@ class Menu:
         self.pos = pygame.mouse.get_pos()
         game = False
         screen = screen
-        
+        pygame_quit = False
         
         # loading credits
         if self.read_once:
@@ -217,7 +217,7 @@ class Menu:
             if self.quit_cliked:
                 self.quit_button_to_show = self.assets["buttons"][1]
                 if (pygame.time.get_ticks() - self.time) >= 100:
-                    pygame.quit()
+                    pygame_quit = True
                     self.quit_cliked = False
                     self.quit_button_to_show = self.assets["buttons"][0]
             
@@ -483,7 +483,7 @@ class Menu:
                     self.back_credits_button_to_show = self.assets["buttons"][0]
 
         
-        return game
+        return game, pygame_quit
 
 
     def draw(self,surface):

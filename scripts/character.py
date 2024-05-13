@@ -22,9 +22,12 @@ class Character():
         "player_run": loadImages(f"char/{self.type}/run"),
         "player_dead": loadImages(f"char/{self.type}/dead"),
         "player_on_fire": loadImages("effects/onFire"),
-        "walk_sound": pygame.mixer.Sound("assets/audio/walk.mp3")
+        "walk_sound": pygame.mixer.Sound("assets/audio/walk.mp3"),
+        'died_sound': pygame.mixer.Sound("assets/audio/died.wav")
         }
         self.assets["walk_sound"].set_volume(scripts.constants.FX_VOLUME)
+        self.assets["died_sound"].set_volume(scripts.constants.FX_VOLUME)
+        self.play_died_sound_once = True
         self.health = health
         self.old_health = health
         self.new_health = health
@@ -40,12 +43,15 @@ class Character():
         self.player_was_hit = False
         self.player_was_heal = False
         self.level = 1
+        self.current_experience = 0
+        self.experience_to_gain_new_level = 25
         self.on_fire_time = None
         self.on_fire_tics = None
         self.fire_damage = None
         self.on_fire_damage_cooldown = None
         self.on_fire_how_long = None
         self.is_on_fire = False
+
    
     def move(self, dx, dy, obstacle_tile):
         # screen scroll
@@ -105,6 +111,8 @@ class Character():
 
     def update(self, flip, moving, health, gold, hud):
         if self.alive:
+            #print (str(self.current_experience) + '-' + str(self.experience_to_gain_new_level) + ' | ' + str(self.level))
+            
             # handle animation
             # update image
             if not moving and not flip:
@@ -127,28 +135,40 @@ class Character():
                 self.animation_index[1][1] += 0.1
                 if self.animation_index[1][1] >= self.max_run_animation:
                     self.animation_index[1][1] = 0
-        # health update
-        self.health = health
-        if self.player_was_hit:
-            if self.old_health <= self.health:
-                self.player_was_hit = False
+            # health update
+            self.health = health
+            if self.player_was_hit:
+                if self.old_health <= self.health:
+                    self.player_was_hit = False
+                else:
+                    self.old_health -= 0.1
+            if self.player_was_heal:
+                if self.health >= self.new_health:
+                    self.health = self.new_health
+                    self.player_was_heal = False
+                else:
+                    self.health += 1
             else:
-                self.old_health -= 0.1
-        if self.player_was_heal:
-            if self.health >= self.new_health:
-                self.health = self.new_health
-                self.player_was_heal = False
-            else:
-                self.health += 1
-        else:
-            self.new_health = health
-        # gold update
-        self.gold = gold
-        # is alive?
-        if self.is_on_fire:
-            self.on_fire()
+                self.new_health = health
+            # gold update
+            self.gold = gold
             
-        if self.health <= 0:
+            # experience handlerer
+            if self.current_experience >= self.experience_to_gain_new_level:
+                self.level += 1
+                self.current_experience = self.current_experience - self.experience_to_gain_new_level
+                if self.current_experience <= 0:
+                    self.current_experience = 0
+                self.experience_to_gain_new_level *= 2
+            
+            # is on fire?
+            if self.is_on_fire:
+                self.on_fire()
+            
+            # is alive?
+            if self.health <= 0:
+                self.alive = False
+        else: 
             if not flip:
                 self.image_to_show = self.assets["player_dead"][math.floor(self.animation_index[2][1])]
                 self.animation_index[2][1] += 0.05
@@ -159,22 +179,31 @@ class Character():
                 self.animation_index[2][1] += 0.05
                 if self.animation_index[2][1] >= self.max_dead_animation:
                     self.animation_index[2][1] = self.max_dead_animation
-            self.alive = False
+                
             hud.healthbar_boss.set_show(False)
+            if self.play_died_sound_once:
+                self.assets['died_sound'].play()
+                self.play_died_sound_once = False
 
-
-        
 
     def died(self):
         end = False
         self.died_counter += 1
         if self.died_counter > 10000:
             end = True
+            self.play_died_sound_once = True
         return end
+    
     
     def change_fx_volume(self):
         self.assets["walk_sound"].set_volume(scripts.constants.FX_VOLUME)
+        self.assets["died_sound"].set_volume(scripts.constants.FX_VOLUME)
+        
 
+    def add_experience(self, experience_points):
+        self.current_experience += experience_points
+        
+        
     def on_fire_trigger(self, damage, time, tics):
         self.on_fire_time = pygame.time.get_ticks()
         self.on_fire_tics = tics

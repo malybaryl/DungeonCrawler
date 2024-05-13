@@ -71,4 +71,10 @@ VERSION: 0.0.9
 VERSION: 0.1.0
 - bugs fixes: 
     - info show bug in town
-    - no more poping out error window
+    - no more poping out error window // ?
+- icon in exe file
+- new main music theme
+- new sounds effect
+- now weapons have diffrent damage and mechanics
+- new weapon type: throwables (rock, throving knive, throving axe etc.)
+- difficulty increased (now enemies are more powerful in further world levels)

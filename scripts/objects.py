@@ -1,7 +1,7 @@
 import pygame
 import scripts.constants
 from random import choice 
-from scripts.weapon import Bow
+from scripts.weapon import Bow, Throwable, TwoHandedSword, Spear
 
 class Object:
     def __init__(self, type):
@@ -26,7 +26,7 @@ class Chest(Object):
         self.time = pygame.time.get_ticks()
         self.show_e_button = False
     
-    def update(self, screen_scroll, event_key_pressed, player):
+    def update(self, screen_scroll, event_key_pressed, player, hud):
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
         wepon = None
@@ -39,10 +39,17 @@ class Chest(Object):
         if self.rect.colliderect(player.rect):    
             if event_key_pressed:
                 if self.closed:
-                    new_wepon = self.return_new_wepon()
+                    type_of_weapon, new_wepon = self.return_new_wepon()
                     x = self.rect.x + 16
                     y = self.rect.y + 16
-                    wepon = Bow(x,y, 'bows', new_wepon, on_ground = True)
+                    if type_of_weapon == 'bows':
+                        wepon = Bow(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                    elif type_of_weapon == 'throwables':
+                        wepon = Throwable(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                    elif type_of_weapon == 'two_handed_swords':
+                        wepon = TwoHandedSword(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                    elif type_of_weapon == 'spears':
+                        wepon = Spear(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
                     self.delete = True
                     self.time = pygame.time.get_ticks()
                 self.closed = False
@@ -69,9 +76,18 @@ class Chest(Object):
         return wepon
                 
     def return_new_wepon(self):
-        wepon = choice(scripts.constants.BOWS)
+        type_of_weapons = choice(scripts.constants.TYPES_OF_WEAPONS)
         
-        return wepon
+        if type_of_weapons == 'bows':
+            wepon = choice(scripts.constants.BOWS)
+        elif type_of_weapons == 'throwables':
+            wepon = choice(scripts.constants.THROWABLES)
+        elif type_of_weapons == 'two_handed_swords':
+            wepon = choice(scripts.constants.TWOHANDEDSWORDS)
+        elif type_of_weapons == 'spears':
+            wepon = choice(scripts.constants.SPEARS)
+            
+        return type_of_weapons, wepon
     
     def diseaper(self):
         if pygame.time.get_ticks() - self.time >= 2000:

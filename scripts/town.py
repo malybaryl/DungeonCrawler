@@ -257,6 +257,8 @@ class Town():
         self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
         self.pressed = False
         self.pressed_cooldown = 0
+        self.smith_menu = False
+        self.smith_menu_cliked = False
         
 
         
@@ -306,11 +308,21 @@ class Town():
             self.pressed = True
             self.pressed_cooldown = pygame.time.get_ticks()
             if not self.fight_button_pressed:
+                # fight menu cliked
                 if scripts.constants.DISPLAY_WIDTH-34 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH-2 and scripts.constants.DISPLAY_HEIGHT-34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT-2:
                         self.fight_button_pressed = True
                         self.time = pygame.time.get_ticks()
-                if 2 < self.pos[0]/scripts.constants.SCALE_WIDTH < 34 and scripts.constants.DISPLAY_HEIGHT-34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT-2:
+                # build menu cliked
+                elif 2 < self.pos[0]/scripts.constants.SCALE_WIDTH < 34 and scripts.constants.DISPLAY_HEIGHT-34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT-2:
                         self.build_button_pressed = True
+                        self.time = pygame.time.get_ticks()
+                # character menu cliked
+                # ---------------------
+                # 36
+                
+                # smith menu cliked
+                elif 70 < self.pos[0]/scripts.constants.SCALE_WIDTH < 102 and scripts.constants.DISPLAY_HEIGHT-34 < self.pos[1]/scripts.constants.SCALE_HEIGHT < scripts.constants.DISPLAY_HEIGHT-2:
+                        self.smith_menu_cliked = True
                         self.time = pygame.time.get_ticks()
         
         if self.pressed:
@@ -715,7 +727,11 @@ class Town():
                         self.walls_cliked = False
                 else:
                         self.walls_cliked = False
-                
+        
+        # smith menu handler
+        if self.smith_menu:
+            pass
+              
         if build_menu_key_pressed:
             if not self.fight_button_pressed:
                 if self.build_menu:
@@ -734,6 +750,16 @@ class Town():
                     else:
                         self.build_menu = True
                         self.build_button_pressed = False
+            
+        if self.smith_menu_cliked:
+            if not self.fight_button_pressed:
+                if (pygame.time.get_ticks() - self.time) >= 100:
+                    if self.smith_menu:
+                        self.smith_menu = False
+                        self.smith_menu_cliked = False
+                    else:
+                        self.smith_menu = True
+                        self.smith_menu_cliked = False
                     
         if fight_town_button_pressed:
             if self.fight_button_pressed:
