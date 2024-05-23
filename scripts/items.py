@@ -30,10 +30,10 @@ class Item(pygame.sprite.Sprite):
         if self.item_type == "health_potion":
             if self.rect.colliderect(player.rect):
                 if player.health < player.health_max:
-                    if player.health >= player.health_max/2:
+                    if player.health >= player.health_max//2:
                         player.new_health = player.health_max
                     else:
-                        player.new_health += player.health_max/2
+                        player.new_health += player.health_max//2
                     player.player_was_heal = True
                     self.assets['pick_up_potion_sound'].play()
                     self.kill()

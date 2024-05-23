@@ -12,7 +12,7 @@ from scripts.mathFunc import distance
 # TWO HANDED SWORDS: 'wooden_sword', 'rusted_sword', 'sword', 'katana', 'great_sword', 'sharpened_druid_staff', 'master_curved_slasher'
 # SPEARS: 'wooden_spear', 'wooden_pitchfork', 'spear', 'pitchfork', 'extended_sickle', 'guard_spear', 'blade_on_stick', 'pike_with_a_wolf's_tooth', 'angel's_spear'
 class Weapon:
-    def __init__(self, type_of_weapon, weapon, on_ground, player_level, hud):  
+    def __init__(self, type_of_weapon, weapon, on_ground, player_level, hud, player):  
         self.assets = {
             "weapon": loadImages(f"wepons/{type_of_weapon}/{weapon}"),  
             'e_key': pygame.image.load('assets/images/HUD/e_button/0.png'),
@@ -28,161 +28,161 @@ class Weapon:
         self.event_key_cooldown = pygame.time.get_ticks()
         self.show_e_button = False
         self.weapon_level = player_level
-        self.min_damage = self.set_min_damage(self.weapon_level)
-        self.max_damage = self.set_max_damage(self.weapon_level)
+        self.min_damage = self.set_min_damage(self.weapon_level, player.minimal_damage_multiplied)
+        self.max_damage = self.set_max_damage(self.weapon_level, player.maximal_damage_multiplied)
         self.animate_x = 0
         self.animate_cooldown = pygame.time.get_ticks()
         if not self.on_ground:
             self.update_info_damage(hud)
        
         
-    def set_min_damage(self, weapon_level):
+    def set_min_damage(self, weapon_level, minimal_damage_multiply):
         min_damage = 3
         
         # BOWS
         if self.weapon == 'slingshot':
-            min_damage = 3 * weapon_level
+            min_damage = 3 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'classic_bow':
-            min_damage = 5 * weapon_level
+            min_damage = 5 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'composite_bow':
-            min_damage = 5 * weapon_level
+            min_damage = 5 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'crossbow':
-            min_damage = 20 * weapon_level
+            min_damage = 20 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'deer_tamer':
-            min_damage = 20 * weapon_level
+            min_damage = 20 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'iron_bow':
-            min_damage = 15 * weapon_level
+            min_damage = 15 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'lava_guardian_crossbow':
-            min_damage = 20 * weapon_level
+            min_damage = 20 * weapon_level * minimal_damage_multiply
             
         # THROWABLES
         elif self.weapon == 'rock':
-            min_damage = 2 * weapon_level
+            min_damage = 2 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'knive':
-            min_damage = 4 * weapon_level
+            min_damage = 4 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'throwing_axe':
-            min_damage = 15 * weapon_level
+            min_damage = 15 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'throwing_spear':
-            min_damage = 5 * weapon_level
+            min_damage = 5 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'broken_druid_staff':
-            min_damage = 15 * weapon_level
+            min_damage = 15 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'crusader_throwing_axe':
-            min_damage = 25 * weapon_level
+            min_damage = 25 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'lava_defenders_penetrator':
-            min_damage = 15 * weapon_level
-            
+            min_damage = 15 * weapon_level * minimal_damage_multiply
+        
         # THROWABLES
         elif self.weapon == 'wooden_sword':
-            min_damage = 10 * weapon_level
+            min_damage = 10 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'rusted_sword':
-            min_damage = 15 * weapon_level
+            min_damage = 15 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'sword':
-            min_damage = 20 * weapon_level
+            min_damage = 20 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'katana':
-            min_damage = 25 * weapon_level
+            min_damage = 25 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'great_sword':
-            min_damage = 30 * weapon_level
+            min_damage = 30 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'sharpened_druid_staff':
-            min_damage = 40 * weapon_level
+            min_damage = 40 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'master_curved_slasher':
-            min_damage = 50 * weapon_level
+            min_damage = 50 * weapon_level * minimal_damage_multiply
         
         # SPEARS
         elif self.weapon == 'wooden_spear':
-            min_damage = 2 * weapon_level
+            min_damage = 2 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'spear':
-            min_damage = 5 * weapon_level
+            min_damage = 5 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'extended_sickle':
-            min_damage = 10 * weapon_level
+            min_damage = 10 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'guard_spear':
-            min_damage = 15 * weapon_level
+            min_damage = 15 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'wooden_pitchfork':
-            min_damage = 1 * weapon_level
+            min_damage = 1 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'pitchfork':
-            min_damage = 3 * weapon_level
+            min_damage = 3 * weapon_level * minimal_damage_multiply
         elif self.weapon == 'blade_on_stick':
-            min_damage = 9 * weapon_level
+            min_damage = 9 * weapon_level * minimal_damage_multiply
         elif self.weapon == "pike_with_a_wolf's_tooth":
-            min_damage = 12 * weapon_level
+            min_damage = 12 * weapon_level * minimal_damage_multiply
         elif self.weapon == "angel's_spear":
-            min_damage = 16 * weapon_level
+            min_damage = 16 * weapon_level * minimal_damage_multiply
         
-        return min_damage
+        return int(min_damage)
         
         
-    def set_max_damage(self, weapon_level):
+    def set_max_damage(self, weapon_level, maximal_damage_mutiply):
         max_damage = 8
         
         # BOWS
         if self.weapon == 'slingshot':
-            max_damage = 8 * weapon_level
+            max_damage = 8 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'classic_bow':
-            max_damage = 15 * weapon_level
+            max_damage = 15 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'composite_bow':
-            max_damage = 40 * weapon_level
+            max_damage = 40 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'crossbow':
-            max_damage = 40 * weapon_level
+            max_damage = 40 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'deer_tamer':
-            max_damage = 40 * weapon_level
+            max_damage = 40 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'iron_bow':
-            max_damage = 25 * weapon_level
+            max_damage = 25 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'lava_guardian_crossbow':
-            max_damage = 40 * weapon_level
+            max_damage = 40 * weapon_level * maximal_damage_mutiply
             
         # THROWABLES
         elif self.weapon == 'rock':
-            max_damage = 4 * weapon_level
+            max_damage = 4 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'knive':
-            max_damage = 8 * weapon_level
+            max_damage = 8 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'throwing_axe':
-            max_damage = 35 * weapon_level    
+            max_damage = 35 * weapon_level  * maximal_damage_mutiply   
         elif self.weapon == 'throwing_spear':
-            max_damage = 20 * weapon_level    
+            max_damage = 20 * weapon_level  * maximal_damage_mutiply   
         elif self.weapon == 'broken_druid_staff':
-            max_damage = 25 * weapon_level    
+            max_damage = 25 * weapon_level  * maximal_damage_mutiply   
         elif self.weapon == 'crusader_throwing_axe':
-            max_damage = 50 * weapon_level    
+            max_damage = 50 * weapon_level   * maximal_damage_mutiply  
         elif self.weapon == 'lava_defenders_penetrator':
-            max_damage = 25 * weapon_level   
+            max_damage = 25 * weapon_level   * maximal_damage_mutiply 
             
         # THROWABLES
         elif self.weapon == 'wooden_sword':
-            max_damage = 15 * weapon_level
+            max_damage = 15 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'rusted_sword':
-            max_damage = 20 * weapon_level
+            max_damage = 20 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'sword':
-            max_damage = 25 * weapon_level
+            max_damage = 25 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'katana':
-            max_damage = 30 * weapon_level
+            max_damage = 30 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'great_sword':
-            max_damage = 35 * weapon_level
+            max_damage = 35 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'sharpened_druid_staff':
-            max_damage = 45 * weapon_level
+            max_damage = 45 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'master_curved_slasher':
-            max_damage = 55 * weapon_level 
+            max_damage = 55 * weapon_level  * maximal_damage_mutiply
         
         # SPEARS
         elif self.weapon == 'wooden_spear':
-            max_damage = 5 * weapon_level
+            max_damage = 5 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'spear':
-            max_damage = 15 * weapon_level
+            max_damage = 15 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'extended_sickle':
-            max_damage = 25 * weapon_level
+            max_damage = 25 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'guard_spear':
-            max_damage = 30 * weapon_level
+            max_damage = 30 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'wooden_pitchfork':
-            max_damage = 5 * weapon_level
+            max_damage = 5 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'pitchfork':
-            max_damage = 15 * weapon_level
+            max_damage = 15 * weapon_level * maximal_damage_mutiply
         elif self.weapon == 'blade_on_stick':
-            max_damage = 45 * weapon_level
+            max_damage = 45 * weapon_level * maximal_damage_mutiply
         elif self.weapon == "pike_with_a_wolf's_tooth":
-            max_damage = 60 * weapon_level
+            max_damage = 60 * weapon_level * maximal_damage_mutiply
         elif self.weapon == "angel's_spear":
-            max_damage = 80 * weapon_level
+            max_damage = 80 * weapon_level * maximal_damage_mutiply
     
         
-        return max_damage
+        return int(max_damage)
     
     
     def update_info_damage(self, hud):
@@ -190,12 +190,21 @@ class Weapon:
         hud.max_damage = self.max_damage
         hud.damege_text = hud.font.render(f"Damage: {self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
         
-            
+    def update_minimal_damage(self, player, hud):
+        self.min_damage = int(self.set_min_damage(self.weapon_level, player.minimal_damage_multiplied))
+        if self.min_damage >= self.max_damage:
+            self.max_damage = self.min_damage
+        self.update_info_damage(hud)     
+    
+    def update_maximal_damage(self, player, hud):
+        self.max_damage = int(self.set_max_damage(self.weapon_level, player.maximal_damage_multiplied))
+        self.update_info_damage(hud)     
+       
     def is_on_ground(self, screen_scroll):
         self.rect.centerx += screen_scroll[0]
         self.rect.centery += screen_scroll[1]
     
-    def change_weapon(self, main_weapon, hud):
+    def change_weapon(self, main_weapon, hud, player):
         if pygame.time.get_ticks() - self.event_key_cooldown >= 1500:
             original_class_ = main_weapon.__class__
             original_weapon_level_ = main_weapon.weapon_level
@@ -210,27 +219,27 @@ class Weapon:
             original_shot_cooldown_ = main_weapon.shot_cooldown
             if self.type == 'bows' or self.type == 'throwables':
                 original_distance_ = main_weapon.distance
-            
+            print('im here')
             main_weapon.__class__ = self.__class__  
             if self.type == 'bows':
-                main_weapon.__init__(self.rect.x, self.rect.y, self.type, self.weapon, self.weapon_level, hud)  
+                main_weapon.__init__(self.rect.x, self.rect.y, self.type, self.weapon, self.weapon_level, hud,False, player)  
                 hud.visible_coursor(True)
             elif self.type == 'throwables':
-                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud)   
+                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud,False, player)   
                 hud.visible_coursor(True)
             elif self.type == 'two_handed_swords':
-                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud) 
+                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud,False, player) 
                 hud.visible_coursor(False)
             elif self.type == 'spears':
-                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud) 
+                main_weapon.__init__(self.rect.x, self.rect.y,self.type, self.weapon, self.weapon_level, hud,False, player) 
                 hud.visible_coursor(False)
                       
             main_weapon.assets = self.assets
             main_weapon.weapon = self.weapon
             main_weapon.type = self.type
             main_weapon.original_image = self.original_image
-            main_weapon.min_damage = self.set_min_damage(main_weapon.weapon_level)
-            main_weapon.max_damage = self.set_max_damage(main_weapon.weapon_level)
+            main_weapon.min_damage = self.set_min_damage(main_weapon.weapon_level, player.minimal_damage_multiplied)
+            main_weapon.max_damage = self.set_max_damage(main_weapon.weapon_level, player.maximal_damage_multiplied)
             main_weapon.update_info_damage(hud)
             main_weapon.shot_cooldown = self.shot_cooldown
             if self.type == 'bows' or self.type == 'throwables':
@@ -238,13 +247,13 @@ class Weapon:
             
             self.__class__ = original_class_  
             if original_type_ == 'bows':
-                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16, original_type_, weapon_, original_weapon_level_, hud, True)  
+                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16, original_type_, weapon_, original_weapon_level_, hud, True, player)  
             elif original_type_ == 'throwables':
-                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True) 
+                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True, player) 
             elif original_type_ == 'two_handed_swords':
-                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True) 
+                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True, player) 
             elif original_type_ == 'spears':
-                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True) 
+                self.__init__(original_x_cord_ + 16, original_y_cord_ + 16,original_type_, weapon_, original_weapon_level_, hud, True, player) 
                 
             self.assets = assets_
             self.weapon = weapon_
@@ -262,7 +271,7 @@ class Weapon:
         if player.rect.colliderect(self.rect):
             self.show_e_button = True
             if event_key_pressed:
-                    self.change_weapon(main_weapon, hud)
+                    self.change_weapon(main_weapon, hud, player)
                     event_key_pressed = False
         else:
             self.show_e_button = False
@@ -276,8 +285,8 @@ class Weapon:
 
 
 class Bow(Weapon):
-    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False):
-        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud)
+    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False, player = None):
+        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud, player)
         self.angle = 0
         self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = pygame.Rect(0, 0, 32, 32)
@@ -635,8 +644,8 @@ class Magicball(pygame.sprite.Sprite):
 
 
 class Throwable(Weapon):
-    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False):
-        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud)
+    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False, player = None):
+        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud, player)
         self.angle = 0
         self.image_to_show = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = pygame.Rect(0, 0, 32, 32)
@@ -725,8 +734,8 @@ class Throwable(Weapon):
           
      
 class TwoHandedSword(Weapon):
-    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False):
-        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud)
+    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False, player = None):
+        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud, player)
         if not on_ground:
             self.image_to_show = pygame.transform.rotate(self.original_image, 10)
         else:
@@ -853,15 +862,12 @@ class TwoHandedSword(Weapon):
                         damage = random.randint(self.min_damage , self.max_damage)
                         damage_pos = enemy.rect
                         enemy.health -= damage
-                        print('hit left | weapon.py line: 695')
                 else:
                     if enemy.rect.centerx >= self.rect.centerx:
                         damage = random.randint(self.min_damage , self.max_damage)
                         damage_pos = enemy.rect
                         enemy.health -= damage
-                        print('hit right | weapon.py line: 702')
-
-                    
+                                 
         return damage, damage_pos
 
     def draw(self, surface):
@@ -875,8 +881,8 @@ class TwoHandedSword(Weapon):
 
 
 class Spear(Weapon):
-    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False):
-        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud)
+    def __init__(self, x, y, type_of_weapon, weapon, player_level, hud, on_ground=False, player = None):
+        super().__init__(type_of_weapon, weapon, on_ground, player_level, hud, player)
         if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear':
             self.shot_cooldown = 2000
             self.image_to_show = self.original_image

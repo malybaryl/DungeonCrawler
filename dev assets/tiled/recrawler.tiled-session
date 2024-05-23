@@ -1,0 +1,50 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "druid.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "001.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 793,
+                "y": 968
+            }
+        },
+        "druid.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 732.6666666666665,
+                "y": 906.6666666666666
+            }
+        },
+        "grassland.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 2
+        }
+    },
+    "last.exportedFilePath": "C:/Users/kacpe/Desktop/programing/python/Recrawler/assets/levels/druid",
+    "last.imagePath": "C:/Users/kacpe/Desktop/programing/python/Recrawler/dev assets/tiled",
+    "map.height": 50,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 50,
+    "openFiles": [
+        "grassland.tsx",
+        "001.tmx",
+        "druid.tmx"
+    ],
+    "project": "recrawler.tiled-project",
+    "recentFiles": [
+        "grassland.tsx",
+        "001.tmx",
+        "druid.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

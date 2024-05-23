@@ -51,10 +51,13 @@ class Character():
         self.on_fire_damage_cooldown = None
         self.on_fire_how_long = None
         self.is_on_fire = False
+        self.minimal_damage_multiplied = 1
+        self.maximal_damage_multiplied = 1
 
    
     def move(self, dx, dy, obstacle_tile):
         # screen scroll
+
         screen_scroll = [0,0]
         if self.alive:
             # sound walk handler
@@ -110,6 +113,7 @@ class Character():
         return screen_scroll
 
     def update(self, flip, moving, health, gold, hud):
+        level_up = False
         if self.alive:
             #print (str(self.current_experience) + '-' + str(self.experience_to_gain_new_level) + ' | ' + str(self.level))
             
@@ -156,6 +160,7 @@ class Character():
             # experience handlerer
             if self.current_experience >= self.experience_to_gain_new_level:
                 self.level += 1
+                level_up = True
                 self.current_experience = self.current_experience - self.experience_to_gain_new_level
                 if self.current_experience <= 0:
                     self.current_experience = 0
@@ -184,6 +189,7 @@ class Character():
             if self.play_died_sound_once:
                 self.assets['died_sound'].play()
                 self.play_died_sound_once = False
+        return level_up
 
 
     def died(self):

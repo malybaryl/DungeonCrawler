@@ -3,10 +3,14 @@ import scripts.constants
 from random import choice 
 from scripts.weapon import Bow, Throwable, TwoHandedSword, Spear
 
+
 class Object:
+    
     def __init__(self, type):
         self.type = type
+    
         
+    
 class Chest(Object):
     def __init__(self, x, y, closed_chest_img, opened_chest_img):
         super().__init__(type= 'chest')
@@ -26,6 +30,7 @@ class Chest(Object):
         self.time = pygame.time.get_ticks()
         self.show_e_button = False
     
+    
     def update(self, screen_scroll, event_key_pressed, player, hud):
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
@@ -43,13 +48,13 @@ class Chest(Object):
                     x = self.rect.x + 16
                     y = self.rect.y + 16
                     if type_of_weapon == 'bows':
-                        wepon = Bow(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                        wepon = Bow(x,y, type_of_weapon, new_wepon, player.level , hud, True, player)
                     elif type_of_weapon == 'throwables':
-                        wepon = Throwable(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                        wepon = Throwable(x,y, type_of_weapon, new_wepon, player.level , hud, True, player)
                     elif type_of_weapon == 'two_handed_swords':
-                        wepon = TwoHandedSword(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                        wepon = TwoHandedSword(x,y, type_of_weapon, new_wepon, player.level , hud ,True, player)
                     elif type_of_weapon == 'spears':
-                        wepon = Spear(x,y, type_of_weapon, new_wepon, player.level , hud, on_ground = True)
+                        wepon = Spear(x,y, type_of_weapon, new_wepon, player.level , hud, True, player)
                     self.delete = True
                     self.time = pygame.time.get_ticks()
                 self.closed = False
@@ -74,6 +79,7 @@ class Chest(Object):
                 player.rect.left = self.collider_rect.right + 1
                 
         return wepon
+    
                 
     def return_new_wepon(self):
         type_of_weapons = choice(scripts.constants.TYPES_OF_WEAPONS)
@@ -89,6 +95,7 @@ class Chest(Object):
             
         return type_of_weapons, wepon
     
+    
     def diseaper(self):
         if pygame.time.get_ticks() - self.time >= 2000:
             self.not_draw = True
@@ -102,3 +109,25 @@ class Chest(Object):
         if scripts.constants.SHOW_HITBOX:
                 pygame.draw.rect(surface, scripts.constants.BLUE, self.rect, 1)
                 pygame.draw.rect(surface, scripts.constants.RED, self.collider_rect, 1)
+      
+      
+                
+class FireUpPlayer(Object):
+    def __init__(self, x, y):
+        type = 'fire_up_player'
+        super().__init__(type)
+        self.rect = pygame.Rect(x, y, 32, 32)
+        self.rect.center = (x,y)
+        
+        
+    def update(self, screen_scroll, player, world_level):
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        if self.rect.colliderect(player.rect) and player.alive:
+            player.on_fire_trigger(1 * world_level, 3, 1)
+            
+            
+    def draw(self, surface):
+        if scripts.constants.SHOW_HITBOX:
+            pygame.draw.rect(surface, scripts.constants.BLUE, self.rect, 32, 1)
+            

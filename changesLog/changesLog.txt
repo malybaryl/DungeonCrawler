@@ -81,3 +81,12 @@ VERSION: 0.1.0
 - new weapon type: two handed swords
 - new weapon type: spears
 - new player level up system
+
+VERSION: 0.1.1
+- bugs fixes:
+    - no more poping up error after the game
+- new maps
+- new world "lavaland"
+- better optimalisation
+- now player can walk into lave and he burns
+- new level up system card

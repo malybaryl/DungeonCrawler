@@ -64,6 +64,8 @@ class Enemy():
             experience = 4 + (0.1 * self.lvl)
         elif self.type == 'druid':
             experience = 50 + (0.25 * self.lvl)
+        elif self.type == 'imp':
+            experience = 10 + (0.2 * self.lvl)
             
         return experience
             
@@ -1651,5 +1653,210 @@ class Druid(Enemy):
         gate_tiles.append(tile_data)
         return gate_tiles
             
+class Imp(Enemy):
+    def __init__(self, x, y, health, world_level):
+        super().__init__('slime_fire_wizard', x, y, health, world_level)
+        self.assets={
+            "imp_idle_walk": loadImages("char/imp/idle_walk"),
+            'imp_attack': loadImages("char/imp/attack"),
+            "orc_hit_sound": pygame.mixer.Sound("assets/audio/swing.mp3")
+            }
+        self.image_to_show = self.assets["imp_idle_walk"][math.floor(self.animation_index[0][1])]
+        self.damage = 0
+        self.fireball_trigger = pygame.time.get_ticks()
+        self.rect = pygame.Rect(0,0,32,32)
+        self.rect.center = (x,y)
+        self.attack = False  
+        
+    def move(self, obstacle_tile, player, screen_scroll):
+       # reposition depending on screen_scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        magicball = None
+        colision_x = False
+        colision_y = False
+        
+        if self.alive:
+            if not self.chaise and self.on_screen():
+                    
+                if self.walk_left:
+                    self.dx = -scripts.constants.SLIME_SPEED
+                    self.is_fliped = False
+                if self.walk_right:
+                    self.dx = scripts.constants.SLIME_SPEED
+                    self.is_fliped = True
+                if self.walk_down:
+                    self.dy = scripts.constants.SLIME_SPEED
+                if self.walk_up:
+                    self.dy = -scripts.constants.SLIME_SPEED
+
+                # update x position
+                if not self.stunned:
+                    self.rect.x += self.dx
+                    old_x = self.rect.x - self.dx
+
+                    # checking colision x
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                        colision_x = True
+                        # checking from which side is collision
+                        if self.dx > 0:
+                            self.rect.x = old_x
+                        if self.dx < 0:
+                            self.rect.x = old_x
+
+                # update y position       
+                if not self.stunned:
+                    self.rect.y += self.dy
+                    old_y = self.rect.y - self.dy
+
+                # checking colision y
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                        colision_y = True
+                        # checking from which side is collision
+                        if self.dy > 0:
+                            self.rect.y = old_y
+                        if self.dy < 0:
+                            self.rect.y = old_y
+
+                # if collison or 5 second change diretion of moving
+                if colision_x or colision_y or pygame.time.get_ticks() > self.wander_timer:
+                    self.walk_down = False
+                    self.walk_up = False
+                    self.walk_left = False
+                    self.walk_right = False
+                    self.change_direction = random.randint(0, 3)
+                    if self.change_direction == 0:
+                        self.walk_down = True
+                    elif self.change_direction == 1:
+                        self.walk_up = True
+                    elif self.change_direction == 2:
+                        self.walk_left = True
+                    elif self.change_direction == 3:
+                        self.walk_right = True
+                    self.wander_timer = pygame.time.get_ticks() + 5000
+
+            if self.chaise:
+                    
+                # reset values
+                self.dx = 0
+                self.dy = 0
     
+                if self.rect.centerx > player.rect.centerx:
+                    self.dx = -scripts.constants.SLIME_SPEED
+                    self.is_fliped = False
+                if self.rect.centerx < player.rect.centerx:
+                    self.dx = scripts.constants.SLIME_SPEED
+                    self.is_fliped = True
+                if self.rect.centery > player.rect.centery:
+                    self.dy = -scripts.constants.SLIME_SPEED
+                if self.rect.centery < player.rect.centery:
+                    self.dy = scripts.constants.SLIME_SPEED
+                    
+                    
+            
+                actuall_time = pygame.time.get_ticks()
+                    
+                if actuall_time - self.fireball_trigger >= 2000:
+                    self.stunned = True
+                    self.attack = True
+                    if self.animation_index[1][1] >= 4:
+                        self.fireball_trigger = actuall_time
+                        magicball = self.magic_ball(player, self.lvl)
+                        self.animation_index[1][1] = 0
+                        self.stunned = False
+                        self.attack = False
+        
+
+                    # update x position
+                if not self.stunned:
+                    self.rect.x += self.dx
+
+                    # checking colision x
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                            # checking from which side is collision
+                        if self.dx > 0:
+                            self.rect.right = obstacle[1].left - 1
+                        if self.dx < 0:
+                            self.rect.left = obstacle[1].right + 1
+
+                    # update y position
+                if not self.stunned:    
+                        self.rect.y += self.dy
+
+                    # checking colision y
+                for obstacle in obstacle_tile:
+                    if obstacle[1].colliderect(self.rect):
+                        # checking from which side is collision
+                        if self.dy > 0:
+                            self.rect.bottom = obstacle[1].top - 1
+                        if self.dy < 0:
+                            self.rect.top = obstacle[1].bottom + 1
+        return magicball  
+    
+    def update(self, player, obstacle_tile):
+        # reset values
+        gold = False
+        health_potion = False
+        self.alive = True
+        clipped_line = None
+        show_hp = False
+        
+        if self.alive:
+            # check if mob has died
+            if self.health <= 0:
+                self.health = 0
+                self.alive = False
+            
+            # handle animation
+            # walk 
+            if not self.attack:
+                self.image_to_show = self.assets["imp_idle_walk"][math.floor(self.animation_index[0][1])]
+                self.animation_index[0][1] += 0.1
+                if self.animation_index[0][1] >= 2.4:
+                    self.animation_index[0][1] = 0
+            else:
+                self.image_to_show = self.assets["imp_attack"][math.floor(self.animation_index[0][1])]
+                self.animation_index[0][1] += 0.1
+                if self.animation_index[0][1] >= 2.4:
+                    self.animation_index[0][1] = 0
+                                    
+            # create a line of sight from enemy to the player
+            self.line_of_sight = ((self.rect.centerx, self.rect.centery), (player.rect.centerx, player.rect.centery))
+            # check if line of sight passes through an obstacle tile
+            for obstacle in obstacle_tile:
+                if obstacle[1].clipline(self.line_of_sight):
+                    clipped_line = obstacle[1].clipline(self.line_of_sight)
+            self.dist = math.sqrt(((self.rect.centerx - player.rect.centerx)**2)+((self.rect.centery-player.rect.centery)**2))
+            # check if chaise
+            if not clipped_line:
+                
+                if self.dist <= scripts.constants.SLIME_FIRE_WIZARD_RANGE or self.health < 0.9*self.max_health:
+                    self.chaise = True
+                    self.stunned = False
+        
+        # when not alive
+        if not self.alive:
+            
+            if self.add_experience_once:
+                self.add_player_experience(player)
+                self.add_experience_once = False
+                
+            if self.randgold <= 50:
+                gold = True
+            if self.randpotion <= 10:
+                health_potion = True
+ 
+            self.image_to_show = self.assets["imp_idle_walk"][math.floor(self.animation_index[1][1])]
+            self.animation_index[1][1] += 0.05
+            if self.animation_index[1][1] >= 2.3:
+                self.animation_index[1][1] = 2
+                self.dead_counter += 1
+            if self.dead_counter > 30:
+                self.delete = True
+            
+                    
+        return gold, health_potion, self.alive, show_hp      
                     

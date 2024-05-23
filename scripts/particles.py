@@ -1,6 +1,6 @@
 import pygame
-import scripts.constants
 import random
+
 
 class Particle:
     def __init__(self, color=(255, 255, 255), x=0, y=0, start_radius=5, direction='left'):
@@ -31,6 +31,8 @@ class Particle:
 
     def is_alive(self):
         return self.radius > 0
+
+
 
 class ParticleSystem:
     def __init__(self, max_particles=100):

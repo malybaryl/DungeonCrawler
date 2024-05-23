@@ -68,11 +68,17 @@ class HUD:
         self.cliked_cooldown = 0
         self.draw_coursor = True
     
+    
     def refresh_player_image(self, player):
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
         
+     
+    def update_character_health_bar(self, player):
+        self.full_health = player.health_max
+        self.image_player_hp = self.font.render(str(self.health)+'/'+str(self.full_health), True, scripts.constants.WHITE)
     
     def update(self, player, world_level, town, game_counter, keys_pressed):
+        pygame.init()
         self.pos = pygame.mouse.get_pos()
         self.world_level = world_level
         self.health = player.health

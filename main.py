@@ -13,6 +13,8 @@ from scripts.music import Music
 from scripts.menu import Menu
 from scripts.town import Town
 from scripts.particles import ParticleSystem
+from scripts.cards_system import CardManager
+from concurrent.futures import ThreadPoolExecutor
 
 
 
@@ -69,7 +71,6 @@ exit_tiles=[]
 enemy_list=[]
 world_level = 0
 fight_town_button_pressed = False
-world.proced_csv_file()
 
 # create background and HUD
 background = Bg()
@@ -82,10 +83,10 @@ build_button_pressed = False
 fight_key_town_button_pressed = False
 
 #weapons
-weapon = Bow(0,0,'bows','slingshot', player.level, hud)
+#weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
 #weapon = Throwable(0,0,'throwables','crusader_throwing_axe', player.level, hud)
 #weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level, hud)
-#weapon = Spear(0,0,'spears','spear', player.level, hud)
+weapon = Spear(0,0,'spears',"guard_spear", player.level + 10, hud,  False ,player)
 magic_ball = None
 
 #parciples
@@ -104,6 +105,9 @@ chest_items = []
 
 # generate level
 generate_world = True
+
+# card manager
+card_manager = CardManager()
 
 fade = True
 # main game loop
@@ -229,16 +233,16 @@ while game_is_on:
                 hud.minutes = 0
                 hud.hours = 0 
                 if player.type == 'player1':
-                    weapon = Bow(0,0,'bows','slingshot', player.level, hud)
+                    weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
                     hud.visible_coursor(True)
                 elif player.type == 'elf':
-                    weapon = Throwable(0,0,'throwables','rock', player.level, hud)
+                    weapon = Throwable(0,0,'throwables','rock', player.level, hud, False, player)
                     hud.visible_coursor(True)
                 elif player.type == 'knight':
-                    weapon = TwoHandedSword(0,0,'two_handed_swords','wooden_sword', player.level, hud)
+                    weapon = TwoHandedSword(0,0,'two_handed_swords','wooden_sword', player.level, hud, False, player)
                     hud.visible_coursor(False)
                 elif player.type == 'pikemen':
-                    weapon = Spear(0,0,'spears',"wooden_spear", player.level, hud)
+                    weapon = Spear(0,0,'spears',"wooden_spear", player.level, hud, False, player)
                     hud.visible_coursor(False)
                         
             if new_level:
@@ -250,42 +254,77 @@ while game_is_on:
             # generate new world
             if generate_world:
                 # clear world data 
+                chest_items.clear()
+                keys_pressed.clear()
                 world_data.clear()
                 world_mobs_data.clear()
                 boss_list.clear()
                 exit_tiles.clear()
                 enemy_list.clear()
-                keys_pressed.clear()
-                chest_items.clear()
                 
+                damage_text_group.empty()
+                arrow_group.empty()
+                item_group.empty()
+                magic_ball_group.empty()
                 
-                damage_text_group.remove()
-                arrow_group.remove()
-                item_group.remove()
-                magic_ball_group.remove()
-                
-                world.character_list.clear()
-                world.gate_tiles.clear()
-                world.world_data.clear()
-                world.world_mobs_data.clear()
-                world.world_objects_data.clear()
-                world.world_decorations_down.clear()
-                world.world_decorations_up.clear()
-                world.objects.clear()
                 world.map_tiles.clear()
+                world.map_tiles2.clear()
                 world.obstacle_tile.clear()
                 world.decorations_up_tiles.clear()
-        
-                # generete new level
+                world.decorations_down_tiles.clear()
+                world.character_list.clear()
+                world.gate_tiles.clear()
+                world.objects.clear()
+                world.world_data.clear()
+                world.world_data2.clear()
+                world.world_mobs_and_objects_data.clear()
+                world.world_decoration_down_data.clear()
+                world.world_decoration_up_data.clear()
+                world.walls.clear()
+
                 world.proced_csv_file(world_level=world_level + 1)
-                player, enemy_list, exit_tiles= world.process_date(world.world_data, "grassland")
-                player, enemy_list, exit_tiles= world.process_date(world.world_mobs_data, "grassland")
-                player, enemy_list, exit_tiles = world.process_date(world.world_objects_data, "grassland")
-                player, enemy_list, exit_tiles= world.process_date(world.world_decorations_up, "grassland")
-                player, enemy_list, exit_tiles= world.process_date(world.world_decorations_down, "grassland")
-                
+                if world_level < 4:
+                    tasks = [
+                        (world.walls, "grassland", 0),
+                        (world.world_data, "grassland", 1),
+                        (world.world_decoration_down_data, "grassland", 3),
+                        (world.world_decoration_up_data, "grassland", 4 ),
+                        (world.world_mobs_and_objects_data, "grassland", 5),
+                        ]
+                    
+                    if world.world_data2:
+                        tasks.append((world.world_data2, "grassland", 2))
+                        
+                    with ThreadPoolExecutor() as executor:
+                        futures = [executor.submit(world.process_date, *task) for task in tasks]
+                    
+                    for future in futures:
+                        future.result()
+                else:
+                    tasks = [
+                        (world.walls, "lavaland", 0),
+                        (world.world_data, "lavaland", 1),
+                        (world.world_decoration_down_data, "lavaland", 3),
+                        (world.world_decoration_up_data, "lavaland", 4 ),
+                        (world.world_mobs_and_objects_data, "lavaland", 5),
+                        ]
+                    
+                    if world.world_data2:
+                        tasks.append((world.world_data2, "lavaland", 2))
+                        
+                    with ThreadPoolExecutor() as executor:
+                        futures = [executor.submit(world.process_date, *task) for task in tasks]
+                    
+                    for future in futures:
+                        future.result()
+                        
+                exit_tiles = world.gate_tiles 
+                enemy_list = world.character_list  
+                player = world.player
+                level_up = False
                 generate_world = False 
                 world_level += 1 
+                background.refresh_world_level(world_level)
                 
                 hud.refresh_player_image(player)
                 # restore player statistic
@@ -326,94 +365,102 @@ while game_is_on:
             scroll_map = player.move(dx,dy, world.obstacle_tile)
                      
             # update 
-            world.update(scroll_map)
-            player.update(is_flipped, moving, player.health, player.gold, hud)
-            parcticle_system.update()
-            in_town = hud.update(player, world_level, town, counter, keys_pressed)
-            if player.alive:
-                if weapon.__class__ != TwoHandedSword and weapon.__class__ != Spear:
-                    arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud)
-                    if arrow:   
-                        arrow_group.add(arrow)
-                    for arrow in arrow_group:
-                        damage, damage_pos = arrow.update(weapon, enemy_list, scroll_map, world.obstacle_tile, boss_list)
+            if not level_up:
+                world.update(scroll_map)
+                level_up = player.update(is_flipped, moving, player.health, player.gold, hud)
+                if level_up:
+                    pick_cards = True
+                parcticle_system.update()
+                in_town = hud.update(player, world_level, town, counter, keys_pressed)
+                if player.alive:
+                    if weapon.__class__ != TwoHandedSword and weapon.__class__ != Spear:
+                        arrow, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud)
+                        if arrow:   
+                            arrow_group.add(arrow)
+                        for arrow in arrow_group:
+                            damage, damage_pos = arrow.update(weapon, enemy_list, scroll_map, world.obstacle_tile, boss_list)
+                            if damage:
+                                damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
+                                damage_text_group.add(damage_text)
+                    else:
+                        damage, damage_pos, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
                         if damage:
                             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
                             damage_text_group.add(damage_text)
-                else:
-                    damage, damage_pos, E_pressed = weapon.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
-                    if damage:
-                        damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), scripts.constants.RED)
-                        damage_text_group.add(damage_text)
-                damage_text_group.update(scroll_map)
-                for object in world.objects:
-                    if object.type == 'chest':
-                        chest_weapon = object.update(scroll_map, E_pressed, player, hud)
-                        if chest_weapon:
-                            chest_items.append(chest_weapon)
-                if chest_items:
-                    for chest_item in chest_items:
-                        print(str(chest_item.__class__))
-                        if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
-                            try:
-                                arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud)
-                            except:
-                                pass
+                    damage_text_group.update(scroll_map)
+                    for object in world.objects:
+                        if object.type == 'chest':
+                            chest_weapon = object.update(scroll_map, E_pressed, player, hud)
+                            if chest_weapon:
+                                chest_items.append(chest_weapon)
+                    if chest_items:
+                        for chest_item in chest_items:
+                            if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
+                                try:
+                                    arrow, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud)
+                                except:
+                                    pass
+                            else:
+                                try:
+                                    damage, damage_pos, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
+                                except:
+                                    pass
+                    for enemy in enemy_list:
+                        if enemy.type == 'druid':
+                            bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = enemy.move(world.obstacle_tile, player, scroll_map)
+                            if bolt1:
+                                magic_ball_group.add(bolt1)
+                            if bolt2:
+                                magic_ball_group.add(bolt2)
+                            if bolt3:
+                                magic_ball_group.add(bolt3)
+                            if bolt4:
+                                magic_ball_group.add(bolt4)
+                            if bolt5:
+                                magic_ball_group.add(bolt5)
+                            if bolt6:
+                                magic_ball_group.add(bolt6)
+                            if bolt7:
+                                magic_ball_group.add(bolt7)
+                            if bolt8:
+                                magic_ball_group.add(bolt8) 
+                            if mob:
+                                enemy_list.append(mob)   
                         else:
-                            try:
-                                damage, damage_pos, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
-                            except:
-                                pass
-                for enemy in enemy_list:
-                    if enemy.type == 'druid':
-                        bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = enemy.move(world.obstacle_tile, player, scroll_map)
-                        if bolt1:
-                            magic_ball_group.add(bolt1)
-                        if bolt2:
-                            magic_ball_group.add(bolt2)
-                        if bolt3:
-                            magic_ball_group.add(bolt3)
-                        if bolt4:
-                            magic_ball_group.add(bolt4)
-                        if bolt5:
-                            magic_ball_group.add(bolt5)
-                        if bolt6:
-                            magic_ball_group.add(bolt6)
-                        if bolt7:
-                            magic_ball_group.add(bolt7)
-                        if bolt8:
-                            magic_ball_group.add(bolt8) 
-                        if mob:
-                            enemy_list.append(mob)   
-                    else:
-                        magic_ball = enemy.move(world.obstacle_tile, player, scroll_map)
-                    if magic_ball:
-                        magic_ball_group.add(magic_ball)
-                    enemy.hit_player(enemy.damage, player)
-                    if enemy.type == 'druid':
-                        gold_, potion_, enemy_alive, exit_tiles  = enemy.update(player, world.obstacle_tile, hud, town, exit_tiles)
-                    else:
-                        gold_, potion_, enemy_alive, show_hp = enemy.update(player, world.obstacle_tile)
-                    if enemy.delete:
-                        if gold_:
-                            item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
-                        if potion_:
-                            item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"health_potion"))
-                        enemy_list.remove(enemy)    
-                for item in item_group:
-                    item.update(player, scroll_map)
-                background.update()
-                for magic_ball in magic_ball_group:
-                    if magic_ball.type == 'druid_bolt':
-                        magic_ball.update(scroll_map, player)
-                    else:
-                        magic_ball.update(scroll_map, player, world.obstacle_tile)
-                if player.is_on_fire:
-                    player.on_fire()
-            if not player.alive:
-                end = player.died()
-                if end:
-                    game_is_on = False
+                            magic_ball = enemy.move(world.obstacle_tile, player, scroll_map)
+                        if magic_ball:
+                            magic_ball_group.add(magic_ball)
+                        enemy.hit_player(enemy.damage, player)
+                        if enemy.type == 'druid':
+                            gold_, potion_, enemy_alive, exit_tiles  = enemy.update(player, world.obstacle_tile, hud, town, exit_tiles)
+                        else:
+                            gold_, potion_, enemy_alive, show_hp = enemy.update(player, world.obstacle_tile)
+                        if enemy.delete:
+                            if gold_:
+                                item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"coin"))
+                            if potion_:
+                                item_group.add(Item(enemy.rect.center[0],enemy.rect.center[1],"health_potion"))
+                            enemy_list.remove(enemy)    
+                    for item in item_group:
+                        item.update(player, scroll_map)
+                    background.update()
+                    for magic_ball in magic_ball_group:
+                        if magic_ball.type == 'druid_bolt':
+                            magic_ball.update(scroll_map, player)
+                        else:
+                            magic_ball.update(scroll_map, player, world.obstacle_tile)
+                    if player.is_on_fire:
+                        player.on_fire()
+                if not player.alive:
+                    end = player.died()
+                    if end:
+                        game_is_on = False
+            else:
+                if pick_cards:
+                    card_manager.pick_cards()
+                    pick_cards = False
+                level_up = card_manager.update(player, hud, weapon)
+                
             
             # draw 
             
@@ -445,6 +492,8 @@ while game_is_on:
             if fade:
                 fade = hud.draw_fade(display)
             hud.draw_red_fade(display,player)
+            if level_up:
+                card_manager.draw(display)
             
     # main menu handler    
     elif not game:
