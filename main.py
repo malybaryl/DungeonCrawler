@@ -86,7 +86,7 @@ fight_key_town_button_pressed = False
 #weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
 #weapon = Throwable(0,0,'throwables','crusader_throwing_axe', player.level, hud)
 #weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level, hud)
-weapon = Spear(0,0,'spears',"guard_spear", player.level + 10, hud,  False ,player)
+weapon = Spear(0,0,'spears',"blade_on_stick", player.level + 10, hud,  False ,player)
 magic_ball = None
 
 #parciples
@@ -283,7 +283,7 @@ while game_is_on:
                 world.walls.clear()
 
                 world.proced_csv_file(world_level=world_level + 1)
-                if world_level < 4:
+                if world_level < 3:
                     tasks = [
                         (world.walls, "grassland", 0),
                         (world.world_data, "grassland", 1),
@@ -327,6 +327,7 @@ while game_is_on:
                 background.refresh_world_level(world_level)
                 
                 hud.refresh_player_image(player)
+                hud.update_icon_sword(weapon.original_image)
                 # restore player statistic
                 if new_level:
                     player.health = player_hp
@@ -460,10 +461,7 @@ while game_is_on:
                     card_manager.pick_cards()
                     pick_cards = False
                 level_up = card_manager.update(player, hud, weapon)
-                
-            
-            # draw 
-            
+            # draw             
             background.draw(display)
             world.draw(display)
             if scripts.constants.SHOW_GRID:
@@ -494,8 +492,8 @@ while game_is_on:
             hud.draw_red_fade(display,player)
             if level_up:
                 card_manager.draw(display)
-            
-    # main menu handler    
+                
+        # main menu handler    
     elif not game:
         game, pygame_quit = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
         main_menu.draw(display)

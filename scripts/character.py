@@ -53,6 +53,7 @@ class Character():
         self.is_on_fire = False
         self.minimal_damage_multiplied = 1
         self.maximal_damage_multiplied = 1
+        self.hud_experience_bar_refresh = False
 
    
     def move(self, dx, dy, obstacle_tile):
@@ -166,6 +167,10 @@ class Character():
                     self.current_experience = 0
                 self.experience_to_gain_new_level *= 2
             
+            if self.hud_experience_bar_refresh:
+                hud.update_experience_bar(self)
+                self.hud_experience_bar_refresh = False
+                
             # is on fire?
             if self.is_on_fire:
                 self.on_fire()
@@ -208,6 +213,7 @@ class Character():
 
     def add_experience(self, experience_points):
         self.current_experience += experience_points
+        self.hud_experience_bar_refresh = True
         
         
     def on_fire_trigger(self, damage, time, tics):

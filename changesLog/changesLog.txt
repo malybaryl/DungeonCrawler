@@ -90,3 +90,9 @@ VERSION: 0.1.1
 - better optimalisation
 - now player can walk into lave and he burns
 - new level up system card
+
+VERSION: 0.1.2
+- new HUD
+- new mechanics of the weapons
+- new weapons animations
+- bugs fixes

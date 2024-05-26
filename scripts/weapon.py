@@ -188,7 +188,7 @@ class Weapon:
     def update_info_damage(self, hud):
         hud.min_damage = self.min_damage
         hud.max_damage = self.max_damage
-        hud.damege_text = hud.font.render(f"Damage: {self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
+        hud.damege_text = hud.font.render(f"Damage:{self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
         
     def update_minimal_damage(self, player, hud):
         self.min_damage = int(self.set_min_damage(self.weapon_level, player.minimal_damage_multiplied))
@@ -242,6 +242,7 @@ class Weapon:
             main_weapon.max_damage = self.set_max_damage(main_weapon.weapon_level, player.maximal_damage_multiplied)
             main_weapon.update_info_damage(hud)
             main_weapon.shot_cooldown = self.shot_cooldown
+            
             if self.type == 'bows' or self.type == 'throwables':
                 main_weapon.distance = self.distance
             
@@ -265,6 +266,9 @@ class Weapon:
             self.shot_cooldown = original_shot_cooldown_
             if self.type == 'bows' or self.type == 'throwables':
                 self.distance = original_distance_
+                
+            #update hud
+            hud.update_icon_sword(main_weapon.original_image)
         
         
     def pick_up_weapon(self, player, event_key_pressed, main_weapon, hud):
@@ -754,6 +758,13 @@ class TwoHandedSword(Weapon):
         self.animate_x_shr = 0
         self.animate_y_shr = 0
         self.animate_forward = True
+        self.swing_animations_images = loadImages('effects/slash_two_handed_sword') # index: 0-3
+        self.swing_animation = False
+        self.swing_animation_index = 0
+        self.swing_animation_cooldown = 0
+        self.swing_image_to_show = self.swing_animations_images[0]
+        self.animate_y = 0
+        self.save_direction_is_fliped = False
 
         
     def update(self, player, screen_scroll, main_weapon, event_key_pressed, hud, player_is_fliped, enemy_list):
@@ -781,60 +792,90 @@ class TwoHandedSword(Weapon):
                     self.image_to_show = pygame.transform.rotate(self.original_image, 10)
             else:
                 self.image_to_show = pygame.transform.flip(self.image_to_animate, True, False)
-                if self.flip:
-                    if self.animate_forward:
-                        self.animate_x_shr += 1
-                        self.animate_y_shr += 4
-                        if self.animate_x_shr >= 32 and self.animate_y_shr >= 128:
-                            self.animate_forward = False
+                if self.save_direction_is_fliped:
+                    
+                    if self.animate_forward == True:
+                        self.animate_x_shr += 2
+                        self.animate_y_shr += 8
+                        if self.animate_x_shr >= self.distance//4 and self.animate_y_shr >= self.distance:
+                            self.animate_forward = False 
                     else:
                         self.animate_x_shr -= 2
                         self.animate_y_shr -= 8
                         if self.animate_x_shr <= 0 and self.animate_y_shr <= 0:
                             self.animate_x_shr = 0
                             self.animate_y_shr = 0  
+                    self.animate_y += 5
+                    if self.animate_y > self.distance//2:
+                        self.animate_y = self.distance//2
                     self.image_to_animate = pygame.transform.scale(self.original_image, (self.animate_x_shr, self.animate_y_shr))
                     self.image_to_show = pygame.transform.rotate(self.image_to_animate, self.animate_degree)
-                    self.animate_x -= 1
-                    self.animate_couner += 1
-                    if self.animate_x <= -32:
-                        self.animate_x = -32
+                    self.animate_x -= 5
+                    self.animate_couner += 0.18
+                    if self.animate_x <= -self.distance//2:
+                        self.animate_x = -self.distance//2
                     self.animate_degree += 9
                     if self.animate_degree >= 195:
                         self.animate_degree = 195
-                    if self.animate_couner >= 50:
+                        self.animate_forward = False
+                    if self.animate_couner >= 4.1400000000000015:
+                        self.animate_forward = True
                         self.animate_degree = 10
                         self.swing = False
                         self.animate_x = 0
+                        self.animate_y = 0
                         self.animate_couner = 0
-                        self.animate_forward = True
                 else:
-                    if self.animate_forward:
-                        self.animate_x_shr += 1
-                        self.animate_y_shr += 4
-                        if self.animate_x_shr >= 32 and self.animate_y_shr >= 128:
-                            self.animate_forward = False
+                    if self.animate_forward == True:
+                        self.animate_x_shr += 2
+                        self.animate_y_shr += 8
+                        if self.animate_x_shr >= self.distance//4 and self.animate_y_shr >= self.distance:
+                            self.animate_forward = False 
                     else:
                         self.animate_x_shr -= 2
                         self.animate_y_shr -= 8
                         if self.animate_x_shr <= 0 and self.animate_y_shr <= 0:
                             self.animate_x_shr = 0
                             self.animate_y_shr = 0  
+                    self.animate_y += 5
+                    if self.animate_y > self.distance//2:
+                        self.animate_y = self.distance//2
                     self.image_to_animate = pygame.transform.scale(self.original_image, (self.animate_x_shr, self.animate_y_shr))
-                    self.image_to_show = pygame.transform.rotate(self.image_to_animate, self.animate_degree)
-                    self.animate_x += 1
-                    self.animate_couner += 1
-                    if self.animate_x >= 32:
-                        self.animate_x = 32
-                    self.animate_degree -= 9
-                    if self.animate_degree <= -195:
-                        self.animate_degree = -195
-                    if self.animate_couner >= 50:
-                        self.animate_degree = -10
+                    self.image_to_show = pygame.transform.rotate(self.image_to_animate, -self.animate_degree)
+                    self.animate_x += 5
+                    self.animate_couner += 0.18
+                    if self.animate_x >= self.distance//2:
+                        self.animate_x = self.distance//2
+                    self.animate_degree += 9
+                    if self.animate_degree >= 195:
+                        self.animate_degree = 195
+                        self.animate_forward = False
+                    if self.animate_couner >= 4.1400000000000015:
+                        self.animate_forward = True
+                        self.animate_degree = 10
                         self.swing = False
                         self.animate_x = 0
+                        self.animate_y = 0
                         self.animate_couner = 0
-                        self.animate_forward = True
+            
+            if self.swing_animation:
+                if self.save_direction_is_fliped:
+                    self.swing_image_to_show = pygame.transform.flip(pygame.transform.scale(self.swing_animations_images[self.swing_animation_index],(self.distance, self.distance*2)),True,False)
+                    self.swing_animation_cooldown += 0.18
+                    self.swing_animation_index = math.floor(self.swing_animation_cooldown)
+                    if self.swing_animation_index > 3:
+                        self.swing_animation = False
+                        self.swing_animation_index = 0
+                        self.swing_animation_cooldown = 0
+                else:
+                    self.swing_image_to_show = pygame.transform.scale(self.swing_animations_images[self.swing_animation_index],(self.distance, self.distance*2))
+                    self.swing_animation_cooldown += 0.18
+                    self.swing_animation_index = math.floor(self.swing_animation_cooldown)
+                    if self.swing_animation_index > 3:
+                        self.swing_animation = False
+                        self.swing_animation_index = 0
+                        self.swing_animation_cooldown = 0
+                
         
             # get mouseclick
             if pygame.mouse.get_pressed()[0] and not self.fired and (pygame.time.get_ticks()- self.last_shot) >= self.shot_cooldown:
@@ -842,6 +883,9 @@ class TwoHandedSword(Weapon):
                 damage, damage_pos = self.attack(enemy_list)
                 self.swing = True
                 self.fired = True
+                self.save_direction_is_fliped = self.flip
+                self.swing_animation = True
+                self.animate_y = -self.distance//2
                 self.last_shot = pygame.time.get_ticks()
                 self.assets["sound"].play()
 
@@ -874,7 +918,13 @@ class TwoHandedSword(Weapon):
         if self.show_e_button:
                 surface.blit(self.assets['e_key'], (self.rect.x + 8, self.rect.y - 16))
                 
-        surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)-1 + self.animate_x,self.rect.center[1]-int(self.image_to_show.get_height()/2)-12))
+        surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)-1 + self.animate_x,self.rect.center[1]-int(self.image_to_show.get_height()/2)-12+ self.animate_y))
+        if self.swing_animation:
+            if self.save_direction_is_fliped:
+                surface.blit(self.swing_image_to_show, (self.rect.centerx - self.distance, self.rect.centery - self.distance))
+            else:
+                surface.blit(self.swing_image_to_show, (self.rect.centerx, self.rect.centery - self.distance))
+        #pygame.draw.circle(surface, (255,255,255), (self.rect.centerx, self.rect.centery), self.distance, 1)
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)
 
@@ -896,7 +946,7 @@ class Spear(Weapon):
         self.fired = False
         self.last_shot = pygame.time.get_ticks()
         self.flip = False
-        self.distance = 100
+        self.distance = 80
         self.swing = False
         self.stab = False
         self.animate_degree = -10
@@ -908,6 +958,18 @@ class Spear(Weapon):
         self.attack_cooldown = pygame.time.get_ticks()
         self.attacks = 3
         self.do_stab_once = True
+        self.swing_animations_images = loadImages('effects/slash_spear_rounded') # index: 0-19
+        self.swing_animation = False
+        self.swing_animation_index = 0
+        self.swing_animation_cooldown = 0
+        self.swing_image_to_show = self.swing_animations_images[0]
+        self.animate_y = 0
+        self.save_direction_is_fliped = False
+        self.stab_animations_images = loadImages('effects/slash_spear') # index: 0-4
+        self.stab_animation = False
+        self.stab_animation_index = 0
+        self.stab_animation_cooldown = 0
+        self.stab_image_to_show = self.stab_animations_images[0]
 
         
     def update(self, player, screen_scroll, main_weapon, event_key_pressed, hud, player_is_fliped, enemy_list):
@@ -933,15 +995,17 @@ class Spear(Weapon):
                     if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear':
                         self.image_to_show = pygame.transform.flip(self.original_image, True, False)
                     else:
-                        self.image_to_show = pygame.transform.rotate(self.original_image, 90)
+                        self.rect = pygame.rect.Rect(self.rect.x - self.rect.width//4, self.rect.y, 46, 4)
+                        self.image_to_show = pygame.transform.scale(pygame.transform.rotate(self.original_image, 90),(self.rect.width,self.rect.height))
                 else:
                     if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear':
                         self.image_to_show = self.original_image
                     else:
-                        self.image_to_show = pygame.transform.rotate(self.original_image, -90)
+                        self.rect = pygame.rect.Rect(self.rect.x + self.rect.width//4, self.rect.y, 46, 4)
+                        self.image_to_show = pygame.transform.scale(pygame.transform.rotate(self.original_image, -90),(self.rect.width,self.rect.height))
             elif self.swing:
                 self.image_to_show = pygame.transform.flip(self.image_to_animate, True, False)
-                if self.flip:
+                if self.save_direction_is_fliped:
                     self.animate_x_shr += 1
                     self.animate_y_shr += 4
                     if self.animate_x_shr >= 32 and self.animate_y_shr >= 128:
@@ -981,7 +1045,23 @@ class Spear(Weapon):
                         self.animate_forward = True
                         self.animate_x_shr = 0
                         self.animate_y_shr = 0
-        
+                if self.swing_animation:
+                    if self.save_direction_is_fliped:
+                        self.swing_image_to_show = pygame.transform.flip(pygame.transform.scale(self.swing_animations_images[self.swing_animation_index],(self.distance*2, self.distance*2)),True,False)
+                        self.swing_animation_cooldown += 0.45
+                        self.swing_animation_index = math.floor(self.swing_animation_cooldown)
+                        if self.swing_animation_index > 19:
+                            self.swing_animation = False
+                            self.swing_animation_index = 0
+                            self.swing_animation_cooldown = 0
+                    else:
+                        self.swing_image_to_show = pygame.transform.scale(self.swing_animations_images[self.swing_animation_index],(self.distance*2, self.distance*2))
+                        self.swing_animation_cooldown += 0.45
+                        self.swing_animation_index = math.floor(self.swing_animation_cooldown)
+                        if self.swing_animation_index > 19:
+                            self.swing_animation = False
+                            self.swing_animation_index = 0
+                            self.swing_animation_cooldown = 0
             # get mouseclick
             if pygame.mouse.get_pressed()[0] and not self.fired and (pygame.time.get_ticks()- self.last_shot) >= self.shot_cooldown:
                 # attack handeler
@@ -991,12 +1071,16 @@ class Spear(Weapon):
                     self.last_shot = pygame.time.get_ticks()
                     self.attack_cooldown = pygame.time.get_ticks()
                     self.attacks = 4
+                    self.save_direction_is_fliped = self.flip
                     self.assets["sound"].play()
+                    self.swing_animation = True
                 else:
                     self.stab = True
                     self.do_stab_once = True
                     self.fired = True
                     self.last_shot = pygame.time.get_ticks()
+                    self.save_direction_is_fliped = self.flip
+                    self.stab_animation = True
                     self.assets["sound"].play()  
             
             # swing attack handler
@@ -1011,27 +1095,46 @@ class Spear(Weapon):
                 original_rect = pygame.rect.Rect(player.rect.x, player.rect.y, 16, 32)
                 if self.do_stab_once:
                     if self.flip:
-                        self.rect = pygame.rect.Rect(original_rect.left - 64, original_rect.y + 8, 64, 16)
+                        self.rect = pygame.rect.Rect(original_rect.centerx - 64, original_rect.y+8, 64, 16)
                         self.animate_x = -16
-                        self.image_to_show = pygame.transform.scale(self.image_to_show, (64, 32))
+                        self.image_to_show = pygame.transform.scale(self.image_to_show, (64,  16))
                         damage, damage_pos = self.attack(enemy_list)
                         self.do_stab_once = False
                         self.animate_cooldown = pygame.time.get_ticks()
                     else:
-                        self.rect = pygame.rect.Rect(original_rect.right, original_rect.y + 8, 64, 16)
+                        self.rect = pygame.rect.Rect(original_rect.centerx, original_rect.y+8, 64, 16)
                         self.animate_x = 16
-                        self.image_to_show = pygame.transform.scale(self.image_to_show, (64, 32))
+                        self.image_to_show = pygame.transform.scale(self.image_to_show, (64,  16))
                         damage, damage_pos = self.attack(enemy_list)
                         self.do_stab_once = False
                         self.animate_cooldown = pygame.time.get_ticks()
-                if pygame.time.get_ticks() - self.animate_cooldown >= 100:
-                    self.rect = pygame.rect.Rect(player.rect.x, player.rect.y, 16, 32)
-                    self.animate_x = 0
-                    if self.flip:
-                        self.image_to_show = pygame.transform.rotate(self.original_image, 90)
-                    else:
-                        self.image_to_show = pygame.transform.rotate(self.original_image, -90)
+                    
+                    if pygame.time.get_ticks() - self.animate_cooldown >= 100:
+                        self.animate_x = 0
+                        if self.flip:
+                            self.image_to_show = pygame.transform.rotate(self.original_image, 90)
+                        else:
+                            self.image_to_show = pygame.transform.rotate(self.original_image, -90)
+                    
                     self.stab = False
+            
+            if self.stab_animation:
+                if self.save_direction_is_fliped:
+                    self.stab_image_to_show = pygame.transform.flip(pygame.transform.scale(self.stab_animations_images[self.stab_animation_index],(self.rect.width, self.rect.height)),True,False)
+                    self.stab_animation_cooldown += 1
+                    self.stab_animation_index = math.floor(self.stab_animation_cooldown)
+                    if self.stab_animation_index > 4:
+                        self.stab_animation = False
+                        self.stab_animation_index = 0
+                        self.stab_animation_cooldown = 0
+                else:
+                    self.stab_image_to_show = pygame.transform.scale(self.stab_animations_images[self.stab_animation_index],(self.rect.width, self.rect.height))
+                    self.stab_animation_cooldown += 1
+                    self.stab_animation_index = math.floor(self.stab_animation_cooldown)
+                    if self.stab_animation_index > 4:
+                        self.stab_animation = False
+                        self.stab_animation_index = 0
+                        self.stab_animation_cooldown = 0
                     
                     
 
@@ -1070,11 +1173,16 @@ class Spear(Weapon):
         
         if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear': 
             surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)-1 + self.animate_x,self.rect.center[1]-int(self.image_to_show.get_height()/2)-12))
+            if self.swing_animation:
+                surface.blit(self.swing_image_to_show, (self.rect.centerx - self.swing_image_to_show.get_size()[0]//2, self.rect.centery - self.swing_image_to_show.get_size()[1]//2))
         else:
             if self.flip:
-                surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)-8 + self.animate_x,self.rect.center[1]-int(self.image_to_show.get_height()/2)))
-            else:
-                surface.blit(self.image_to_show, (self.rect.center[0]-int(self.image_to_show.get_width()/2)+8 + self.animate_x,self.rect.center[1]-int(self.image_to_show.get_height()/2)))
                 
+                surface.blit(self.image_to_show, (self.rect.x, self.rect.y))
+            else:
+                surface.blit(self.image_to_show, (self.rect.x, self.rect.y))
+            if self.stab_animation:
+                surface.blit(self.stab_image_to_show, (self.rect.x, self.rect.y))      
+        
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.RED, self.rect, 1)

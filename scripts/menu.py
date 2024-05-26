@@ -14,7 +14,7 @@ class Menu:
             "font2": pygame.font.Font("assets/fonts/font.ttf",24),
             "logo": loadImages("HUD/logo")
         }
-        self.version = "0.1.1"
+        self.version = "0.1.2"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False

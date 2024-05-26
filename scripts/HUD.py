@@ -10,7 +10,9 @@ class HUD:
             "gold": loadImage("coin/0.png"),
             "red_fade": loadImage("effects/redfade/0.png"),
             "buttons": loadImages("HUD/button"),
-            "health_bar": loadImage("HUD/health_bar/0.png")
+            "health_bar": loadImage("HUD/health_bar/0.png"),
+            "main_HUD": loadImage("HUD/main_HUD/0.png"),
+            'info_icons_HUD': loadImages('HUD/icons_info_HUD'), # resolution 17x17
         }
         pygame.mouse.set_visible(False)    
         self.pos = None
@@ -24,9 +26,15 @@ class HUD:
         self.gold = player.gold
         self.was_hit = player.player_was_hit
         self.was_heal = player.player_was_heal
+        self.current_experience = player.current_experience
+        self.experience_to_gain_new_level = player.experience_to_gain_new_level
+        self.experience_percange = self.current_experience / self.experience_to_gain_new_level
+        self.player_level = player.level
         self.font = pygame.font.Font("assets/fonts/font.ttf",8)
         self.font2 = pygame.font.Font("assets/fonts/font.ttf",48)
         self.font3 = pygame.font.Font("assets/fonts/font.ttf",16)
+        self.experience_text = self.font.render(str(self.current_experience)+'/'+str(self.experience_to_gain_new_level), True, scripts.constants.WHITE)
+        self.player_level_text = self.font.render('Hero Level:' + str(self.player_level), True, scripts.constants.WHITE)
         self.image_world_level_infor = self.font.render(str(self.gold), True, scripts.constants.WHITE)
         self.image_died = self.font2.render("YOU DIED", True, scripts.constants.RED)
         self.image_player_hp = self.font.render(str(self.health)+'/'+str(self.full_health), True, scripts.constants.WHITE)
@@ -36,7 +44,9 @@ class HUD:
         self.statistic_text = self.font.render("STATISTICS", True, scripts.constants.WHITE)
         self.min_damage = 0
         self.max_damage = 0
-        self.damege_text = self.font.render(f"Damage: {self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
+        self.health = 'HP:'
+        self.health_text = self.font.render(self.health, True, scripts.constants.WHITE)
+        self.damege_text = self.font.render(f"Damage:{self.min_damage}-{self.max_damage}", True, scripts.constants.WHITE)
         self.back_to_town_text = self.font.render("SAVE & BACK TO TOWN", True, scripts.constants.WHITE)
         self.back_to_town_button_clicked = False
         self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(166,26)) 
@@ -63,11 +73,29 @@ class HUD:
         self.cooldown_death_clock = 0
         self.cooldown_death_do_once = True
         self.text_input_image_to_show = self.font.render('Enter your nickname and save your score', True, scripts.constants.WHITE)
-        self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+        self.coursor = self.assets["coursor"][4]
         self.cliked = True
         self.cliked_cooldown = 0
         self.draw_coursor = True
+        self.sword_icon = True
+        self.weapon_image = None
     
+    def update_icon_sword(self, weapon_image):
+        self.sword_icon = False
+        scale = weapon_image.get_size()[0] / weapon_image.get_size()[1]
+        self.weapon_image = pygame.transform.scale(weapon_image,(16*scale,16))
+        
+        
+    
+    def update_experience_bar(self, player):
+        self.current_experience = int(player.current_experience)
+        self.experience_to_gain_new_level = int(player.experience_to_gain_new_level)
+        self.experience_percange = self.current_experience / self.experience_to_gain_new_level
+        self.player_level = player.level
+        
+        self.experience_text = self.font.render(str(self.current_experience)+'/'+str(self.experience_to_gain_new_level), True, scripts.constants.WHITE)
+        self.player_level_text = self.font.render('Hero Level:' + str(self.player_level), True, scripts.constants.WHITE)
+        
     
     def refresh_player_image(self, player):
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
@@ -224,25 +252,48 @@ class HUD:
     def draw(self, display):
         if self.player_alive:
             if self.info:
-                pygame.draw.rect(display,scripts.constants.WHITE,(scripts.constants.DISPLAY_WIDTH/8-2,scripts.constants.DISPLAY_HEIGHT/8-2,scripts.constants.DISPLAY_WIDTH-scripts.constants.DISPLAY_WIDTH/4+4,scripts.constants.DISPLAY_HEIGHT-scripts.constants.DISPLAY_HEIGHT/4+4))
-                pygame.draw.rect(display,scripts.constants.MAINMENU_COLOR,(scripts.constants.DISPLAY_WIDTH/8,scripts.constants.DISPLAY_HEIGHT/8,scripts.constants.DISPLAY_WIDTH-scripts.constants.DISPLAY_WIDTH/4,scripts.constants.DISPLAY_HEIGHT-scripts.constants.DISPLAY_HEIGHT/4))
                 # drawing info world level
                 display.blit(self.image_world_level,(2,2))
                 # drawing info gold
-                display.blit(self.assets["gold"],(2-8,scripts.constants.DISPLAY_HEIGHT-18-8))
-                display.blit(self.image,(20,scripts.constants.DISPLAY_HEIGHT-13))
+                display.blit(self.assets["gold"],(8,scripts.constants.DISPLAY_HEIGHT-50))
+                display.blit(self.image,(37,scripts.constants.DISPLAY_HEIGHT-38))
+                # drawing experience bar
+                pygame.draw.rect(display, scripts.constants.YELLOW, (0, scripts.constants.DISPLAY_HEIGHT - 12, self.experience_percange * scripts.constants.DISPLAY_WIDTH, 12))
+                # drawing main HUD
+                display.blit(self.assets['main_HUD'],(0,0))
+                # sword icon
+                if self.sword_icon:
+                    display.blit(self.assets['info_icons_HUD'][0],(74,121))
+                else:
+                    display.blit(self.weapon_image,(83 - self.weapon_image.get_size()[0]//2,121))
+                # shield icon
+                display.blit(self.assets['info_icons_HUD'][1],(95,121))
+                # shoes icon
+                display.blit(self.assets['info_icons_HUD'][2],(131,100))
+                # tors icon
+                display.blit(self.assets['info_icons_HUD'][3],(131,75))
+                # helmet icon
+                display.blit(self.assets['info_icons_HUD'][4],(131,51))
+                # necles icon
+                display.blit(self.assets['info_icons_HUD'][5],(40,51))
+                # ring 1 icon
+                display.blit(self.assets['info_icons_HUD'][6],(40,75))
+                # ring 2 icon
+                display.blit(self.assets['info_icons_HUD'][7],(40,100))
                 # drawing player image
-                pygame.draw.rect(display,scripts.constants.MAINMENU_COLOR_DARKER,((scripts.constants.DISPLAY_WIDTH/6),(scripts.constants.DISPLAY_HEIGHT/6)+((scripts.constants.DISPLAY_HEIGHT/6)/2),64,64))
-                display.blit(self.player_image,((scripts.constants.DISPLAY_WIDTH/6),(scripts.constants.DISPLAY_HEIGHT/6)+((scripts.constants.DISPLAY_HEIGHT/6)/2)))
+                display.blit(self.player_image,((scripts.constants.DISPLAY_WIDTH//7-6),(scripts.constants.DISPLAY_HEIGHT//7+15)))
                 # STATISCTIS
-                display.blit(self.statistic_text,(scripts.constants.DISPLAY_WIDTH*5/6-64-32,scripts.constants.DISPLAY_HEIGHT/8+4))
-                pygame.draw.rect(display,scripts.constants.MAINMENU_COLOR_DARKER,(scripts.constants.DISPLAY_WIDTH*5/6-128-2,scripts.constants.DISPLAY_HEIGHT/8+16+4-2,135,125))
+                display.blit(self.statistic_text,(scripts.constants.DISPLAY_WIDTH*5/6-110,scripts.constants.DISPLAY_HEIGHT/8 - 8))
+                # Experience Bar
+                display.blit(self.experience_text,((scripts.constants.DISPLAY_WIDTH//2 - self.experience_text.get_size()[0]//2),scripts.constants.DISPLAY_HEIGHT - 10))
                 # drawing player health
-                pygame.draw.rect(display,scripts.constants.BLACK,(scripts.constants.DISPLAY_WIDTH*5/6-128,scripts.constants.DISPLAY_HEIGHT/8+16+4,102,12))
-                pygame.draw.rect(display,scripts.constants.DARKRED,(scripts.constants.DISPLAY_WIDTH*5/6-128+1,scripts.constants.DISPLAY_HEIGHT/8+16+4-2+5-2,100,10))
-                pygame.draw.rect(display,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH*5/6-128+1,scripts.constants.DISPLAY_HEIGHT/8+16+4-2+5-2,(self.health/self.full_health)*100,10))
-                display.blit(self.image_player_hp,(scripts.constants.DISPLAY_WIDTH*5/6-128+24,scripts.constants.DISPLAY_HEIGHT/8+16+6))
-                display.blit(self.damege_text,(scripts.constants.DISPLAY_WIDTH*5/6-128,scripts.constants.DISPLAY_HEIGHT/8+16+4+16))
+                display.blit(self.health_text,(scripts.constants.DISPLAY_WIDTH*7//17,scripts.constants.DISPLAY_HEIGHT*3//16))
+                pygame.draw.rect(display,scripts.constants.BLACK,(scripts.constants.DISPLAY_WIDTH*7//16 + self.health_text.get_size()[0]*2//3, scripts.constants.DISPLAY_HEIGHT*3//16 - self.health_text.get_size()[1]//2,102,14))
+                pygame.draw.rect(display,scripts.constants.DARKRED,(scripts.constants.DISPLAY_WIDTH*7//16 + self.health_text.get_size()[0]*2//3+1, scripts.constants.DISPLAY_HEIGHT*3//16 - self.health_text.get_size()[1]//2+1,100,12))
+                pygame.draw.rect(display,scripts.constants.RED,(scripts.constants.DISPLAY_WIDTH*7//16 + self.health_text.get_size()[0]*2//3+1, scripts.constants.DISPLAY_HEIGHT*3//16 - self.health_text.get_size()[1]//2+1,(self.health/self.full_health)*100,12))
+                display.blit(self.image_player_hp,(scripts.constants.DISPLAY_WIDTH*7//16 + self.health_text.get_size()[0]*2//3 + 51 - self.image_player_hp.get_size()[0]//2, scripts.constants.DISPLAY_HEIGHT*3//16))
+                display.blit(self.damege_text,(scripts.constants.DISPLAY_WIDTH*12//17,scripts.constants.DISPLAY_HEIGHT*3//16))
+                display.blit(self.player_level_text,(scripts.constants.DISPLAY_WIDTH*7//17,scripts.constants.DISPLAY_HEIGHT*4//16))
                 # drawing counter
                 display.blit(self.image_counter, (scripts.constants.DISPLAY_WIDTH - 116,2))
                 # drawing coursor

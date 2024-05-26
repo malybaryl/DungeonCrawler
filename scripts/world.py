@@ -1497,8 +1497,8 @@ class World():
                                 image_x = x * scripts.constants.TILE_SIZE 
                                 image_y = y * scripts.constants.TILE_SIZE        
                                 tile_data = [image, image_rect, image_x, image_y]
-                                #self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
-                                self.character_list.append(Imp(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
+                                self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
+                                #self.character_list.append(Imp(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
                             
                             # TROLL
                             elif tile == 51:
@@ -1613,8 +1613,8 @@ class World():
                                 image_x = x * scripts.constants.TILE_SIZE 
                                 image_y = y * scripts.constants.TILE_SIZE        
                                 tile_data = [image, image_rect, image_x, image_y]
-                                #self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
-                                self.character_list.append(Imp(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
+                                self.character_list.append(Wolf(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
+                                #self.character_list.append(Imp(tile_data[2],tile_data[3],scripts.constants.WOLF_HP, self.world_level))
                             
                             # TROLL
                             elif tile == 13:
