@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "untitled.tmx",
+    "activeFile": "grassland.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -24,7 +24,7 @@
         "grassland.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
-            "scaleInEditor": 2
+            "scaleInEditor": 1
         },
         "map01.tmx": {
             "scale": 3,
@@ -50,11 +50,7 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 50,
     "openFiles": [
-        "grassland.tsx",
-        "map01.tmx",
-        "castle.tmx",
-        "Castle.tsx",
-        "untitled.tmx"
+        "grassland.tsx"
     ],
     "project": "grassland.tiled-project",
     "recentFiles": [

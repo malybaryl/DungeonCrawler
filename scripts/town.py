@@ -254,7 +254,7 @@ class Town():
         self.confim_text_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)
         self.confim_text_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)
         self.confim_text_to_show_5 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)
-        self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+        self.coursor = self.assets["coursor"][4]
         self.pressed = False
         self.pressed_cooldown = 0
         self.smith_menu = False
@@ -304,7 +304,7 @@ class Town():
         self.gold = math.ceil(scripts.constants.GOLD)
         self.gold_text = self.assets["font_8"].render(f"{self.gold}", True, scripts.constants.BLACK)
         if pygame.mouse.get_pressed()[0]:
-            self.coursor = pygame.transform.scale(self.assets["coursor"][5],(24,24))
+            self.coursor = self.assets["coursor"][5]
             self.pressed = True
             self.pressed_cooldown = pygame.time.get_ticks()
             if not self.fight_button_pressed:
@@ -327,7 +327,7 @@ class Town():
         
         if self.pressed:
             if pygame.time.get_ticks() - self.pressed_cooldown >= 100:
-                self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+                self.coursor = self.assets["coursor"][4]
                 self.pressed = False
             
         # building menu handler            
@@ -423,7 +423,7 @@ class Town():
                         self.confim_text_line_1 = 'Are you sure you' 
                         self.confim_text_line_2 = 'want to build'
                         self.confim_text_line_3 = '"The Hut"? Cost:'
-                        self.confim_text_line_4 = f'{self.hut_cost} gold'
+                        self.confim_text_line_4 = '100 gold'
                         self.confim_text_line_5 = ''
                         self.confim_text_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
                         self.confim_text_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
@@ -502,16 +502,16 @@ class Town():
             if self.dwarfs_house_cliked:
                 if not self.dwarfs_house_builded:
                     if self.dwarfs_house_cost <= self.gold:
-                        self.dwarfs_house_line_1 = 'Are you sure you' 
-                        self.dwarfs_house_line_2 = 'want to build'
-                        self.dwarfs_house_line_3 = '"The Wizard Tower"'
-                        self.dwarfs_house_line_4 = f'? Cost:{self.dwarfs_house_cost}'
-                        self.dwarfs_house_line_5 = 'gold'
-                        self.dwarfs_house_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
-                        self.dwarfs_house_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
-                        self.dwarfs_house_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
-                        self.dwarfs_house_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
-                        self.dwarfs_house_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
+                        self.confim_text_line_1 = 'Are you sure you' 
+                        self.confim_text_line_2 = 'want to build'
+                        self.confim_text_line_3 = '"The Dwarfs house"'
+                        self.confim_text_line_4 = f'? Cost:{self.dwarfs_house_cost}'
+                        self.confim_text_line_5 = 'gold'
+                        self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                         answer, self.draw_confim = self.confim()
                         if answer > 0.5 and answer < 1.5:
                             self.dwarfs_house_builded = True
@@ -530,16 +530,16 @@ class Town():
             if self.knight_castle_cliked:
                 if not self.knight_castle_builded:
                     if self.knight_castle_cost <= self.gold:
-                        self.knight_castle_line_1 = 'Are you sure you' 
-                        self.knight_castle_line_2 = 'want to build'
-                        self.knight_castle_line_3 = '"The Wizard Tower"'
-                        self.knight_castle_line_4 = f'? Cost:{self.knight_castle_cost}'
-                        self.knight_castle_line_5 = 'gold'
-                        self.knight_castle_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
-                        self.knight_castle_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
-                        self.knight_castle_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
-                        self.knight_castle_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
-                        self.knight_castle_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
+                        self.confim_text_line_1 = 'Are you sure you' 
+                        self.confim_text_line_2 = 'want to build'
+                        self.confim_text_line_3 = '"The Knight Castle"'
+                        self.confim_text_line_4 = f'? Cost:{self.knight_castle_cost}'
+                        self.confim_text_line_5 = 'gold'
+                        self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                         answer, self.draw_confim = self.confim()
                         if answer > 0.5 and answer < 1.5:
                             self.knight_castle_builded = True
@@ -558,16 +558,16 @@ class Town():
             if self.pikemen_tower_cliked:
                 if not self.pikemen_tower_builded:
                     if self.pikemen_tower_cost <= self.gold:
-                        self.pikemen_tower_line_1 = 'Are you sure you' 
-                        self.pikemen_tower_line_2 = 'want to build'
-                        self.pikemen_tower_line_3 = '"The Hut"? Cost:'
-                        self.pikemen_tower_line_4 = f'{self.pikemen_tower_cost} gold'
-                        self.pikemen_tower_line_5 = ''
-                        self.pikemen_tower_to_show_1 = self.assets["font_8"].render(self.pikemen_tower_line_1,True,scripts.constants.WHITE)        
-                        self.pikemen_tower_to_show_2 = self.assets["font_8"].render(self.pikemen_tower_line_2,True,scripts.constants.WHITE)        
-                        self.pikemen_tower_to_show_3 = self.assets["font_8"].render(self.pikemen_tower_line_3,True,scripts.constants.WHITE)        
-                        self.pikemen_tower_to_show_4 = self.assets["font_8"].render(self.pikemen_tower_line_4,True,scripts.constants.WHITE)        
-                        self.pikemen_tower_to_show_4 = self.assets["font_8"].render(self.pikemen_tower_line_5,True,scripts.constants.WHITE)        
+                        self.confim_text_line_1 = 'Are you sure you' 
+                        self.confim_text_line_2 = 'want to build'
+                        self.confim_text_line_3 = '"Pikemen tower"'
+                        self.confim_text_line_4 = '? Cost:'
+                        self.confim_text_line_5 = f'{self.pikemen_tower_cost} gold'
+                        self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                         answer, self.draw_confim = self.confim()
                         if answer > 0.5 and answer < 1.5:
                             self.pikemen_tower_builded = True
@@ -586,16 +586,16 @@ class Town():
             if self.canals_cliked:
                 if not self.canals_builded:
                     if self.canals_cost <= self.gold:
-                        self.canals_line_1 = 'Are you sure you' 
-                        self.canals_line_2 = 'want to build'
-                        self.canals_line_3 = '"The Hut"? Cost:'
-                        self.canals_line_4 = f'{self.canals_cost} gold'
-                        self.canals_line_5 = ''
-                        self.canals_to_show_1 = self.assets["font_8"].render(self.canals_line_1,True,scripts.constants.WHITE)        
-                        self.canals_to_show_2 = self.assets["font_8"].render(self.canals_line_2,True,scripts.constants.WHITE)        
-                        self.canals_to_show_3 = self.assets["font_8"].render(self.canals_line_3,True,scripts.constants.WHITE)        
-                        self.canals_to_show_4 = self.assets["font_8"].render(self.canals_line_4,True,scripts.constants.WHITE)        
-                        self.canals_to_show_4 = self.assets["font_8"].render(self.canals_line_5,True,scripts.constants.WHITE)        
+                        self.confim_text_line_1 = 'Are you sure you' 
+                        self.confim_text_line_2 = 'want to build'
+                        self.confim_text_line_3 = '"Canals"? Cost:'
+                        self.confim_text_line_4 = f'{self.canals_cost} gold'
+                        self.confim_text_line_5 = ''
+                        self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                         answer, self.draw_confim = self.confim()
                         if answer > 0.5 and answer < 1.5:
                             self.canals_builded = True
@@ -614,16 +614,16 @@ class Town():
             if self.statue_cliked:
                 if not self.statue_builded:
                     if self.statue_cost <= self.gold:
-                        self.statue_line_1 = 'Are you sure you' 
-                        self.statue_line_2 = 'want to build'
-                        self.statue_line_3 = '"The Hut"? Cost:'
-                        self.statue_line_4 = f'{self.statue_cost} gold'
-                        self.statue_line_5 = ''
-                        self.statue_to_show_1 = self.assets["font_8"].render(self.statue_line_1,True,scripts.constants.WHITE)        
-                        self.statue_to_show_2 = self.assets["font_8"].render(self.statue_line_2,True,scripts.constants.WHITE)        
-                        self.statue_to_show_3 = self.assets["font_8"].render(self.statue_line_3,True,scripts.constants.WHITE)        
-                        self.statue_to_show_4 = self.assets["font_8"].render(self.statue_line_4,True,scripts.constants.WHITE)        
-                        self.statue_to_show_4 = self.assets["font_8"].render(self.statue_line_5,True,scripts.constants.WHITE)        
+                        self.confim_text_line_1 = 'Are you sure you' 
+                        self.confim_text_line_2 = 'want to build'
+                        self.confim_text_line_3 = '"Statue"? Cost:'
+                        self.confim_text_line_4 = f'{self.statue_cost} gold'
+                        self.confim_text_line_5 = ''
+                        self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                        self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                         answer, self.draw_confim = self.confim()
                         if answer > 0.5 and answer < 1.5:
                             self.statue_builded = True
@@ -643,16 +643,16 @@ class Town():
                 if not self.crow_builded:
                     if scripts.constants.DRUID_DEFEAT:
                         if self.crow_cost <= self.gold:
-                            self.crow_line_1 = 'Are you sure you' 
-                            self.crow_line_2 = 'want to build'
-                            self.crow_line_3 = '"The Hut"? Cost:'
-                            self.crow_line_4 = f'{self.crow_cost} gold'
-                            self.crow_line_5 = ''
-                            self.crow_to_show_1 = self.assets["font_8"].render(self.crow_line_1,True,scripts.constants.WHITE)        
-                            self.crow_to_show_2 = self.assets["font_8"].render(self.crow_line_2,True,scripts.constants.WHITE)        
-                            self.crow_to_show_3 = self.assets["font_8"].render(self.crow_line_3,True,scripts.constants.WHITE)        
-                            self.crow_to_show_4 = self.assets["font_8"].render(self.crow_line_4,True,scripts.constants.WHITE)        
-                            self.crow_to_show_4 = self.assets["font_8"].render(self.crow_line_5,True,scripts.constants.WHITE)        
+                            self.confim_text_line_1 = 'Are you sure you' 
+                            self.confim_text_line_2 = 'want to build'
+                            self.confim_text_line_3 = '"???"? Cost:'
+                            self.confim_text_line_4 = f'{self.crow_cost} gold'
+                            self.confim_text_line_5 = ''
+                            self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                             answer, self.draw_confim = self.confim()
                             if answer > 0.5 and answer < 1.5:
                                 self.crow_builded = True
@@ -674,16 +674,16 @@ class Town():
                 if not self.upgrade_town_builded:
                     if self.town_level >= 5:
                         if self.upgrade_town_cost <= self.gold:
-                            self.upgrade_town_line_1 = 'Are you sure you' 
-                            self.upgrade_town_line_2 = 'want to build'
-                            self.upgrade_town_line_3 = '"The Hut"? Cost:'
-                            self.upgrade_town_line_4 = f'{self.crow_cost} gold'
-                            self.upgrade_town_line_5 = ''
-                            self.upgrade_town_to_show_1 = self.assets["font_8"].render(self.upgrade_town_line_1,True,scripts.constants.WHITE)        
-                            self.upgrade_town_to_show_2 = self.assets["font_8"].render(self.upgrade_town_line_2,True,scripts.constants.WHITE)        
-                            self.upgrade_town_to_show_3 = self.assets["font_8"].render(self.upgrade_town_line_3,True,scripts.constants.WHITE)        
-                            self.upgrade_town_to_show_4 = self.assets["font_8"].render(self.upgrade_town_line_4,True,scripts.constants.WHITE)        
-                            self.upgrade_town_to_show_4 = self.assets["font_8"].render(self.upgrade_town_line_5,True,scripts.constants.WHITE)        
+                            self.confim_text_line_1 = 'Are you sure you' 
+                            self.confim_text_line_2 = 'want to build'
+                            self.confim_text_line_3 = '"Upgrade Town"?'
+                            self.confim_text_line_4 = ' Cost:'
+                            self.confim_text_line_5 = f'{self.upgrade_town_cost} gold'
+                            self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_1,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_2,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)        
                             answer, self.draw_confim = self.confim()
                             if answer > 0.5 and answer < 1.5:
                                 self.upgrade_town_builded = True
@@ -703,16 +703,16 @@ class Town():
                 if not self.walls_builded:
                     if self.wizard_tower_builded and self.knight_castle_builded and self.pikemen_tower_builded:
                         if self.walls_cost <= self.gold:
-                            self.walls_line_1 = 'Are you sure you' 
-                            self.walls_line_2 = 'want to build'
-                            self.walls_line_3 = '"The Hut"? Cost:'
-                            self.walls_line_4 = f'{self.crow_cost} gold'
-                            self.walls_line_5 = ''
-                            self.walls_to_show_1 = self.assets["font_8"].render(self.walls_line_1,True,scripts.constants.WHITE)        
-                            self.walls_to_show_2 = self.assets["font_8"].render(self.walls_line_2,True,scripts.constants.WHITE)        
-                            self.walls_to_show_3 = self.assets["font_8"].render(self.walls_line_3,True,scripts.constants.WHITE)        
-                            self.walls_to_show_4 = self.assets["font_8"].render(self.walls_line_4,True,scripts.constants.WHITE)        
-                            self.walls_to_show_4 = self.assets["font_8"].render(self.walls_line_5,True,scripts.constants.WHITE)        
+                            self.confim_text_line_line_1 = 'Are you sure you' 
+                            self.confim_text_line_line_2 = 'want to build'
+                            self.confim_text_line_line_3 = '"Walls"? Cost:'
+                            self.confim_text_line_line_4 = f'{self.walls_cost} gold'
+                            self.confim_text_line_line_5 = ''
+                            self.confim_text_line_to_show_1 = self.assets["font_8"].render(self.confim_text_line_line_1,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_2 = self.assets["font_8"].render(self.confim_text_line_line_2,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_3 = self.assets["font_8"].render(self.confim_text_line_line_3,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_line_4,True,scripts.constants.WHITE)        
+                            self.confim_text_line_to_show_4 = self.assets["font_8"].render(self.confim_text_line_line_5,True,scripts.constants.WHITE)        
                             answer, self.draw_confim = self.confim()
                             if answer > 0.5 and answer < 1.5:
                                 self.walls_builded = True
@@ -1089,7 +1089,7 @@ class Town():
         display.blit(self.assets["town"][12],(0,0))
             # buttons
         display.blit(self.assets["town"][13],(0,0))
-        display.blit(self.assets["town"][14],(0,0))
+        #display.blit(self.assets["town"][14],(0,0))
         display.blit(self.assets["town"][15],(0,0))
             # resources
         display.blit(self.assets["gold"],(scripts.constants.DISPLAY_WIDTH//3-8, scripts.constants.DISPLAY_HEIGHT-23-7))

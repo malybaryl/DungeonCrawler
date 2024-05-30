@@ -5,7 +5,7 @@ import scripts.enemies
 from scripts.load import loadImages
 from scripts.character import Peasant, Wizard, Dwarf, Knight, Pikemen, Elf, Paladin, Druid
 from scripts.enemies import Slime, Wolf, Troll, Goblin, Ent, SlimeFireWizard, Druid, Imp
-from scripts.objects import Chest
+from scripts.objects import Chest, FireUpPlayer, NextRoomEnterence, PreviousRoomEnterence
 from scripts.world_process_funcs import process_1_ground_csv, process_2_decoration_dows_csv, process_3_decorations_up_csv, process_4_walls_csv, process_5_mobs_and_objects_csv, process_6_ground2_csv
 from random import randint
 from concurrent.futures import ThreadPoolExecutor
@@ -1446,6 +1446,14 @@ class World():
                             if tile == 0:
                                 self.objects.append(Chest(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE, closed_chest_img = self.assets[type][23], opened_chest_img = self.assets[type][24]))
                             
+                            # next room
+                            elif tile == 100:
+                                self.objects.append(NextRoomEnterence(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
+                            
+                            # previous room
+                            elif tile == 101:
+                                self.objects.append(PreviousRoomEnterence(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
+
                             # PORTAL
                             elif tile == 30:
                                 image = self.assets[type][34]
@@ -1565,7 +1573,8 @@ class World():
                             
                             # FIRE UP PLAYER
                             elif tile == 2:
-                                pass 
+                                self.objects.append(FireUpPlayer(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
+                            
                             # GAYZER
                             elif tile == 4:
                                 pass 
@@ -1662,7 +1671,7 @@ class World():
                                 self.character_list.append(scripts.enemies.Druid(tile_data[2],tile_data[3],scripts.constants.DRUID_HP, self.world_level))
         
         
-    def generate(self, mobs = False):  
+    def generate(self, world_level = 1):  
         pass
     
     def update(self, screen_scroll):
@@ -1711,11 +1720,12 @@ class World():
     def new_level(self, player):
         return player.health, player.health_max, player.gold, player.level, player.current_experience, player.experience_to_gain_new_level
     
-    def check_if_new_level(self, exit_tiles, player):
+    def check_if_new_level(self, exit_tiles, player, new_level):
         for exit_tile in exit_tiles:
             if exit_tile[1].colliderect(player.rect):
-                return True
-        return False
+                new_level = True
+                return new_level
+        return new_level
 
                 
 

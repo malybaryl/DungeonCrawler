@@ -4,12 +4,19 @@ from random import choice
 from scripts.weapon import Bow, Throwable, TwoHandedSword, Spear
 
 
-class Object:
-    
+class Object: 
     def __init__(self, type):
         self.type = type
-    
+     
         
+    def update(self, *args):
+        pass
+
+
+    def draw(self, *args):
+        pass
+    
+    
     
 class Chest(Object):
     def __init__(self, x, y, closed_chest_img, opened_chest_img):
@@ -118,7 +125,7 @@ class FireUpPlayer(Object):
         super().__init__(type)
         self.rect = pygame.Rect(x, y, 32, 32)
         self.rect.center = (x,y)
-        
+
         
     def update(self, screen_scroll, player, world_level):
         self.rect.x += screen_scroll[0]
@@ -130,4 +137,34 @@ class FireUpPlayer(Object):
     def draw(self, surface):
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.BLUE, self.rect, 32, 1)
+        
+        
+            
+class RoomEnterence(Object):
+    def __init__(self, x, y, type):
+        self.rect = pygame.Rect(x - 1, y - 1, 34, 66)
+        self.rect.center = (x - 1,y - 1)
+        super().__init__(type)
+
+    
+    def update(self, player, screen_scroll):
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        if self.rect.colliderect(player.rect):
+            return True
+        return False
+
+
+
+class NextRoomEnterence(RoomEnterence):
+    def __init__(self, x, y):
+        type = 'next_room_enterence'
+        super().__init__(x, y, type)
+        
+        
+        
+class PreviousRoomEnterence(RoomEnterence):
+    def __init__(self, x, y):
+        type = 'previous_room_enterence'
+        super().__init__(x, y, type)
             

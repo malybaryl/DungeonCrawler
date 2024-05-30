@@ -96,3 +96,10 @@ VERSION: 0.1.2
 - new mechanics of the weapons
 - new weapons animations
 - bugs fixes
+
+VERSION: 0.1.3
+- new weapon icons
+- bugs fixes:
+    - spears bug
+    - druid boss fix
+- generating new rooms

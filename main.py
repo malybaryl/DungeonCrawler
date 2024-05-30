@@ -16,6 +16,8 @@ from scripts.particles import ParticleSystem
 from scripts.cards_system import CardManager
 from concurrent.futures import ThreadPoolExecutor
 
+from scripts.generate import generate, reset_prev_mobs
+
 
 
 # pygame init
@@ -70,6 +72,8 @@ boss_list=[]
 exit_tiles=[]
 enemy_list=[]
 world_level = 0
+room = 1
+new_level_world = True
 fight_town_button_pressed = False
 
 # create background and HUD
@@ -85,8 +89,8 @@ fight_key_town_button_pressed = False
 #weapons
 #weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
 #weapon = Throwable(0,0,'throwables','crusader_throwing_axe', player.level, hud)
-#weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level, hud)
-weapon = Spear(0,0,'spears',"blade_on_stick", player.level + 10, hud,  False ,player)
+weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level + 15, hud, False, player)
+#weapon = Spear(0,0,'spears',"blade_on_stick", player.level + 10, hud,  False ,player)
 magic_ball = None
 
 #parciples
@@ -113,9 +117,8 @@ fade = True
 # main game loop
 game_is_on = True
 game = False
-
+generate_world_2 = True
 while game_is_on:
-
     # events system
     for event in pygame.event.get():
         if event.type == pygame.QUIT or pygame_quit:
@@ -218,20 +221,21 @@ while game_is_on:
             town.clouds()     
             town.draw(display)
         else:  
-            
             # check if new level
-            new_level = world.check_if_new_level(exit_tiles, player)
             counter = pygame.time.get_ticks()
             
             
             if fight_town_button_pressed:
-                generate_world = True
                 fade = True
                 fight_town_button_pressed = False
                 world_level = 0
                 hud.seconds = 0
                 hud.minutes = 0
                 hud.hours = 0 
+                room = 0
+                new_level = False
+                new_level_world = True
+                level, rooms_to_go = generate(world_level)
                 if player.type == 'player1':
                     weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
                     hud.visible_coursor(True)
@@ -244,6 +248,8 @@ while game_is_on:
                 elif player.type == 'pikemen':
                     weapon = Spear(0,0,'spears',"wooden_spear", player.level, hud, False, player)
                     hud.visible_coursor(False)
+                    
+            new_level = world.check_if_new_level(exit_tiles, player, new_level)
                         
             if new_level:
                 generate_world = True
@@ -254,6 +260,9 @@ while game_is_on:
             # generate new world
             if generate_world:
                 # clear world data 
+                level = reset_prev_mobs(level, room)
+                if new_level_world:
+                    world_level += 1 
                 chest_items.clear()
                 keys_pressed.clear()
                 world_data.clear()
@@ -282,8 +291,35 @@ while game_is_on:
                 world.world_decoration_up_data.clear()
                 world.walls.clear()
 
-                world.proced_csv_file(world_level=world_level + 1)
-                if world_level < 3:
+                if world_level <= 2:
+                    if world_level == 2:
+                        if generate_world_2:
+                            level, rooms_to_go = generate(world_level)
+                            generate_world_2 = False
+                            
+                    tasks = [
+                        (level[room][0], "grassland", 1),
+                        (level[room][1], "grassland", 0),
+                        (level[room][2], "grassland", 3),
+                        (level[room][3], "grassland", 4 ),
+                        (level[room][4], "grassland", 5),
+                        ]
+                    
+                    if world.world_data2:
+                        tasks.append((world.world_data2, "grassland", 2))
+                        
+                    with ThreadPoolExecutor() as executor:
+                        futures = [executor.submit(world.process_date, *task) for task in tasks]
+                    
+                    for future in futures:
+                        future.result()
+                        
+                    if room == rooms_to_go - 1:
+                        room = 0
+                # druid fight
+                elif world_level == 3:
+                    world.proced_csv_file(world_level=world_level)
+                    
                     tasks = [
                         (world.walls, "grassland", 0),
                         (world.world_data, "grassland", 1),
@@ -300,7 +336,9 @@ while game_is_on:
                     
                     for future in futures:
                         future.result()
+                # lava land
                 else:
+                    world.proced_csv_file(world_level=world_level)
                     tasks = [
                         (world.walls, "lavaland", 0),
                         (world.world_data, "lavaland", 1),
@@ -323,11 +361,11 @@ while game_is_on:
                 player = world.player
                 level_up = False
                 generate_world = False 
-                world_level += 1 
+                new_level_world = True
                 background.refresh_world_level(world_level)
                 
                 hud.refresh_player_image(player)
-                hud.update_icon_sword(weapon.original_image)
+                hud.update_icon_sword(weapon.assets['icon'])
                 # restore player statistic
                 if new_level:
                     player.health = player_hp
@@ -337,6 +375,7 @@ while game_is_on:
                     player.current_experience = player_current_experience
                     player.experience_to_gain_new_level = player_experience_to_gain_new_level
                     new_level = False
+                    hud.update_character_health_bar(player)
 
             
             # calculate player movement
@@ -394,6 +433,18 @@ while game_is_on:
                             chest_weapon = object.update(scroll_map, E_pressed, player, hud)
                             if chest_weapon:
                                 chest_items.append(chest_weapon)
+                        elif object.type == 'fire_up_player':
+                            object.update(scroll_map, player, world_level)
+                        elif object.type == 'next_room_enterence':
+                            if object.update(player, scroll_map):
+                                room += 1
+                                new_level_world = False
+                                new_level = True
+                        elif object.type == 'previous_room_enterence':
+                            if object.update(player, scroll_map):
+                                room -= 1  
+                                new_level_world = False  
+                                new_level = True 
                     if chest_items:
                         for chest_item in chest_items:
                             if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
@@ -406,6 +457,8 @@ while game_is_on:
                                     damage, damage_pos, E_pressed = chest_item.update(player, scroll_map, weapon, E_pressed, hud, is_flipped, enemy_list)
                                 except:
                                     pass
+                            if E_pressed:
+                                hud.update_icon_sword(weapon.assets['icon'])
                     for enemy in enemy_list:
                         if enemy.type == 'druid':
                             bolt1, bolt2, bolt3, bolt4, bolt5, bolt6, bolt7, bolt8, mob = enemy.move(world.obstacle_tile, player, scroll_map)
