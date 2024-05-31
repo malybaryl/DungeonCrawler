@@ -122,6 +122,7 @@ class Menu:
         
     
     def update(self, music, screen, player, bow, enemy_list, boss_list, magic_ball_group):
+        pygame.init()
         self.pos = pygame.mouse.get_pos()
         game = False
         screen = screen

@@ -33,6 +33,7 @@ if is_fullscreened == True:
     screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),False)
 else:
     screen = changeResolution((scripts.constants.SCREEN_WIDTH,scripts.constants.SCREEN_HEIGHT),True)
+    
 display = pygame.Surface((scripts.constants.DISPLAY_WIDTH, scripts.constants.DISPLAY_HEIGHT))
 fade = False
 pygame_quit = False
@@ -116,11 +117,11 @@ game_is_on = True
 game = False
 new_level = False
 while game_is_on:
-
+    pygame.init()
     # events system
     for event in pygame.event.get():
         if event.type == pygame.QUIT or pygame_quit:
-                pygame.quit()
+                game_is_on = False
         if game:
             # in town events
             if in_town:
@@ -545,10 +546,17 @@ while game_is_on:
             pygame.quit()
         
     # display all on screen
-    if pygame.display.get_init():
-        pygame.display.update()
-        
-    pygame.display.update()
+    try:
+        if pygame.display.get_init():
+            pygame.display.update()
+    except:
+        pass
+    
+    
+    
     clock.tick(60)
-    screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))
+    try:
+        screen.blit(pygame.transform.scale(display, screen.get_size()),(0, 0))
+    except:
+        pass
     
