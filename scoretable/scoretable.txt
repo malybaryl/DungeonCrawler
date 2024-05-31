@@ -15,6 +15,7 @@ __________   TIME: 00:00:48   WORLD LEVEL: 4
 __________   TIME: 00:01:09   WORLD LEVEL: 4
 D_________   TIME: 00:01:13   WORLD LEVEL: 4
 __________   TIME: 00:01:31   WORLD LEVEL: 4
+W_________   TIME: 00:02:50   WORLD LEVEL: 4
 S_________   TIME: 00:02:59   WORLD LEVEL: 4
 __________   TIME: 00:05:46   WORLD LEVEL: 4
 __________   TIME: 00:10:54   WORLD LEVEL: 4
@@ -39,6 +40,7 @@ D_________   TIME: 00:09:18   WORLD LEVEL: 3
 __________   TIME: 00:12:38   WORLD LEVEL: 3
 W_________   TIME: 00:01:23   WORLD LEVEL: 2
 W_________   TIME: 00:01:25   WORLD LEVEL: 2
+__________   TIME: 00:01:38   WORLD LEVEL: 2
 __________   TIME: 00:02:21   WORLD LEVEL: 2
 __________   TIME: 00:03:15   WORLD LEVEL: 2
 A_________   TIME: 00:03:43   WORLD LEVEL: 2
@@ -72,6 +74,7 @@ W_________   TIME: 00:00:47   WORLD LEVEL: 1
 __________   TIME: 00:00:49   WORLD LEVEL: 1
 __________   TIME: 00:00:49   WORLD LEVEL: 1
 __________   TIME: 00:00:49   WORLD LEVEL: 1
+__________   TIME: 00:00:50   WORLD LEVEL: 1
 WASS______   TIME: 00:00:52   WORLD LEVEL: 1
 WA________   TIME: 00:00:54   WORLD LEVEL: 1
 WASS______   TIME: 00:00:56   WORLD LEVEL: 1
@@ -83,6 +86,7 @@ A_________   TIME: 00:01:04   WORLD LEVEL: 1
 WASSWAD___   TIME: 00:01:10   WORLD LEVEL: 1
 __________   TIME: 00:01:14   WORLD LEVEL: 1
 WASSWAD___   TIME: 00:01:15   WORLD LEVEL: 1
+D_________   TIME: 00:01:17   WORLD LEVEL: 1
 __________   TIME: 00:01:22   WORLD LEVEL: 1
 WASSWAD___   TIME: 00:01:23   WORLD LEVEL: 1
 S_________   TIME: 00:01:23   WORLD LEVEL: 1

@@ -8,6 +8,12 @@ class Object:
     
     def __init__(self, type):
         self.type = type
+        
+    def update(self, *args):
+        pass
+    
+    def draw(self, *args):
+        pass
     
         
     
@@ -130,4 +136,33 @@ class FireUpPlayer(Object):
     def draw(self, surface):
         if scripts.constants.SHOW_HITBOX:
             pygame.draw.rect(surface, scripts.constants.BLUE, self.rect, 32, 1)
+
+class RoomEnterence(Object):
+    def __init__(self, x, y, type):
+        super().__init__(type)
+        self.rect = pygame.Rect(x, y, 34, 66)
+        self.rect.center = (x - 1,y - 1)
+    
+    def update(self, screen_scroll, player):
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+        if self.rect.colliderect(player.rect):
+            print('True')
+            return True
+        print('False')   
+        return False
+
+class NextRoomEnterence(RoomEnterence):
+    def __init__(self, x, y):
+        type = 'next_room_enterence'
+        super().__init__(x,y,type)
+
+class PreviousRoomEnterence(RoomEnterence):
+    def __init__(self, x, y):
+        type = 'previous_room_enterence'
+        super().__init__(x,y,type)
+ 
+        
+        
+            
             

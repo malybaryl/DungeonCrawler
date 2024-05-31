@@ -5,7 +5,7 @@ import scripts.enemies
 from scripts.load import loadImages
 from scripts.character import Peasant, Wizard, Dwarf, Knight, Pikemen, Elf, Paladin, Druid
 from scripts.enemies import Slime, Wolf, Troll, Goblin, Ent, SlimeFireWizard, Druid, Imp
-from scripts.objects import Chest
+from scripts.objects import Chest, NextRoomEnterence, PreviousRoomEnterence
 from scripts.world_process_funcs import process_1_ground_csv, process_2_decoration_dows_csv, process_3_decorations_up_csv, process_4_walls_csv, process_5_mobs_and_objects_csv, process_6_ground2_csv
 from random import randint
 from concurrent.futures import ThreadPoolExecutor
@@ -1441,7 +1441,13 @@ class World():
             if type == 'grassland':
                 for y, row in enumerate(data):
                     for x, tile in enumerate(row):
-                        if tile >= 0:                
+                        if tile >= 0:
+                            if tile == 100:
+                                self.objects.append(NextRoomEnterence(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
+                            if tile == 101:
+                                self.objects.append(PreviousRoomEnterence(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
+                                
+                                                
                             # CHEST
                             if tile == 0:
                                 self.objects.append(Chest(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE, closed_chest_img = self.assets[type][23], opened_chest_img = self.assets[type][24]))
@@ -1711,11 +1717,12 @@ class World():
     def new_level(self, player):
         return player.health, player.health_max, player.gold, player.level, player.current_experience, player.experience_to_gain_new_level
     
-    def check_if_new_level(self, exit_tiles, player):
+    def check_if_new_level(self, exit_tiles, player, new_level):
         for exit_tile in exit_tiles:
             if exit_tile[1].colliderect(player.rect):
-                return True
-        return False
+                new_level = True
+                return new_level
+        return new_level
 
                 
 

@@ -254,7 +254,7 @@ class Town():
         self.confim_text_to_show_3 = self.assets["font_8"].render(self.confim_text_line_3,True,scripts.constants.WHITE)
         self.confim_text_to_show_4 = self.assets["font_8"].render(self.confim_text_line_4,True,scripts.constants.WHITE)
         self.confim_text_to_show_5 = self.assets["font_8"].render(self.confim_text_line_5,True,scripts.constants.WHITE)
-        self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+        self.coursor = self.assets["coursor"][4]
         self.pressed = False
         self.pressed_cooldown = 0
         self.smith_menu = False
@@ -304,7 +304,7 @@ class Town():
         self.gold = math.ceil(scripts.constants.GOLD)
         self.gold_text = self.assets["font_8"].render(f"{self.gold}", True, scripts.constants.BLACK)
         if pygame.mouse.get_pressed()[0]:
-            self.coursor = pygame.transform.scale(self.assets["coursor"][5],(24,24))
+            self.coursor = self.assets["coursor"][5]
             self.pressed = True
             self.pressed_cooldown = pygame.time.get_ticks()
             if not self.fight_button_pressed:
@@ -327,7 +327,7 @@ class Town():
         
         if self.pressed:
             if pygame.time.get_ticks() - self.pressed_cooldown >= 100:
-                self.coursor = pygame.transform.scale(self.assets["coursor"][4],(24,24))
+                self.coursor = self.assets["coursor"][4]
                 self.pressed = False
             
         # building menu handler            
@@ -1089,7 +1089,7 @@ class Town():
         display.blit(self.assets["town"][12],(0,0))
             # buttons
         display.blit(self.assets["town"][13],(0,0))
-        display.blit(self.assets["town"][14],(0,0))
+        #display.blit(self.assets["town"][14],(0,0))
         display.blit(self.assets["town"][15],(0,0))
             # resources
         display.blit(self.assets["gold"],(scripts.constants.DISPLAY_WIDTH//3-8, scripts.constants.DISPLAY_HEIGHT-23-7))

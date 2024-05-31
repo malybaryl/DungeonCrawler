@@ -1,6 +1,6 @@
 import pygame
 import scripts.constants
-from scripts.load import loadImages, loadCredits, change_values_of_config, loadScoreTable
+from scripts.load import loadImages, loadImage, loadCredits, change_values_of_config, loadScoreTable
 from scripts.music import Music
 from scripts.changeResolution import changeResolution
 import math
@@ -12,15 +12,18 @@ class Menu:
             "coursor": loadImages("HUD/coursor"),
             "font1": pygame.font.Font("assets/fonts/font.ttf",8),
             "font2": pygame.font.Font("assets/fonts/font.ttf",24),
-            "logo": loadImages("HUD/logo")
+            "logo": loadImages("HUD/logo"),
+            'background': loadImage('menu/background/0.png')
         }
-        self.version = "0.1.2"
+        self.version = "0.1.3"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False
         self.credits_menu = False
         self.logo_x = 256
         self.logo_y = 64
+        self.bg_x = -100
+        self.bg_y = -150
         self.logo = pygame.transform.scale(self.assets["logo"][0],(self.logo_x,self.logo_y))
         self.answer_YES="YES"
         self.answer_NO="NO"
@@ -488,7 +491,7 @@ class Menu:
 
     def draw(self,surface):
         # drawing background
-        pygame.draw.rect(surface,scripts.constants.MAINMENU_COLOR,(0,0,scripts.constants.DISPLAY_WIDTH,scripts.constants.DISPLAY_HEIGHT))
+        surface.blit(self.assets['background'],(self.bg_x,self.bg_y))
         
         if self.main_menu:
             # drawing logo

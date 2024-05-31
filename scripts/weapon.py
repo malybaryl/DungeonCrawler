@@ -3,7 +3,7 @@ import pygame
 import scripts.constants
 import math
 import random
-from scripts.load import loadImages
+from scripts.load import loadImages, loadImage
 from scripts.mathFunc import distance
 
 # type_of_weapon: 'bows', 'throwables'
@@ -16,7 +16,8 @@ class Weapon:
         self.assets = {
             "weapon": loadImages(f"wepons/{type_of_weapon}/{weapon}"),  
             'e_key': pygame.image.load('assets/images/HUD/e_button/0.png'),
-            "sound": pygame.mixer.Sound(f"assets/audio/{type_of_weapon}.mp3")
+            "sound": pygame.mixer.Sound(f"assets/audio/{type_of_weapon}.mp3"),
+            'icon': loadImage(f"icons/weapons/{type_of_weapon}/{weapon}.png")
         }
         self.hud = hud
         self.type = type_of_weapon
@@ -995,13 +996,13 @@ class Spear(Weapon):
                     if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear':
                         self.image_to_show = pygame.transform.flip(self.original_image, True, False)
                     else:
-                        self.rect = pygame.rect.Rect(self.rect.x - self.rect.width//4, self.rect.y, 46, 4)
+                        self.rect = pygame.rect.Rect(self.rect.x - self.rect.width//4, self.rect.y, self.original_image.get_size()[1], self.original_image.get_size()[0])
                         self.image_to_show = pygame.transform.scale(pygame.transform.rotate(self.original_image, 90),(self.rect.width,self.rect.height))
                 else:
                     if self.weapon == 'wooden_spear' or self.weapon == 'spear' or self.weapon == 'extended_sickle' or self.weapon == 'guard_spear':
                         self.image_to_show = self.original_image
                     else:
-                        self.rect = pygame.rect.Rect(self.rect.x + self.rect.width//4, self.rect.y, 46, 4)
+                        self.rect = pygame.rect.Rect(self.rect.x + self.rect.width//4, self.rect.y, self.original_image.get_size()[1], self.original_image.get_size()[0])
                         self.image_to_show = pygame.transform.scale(pygame.transform.rotate(self.original_image, -90),(self.rect.width,self.rect.height))
             elif self.swing:
                 self.image_to_show = pygame.transform.flip(self.image_to_animate, True, False)

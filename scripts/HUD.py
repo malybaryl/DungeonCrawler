@@ -178,7 +178,7 @@ class HUD:
             if pygame.mouse.get_pressed()[0]:
                 self.cliked = True
                 self.cliked_cooldown = pygame.time.get_ticks()
-                self.coursor = pygame.transform.scale(self.assets["coursor"][5],(24,24))
+                self.coursor = self.assets["coursor"][5]
                 if scripts.constants.DISPLAY_WIDTH//2-56 < self.pos[0]/scripts.constants.SCALE_WIDTH < scripts.constants.DISPLAY_WIDTH//2-56+112 and 3*scripts.constants.DISPLAY_HEIGHT//4 < self.pos[1]/scripts.constants.SCALE_HEIGHT < 3*scripts.constants.DISPLAY_HEIGHT//4+26:
                     self.back_to_town_button_clicked = True
                     self.time = pygame.time.get_ticks()
@@ -265,7 +265,7 @@ class HUD:
                 if self.sword_icon:
                     display.blit(self.assets['info_icons_HUD'][0],(74,121))
                 else:
-                    display.blit(self.weapon_image,(83 - self.weapon_image.get_size()[0]//2,121))
+                    display.blit(self.weapon_image,(74,121))
                 # shield icon
                 display.blit(self.assets['info_icons_HUD'][1],(95,121))
                 # shoes icon

@@ -15,6 +15,7 @@ from scripts.town import Town
 from scripts.particles import ParticleSystem
 from scripts.cards_system import CardManager
 from concurrent.futures import ThreadPoolExecutor
+from scripts.generete import generate, reset_prev_mobs
 
 
 
@@ -22,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 pygame.mixer.init()
 pygame.init()
 pygame.display.init()
-
+room = 0
 
 # loading config
 loadConfig()
@@ -83,10 +84,10 @@ build_button_pressed = False
 fight_key_town_button_pressed = False
 
 #weapons
-#weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
+weapon = Bow(0,0,'bows','classic_bow', player.level, hud, False, player)
 #weapon = Throwable(0,0,'throwables','crusader_throwing_axe', player.level, hud)
 #weapon = TwoHandedSword(0,0,'two_handed_swords','sword', player.level, hud)
-weapon = Spear(0,0,'spears',"blade_on_stick", player.level + 10, hud,  False ,player)
+#weapon = Spear(0,0,'spears',"blade_on_stick", player.level + 10, hud,  False ,player)
 magic_ball = None
 
 #parciples
@@ -113,7 +114,7 @@ fade = True
 # main game loop
 game_is_on = True
 game = False
-
+new_level = False
 while game_is_on:
 
     # events system
@@ -220,7 +221,7 @@ while game_is_on:
         else:  
             
             # check if new level
-            new_level = world.check_if_new_level(exit_tiles, player)
+            new_level = world.check_if_new_level(exit_tiles, player, new_level)
             counter = pygame.time.get_ticks()
             
             
@@ -232,6 +233,10 @@ while game_is_on:
                 hud.seconds = 0
                 hud.minutes = 0
                 hud.hours = 0 
+                room = 0
+                new_world_level = True
+                generate_world_2 = True
+                levels, rooms_to_go = generate(world_level)
                 if player.type == 'player1':
                     weapon = Bow(0,0,'bows','slingshot', player.level, hud, False, player)
                     hud.visible_coursor(True)
@@ -281,9 +286,33 @@ while game_is_on:
                 world.world_decoration_down_data.clear()
                 world.world_decoration_up_data.clear()
                 world.walls.clear()
-
-                world.proced_csv_file(world_level=world_level + 1)
+                if new_world_level:
+                    world_level += 1 
+                new_world_level = True
+                
                 if world_level < 3:
+                    reset_prev_mobs(levels, room)
+                    if world_level == 2:
+                        if generate_world_2:
+                            levels, rooms_to_go = generate(world_level)
+                    tasks = [
+                        (levels[room][0], "grassland", 1),
+                        (levels[room][1], "grassland", 0),
+                        (levels[room][2], "grassland", 3),
+                        (levels[room][3], "grassland", 4 ),
+                        (levels[room][4], "grassland", 5),
+                        ]
+                        
+                    with ThreadPoolExecutor() as executor:
+                        futures = [executor.submit(world.process_date, *task) for task in tasks]
+                    
+                    for future in futures:
+                        future.result()
+                    
+                    if room == rooms_to_go - 1:
+                        room = 0
+                elif world_level == 3:
+                    world.proced_csv_file(world_level=world_level)
                     tasks = [
                         (world.walls, "grassland", 0),
                         (world.world_data, "grassland", 1),
@@ -301,6 +330,8 @@ while game_is_on:
                     for future in futures:
                         future.result()
                 else:
+                    world.proced_csv_file(world_level=world_level)
+                    
                     tasks = [
                         (world.walls, "lavaland", 0),
                         (world.world_data, "lavaland", 1),
@@ -323,11 +354,11 @@ while game_is_on:
                 player = world.player
                 level_up = False
                 generate_world = False 
-                world_level += 1 
+
                 background.refresh_world_level(world_level)
                 
                 hud.refresh_player_image(player)
-                hud.update_icon_sword(weapon.original_image)
+                hud.update_icon_sword(weapon.assets['icon'])
                 # restore player statistic
                 if new_level:
                     player.health = player_hp
@@ -337,6 +368,7 @@ while game_is_on:
                     player.current_experience = player_current_experience
                     player.experience_to_gain_new_level = player_experience_to_gain_new_level
                     new_level = False
+                
 
             
             # calculate player movement
@@ -392,8 +424,20 @@ while game_is_on:
                     for object in world.objects:
                         if object.type == 'chest':
                             chest_weapon = object.update(scroll_map, E_pressed, player, hud)
+                            if E_pressed:
+                                hud.update_icon_sword(weapon.assets['icon'])
                             if chest_weapon:
                                 chest_items.append(chest_weapon)
+                        elif object.type == 'next_room_enterence':
+                            if object.update(scroll_map, player):
+                                room += 1
+                                new_level = True
+                                new_world_level = False
+                        elif object.type == 'previous_room_enterence':
+                            if object.update(scroll_map, player):
+                                room -= 1
+                                new_level = True
+                                new_world_level = False
                     if chest_items:
                         for chest_item in chest_items:
                             if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
