@@ -5,7 +5,7 @@ import scripts.enemies
 from scripts.load import loadImages
 from scripts.character import Peasant, Wizard, Dwarf, Knight, Pikemen, Elf, Paladin, Druid
 from scripts.enemies import Slime, Wolf, Troll, Goblin, Ent, SlimeFireWizard, Druid, Imp
-from scripts.objects import Chest, NextRoomEnterence, PreviousRoomEnterence
+from scripts.objects import Chest, NextRoomEnterence, PreviousRoomEnterence, FireUpPlayer
 from scripts.world_process_funcs import process_1_ground_csv, process_2_decoration_dows_csv, process_3_decorations_up_csv, process_4_walls_csv, process_5_mobs_and_objects_csv, process_6_ground2_csv
 from random import randint
 from concurrent.futures import ThreadPoolExecutor
@@ -1571,7 +1571,7 @@ class World():
                             
                             # FIRE UP PLAYER
                             elif tile == 2:
-                                pass 
+                                 self.objects.append(FireUpPlayer(x * scripts.constants.TILE_SIZE, y * scripts.constants.TILE_SIZE))
                             # GAYZER
                             elif tile == 4:
                                 pass 

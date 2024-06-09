@@ -116,8 +116,14 @@ fade = True
 game_is_on = True
 game = False
 new_level = False
+
+font = pygame.font.Font("assets/fonts/font.ttf", 8)
+
 while game_is_on:
     pygame.init()
+    #delta_time = clock.tick() / 1000.0
+    delta_time = 1
+    
     # events system
     for event in pygame.event.get():
         if event.type == pygame.QUIT or pygame_quit:
@@ -230,7 +236,7 @@ while game_is_on:
                 generate_world = True
                 fade = True
                 fight_town_button_pressed = False
-                world_level = 0
+                world_level = 3
                 hud.seconds = 0
                 hud.minutes = 0
                 hud.hours = 0 
@@ -296,6 +302,8 @@ while game_is_on:
                     if world_level == 2:
                         if generate_world_2:
                             levels, rooms_to_go = generate(world_level)
+                            room = rooms_to_go - rooms_to_go
+                            generate_world_2 = False
                     tasks = [
                         (levels[room][0], "grassland", 1),
                         (levels[room][1], "grassland", 0),
@@ -377,21 +385,21 @@ while game_is_on:
             dy = 0
             moving = False
             if moving_right:
-                dx = scripts.constants.SPEED
+                dx = scripts.constants.SPEED 
                 is_flipped = False
                 moving = True
                 parcticle_system.create_particle(player.rect.x+player.rect.width/2, player.rect.y+player.rect.height,scripts.constants.BROWN,'left')
             if moving_left:
-                dx = -scripts.constants.SPEED
+                dx = -scripts.constants.SPEED 
                 is_flipped = True
                 moving = True
                 parcticle_system.create_particle(player.rect.x+player.rect.width/2, player.rect.y+player.rect.height,scripts.constants.BROWN,'right')
             if moving_up:
-                dy = -scripts.constants.SPEED
+                dy = -scripts.constants.SPEED 
                 moving = True
                 parcticle_system.create_particle(player.rect.x+player.rect.width/2, player.rect.y+player.rect.height,scripts.constants.BROWN,'down')
             if moving_down:
-                dy = scripts.constants.SPEED
+                dy = scripts.constants.SPEED 
                 moving = True
                 parcticle_system.create_particle(player.rect.x+player.rect.width/2, player.rect.y+player.rect.height,scripts.constants.BROWN,'up')
                 
@@ -401,7 +409,7 @@ while game_is_on:
             # update 
             if not level_up:
                 world.update(scroll_map)
-                level_up = player.update(is_flipped, moving, player.health, player.gold, hud)
+                level_up = player.update(is_flipped, moving, player.health, player.gold, hud, delta_time)
                 if level_up:
                     pick_cards = True
                 parcticle_system.update()
@@ -439,6 +447,8 @@ while game_is_on:
                                 room -= 1
                                 new_level = True
                                 new_world_level = False
+                        elif object.type == 'fire_up_player':
+                            object.update(scroll_map, player, world_level)
                     if chest_items:
                         for chest_item in chest_items:
                             if chest_item.__class__ != TwoHandedSword and chest_item.__class__ != Spear:
@@ -538,12 +548,19 @@ while game_is_on:
             if level_up:
                 card_manager.draw(display)
                 
+                
         # main menu handler    
     elif not game:
         game, pygame_quit = main_menu.update(music,screen, player, weapon, enemy_list, boss_list, magic_ball_group) #main_menu.update(music,screen, player, bow, enemy_list, boss_list, magic_ball_group)
         main_menu.draw(display)
         if pygame_quit:
             pygame.quit()
+        
+    # fps handler
+    if scripts.constants.SHOW_FPS:
+        fps = clock.get_fps()
+        fps_to_show = font.render(f'FPS:{int(fps)}', True, scripts.constants.WHITE)
+        display.blit(fps_to_show, (scripts.constants.DISPLAY_WIDTH - int(fps_to_show.get_width()) - 2, scripts.constants.DISPLAY_HEIGHT - int(fps_to_show.get_height() + 2)))
         
     # display all on screen
     try:

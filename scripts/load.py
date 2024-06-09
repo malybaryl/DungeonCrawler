@@ -87,9 +87,10 @@ def loadScoreTable():
 def save_score_to_score_table(name, hours, minutes, seconds, world_level):
     name = re.sub(r'^(.{0,10})$', lambda match: match.group(1).ljust(10, '_'), name)
 
-    # Odczytaj zawartość pliku
+    # Reading file
     lines = loadScoreTable()
-    # Dodaj nowy wynik
+
+    #ading new score
     hours_str = str(hours)
     minutes_str = str(minutes)
     seconds_str = str(seconds)
@@ -104,11 +105,11 @@ def save_score_to_score_table(name, hours, minutes, seconds, world_level):
     time_str = f"TIME: {hours_str}:{minutes_str}:{seconds_str}"
     
     lines.append( name + '   ' + time_str + '   ' + 'WORLD LEVEL: ' + str(world_level))
-    # Posortuj wyniki
+    # Sorting results
     lines.sort(key=lambda x: (-int(re.search(r'WORLD LEVEL: (\d+)', x).group(1)), 
                               *[int(part) for part in re.search(r'TIME: (\d+):(\d+):(\d+)', x).groups()]))
     
-    # Zapisz posortowane wyniki do pliku
+    # Saving results
     with open("scoretable/scoretable.txt", encoding="UTF-8", mode='w') as f:
         for line in lines:
             f.write(line + '\n')

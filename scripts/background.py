@@ -13,6 +13,7 @@ class Bg():
         }
         self.time = pygame.time.get_ticks()
         self.world_level = 0
+           
     
     def load_lavaland_images(self):
         array = []
@@ -23,7 +24,7 @@ class Bg():
         type = 0
         
         while x < cols*32:
-            x += 32
+            x += 32 
             while y < rows*32:
                 y += 32
                 if type == 0:

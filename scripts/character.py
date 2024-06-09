@@ -91,8 +91,8 @@ class Character():
             if dx != 0 and dy != 0:
                 dx = dx * (math.sqrt(2)/2)
                 dy = dy * (math.sqrt(2)/2)
-            self.rect.x += dx
-            old_dx = self.rect.x - dx
+            self.rect.x += dx 
+            old_dx = self.rect.x - dx 
             # check for collision x
             for obstacle in obstacle_tile:
                 if obstacle[1].colliderect(self.rect):
@@ -113,7 +113,7 @@ class Character():
                         self.rect.y = old_dy + 1
         return screen_scroll
 
-    def update(self, flip, moving, health, gold, hud):
+    def update(self, flip, moving, health, gold, hud, delta_time):
         level_up = False
         if self.alive:
             #print (str(self.current_experience) + '-' + str(self.experience_to_gain_new_level) + ' | ' + str(self.level))
@@ -122,22 +122,22 @@ class Character():
             # update image
             if not moving and not flip:
                 self.image_to_show = self.assets["player_idle"][math.floor(self.animation_index[0][1])]
-                self.animation_index[0][1] += 0.1
+                self.animation_index[0][1] += 0.1 * delta_time
                 if self.animation_index[0][1] >= self.max_idle_animation:
                     self.animation_index[0][1] = 0
             if not moving and flip:
                 self.image_to_show = pygame.transform.flip(self.assets["player_idle"][math.floor(self.animation_index[0][1])],True,False)
-                self.animation_index[0][1] += 0.1
+                self.animation_index[0][1] += 0.1 * delta_time
                 if self.animation_index[0][1] >= self.max_idle_animation:
                     self.animation_index[0][1] = 0
             if moving and flip:
                 self.image_to_show = pygame.transform.flip(self.assets["player_run"][math.floor(self.animation_index[1][1])],True,False)
-                self.animation_index[1][1] += 0.1
+                self.animation_index[1][1] += 0.1 * delta_time
                 if self.animation_index[1][1] >= self.max_run_animation:
                     self.animation_index[1][1] = 0
             if moving and not flip:
                 self.image_to_show = self.assets["player_run"][math.floor(self.animation_index[1][1])]
-                self.animation_index[1][1] += 0.1
+                self.animation_index[1][1] += 0.1 * delta_time
                 if self.animation_index[1][1] >= self.max_run_animation:
                     self.animation_index[1][1] = 0
             # health update
@@ -146,13 +146,13 @@ class Character():
                 if self.old_health <= self.health:
                     self.player_was_hit = False
                 else:
-                    self.old_health -= 0.1
+                    self.old_health -= 0.1 * delta_time
             if self.player_was_heal:
                 if self.health >= self.new_health:
                     self.health = self.new_health
                     self.player_was_heal = False
                 else:
-                    self.health += 1
+                    self.health += 1 * delta_time
             else:
                 self.new_health = health
             # gold update
@@ -171,6 +171,7 @@ class Character():
                 hud.update_experience_bar(self)
                 self.hud_experience_bar_refresh = False
                 
+                 
             # is on fire?
             if self.is_on_fire:
                 self.on_fire()
@@ -181,25 +182,26 @@ class Character():
         else: 
             if not flip:
                 self.image_to_show = self.assets["player_dead"][math.floor(self.animation_index[2][1])]
-                self.animation_index[2][1] += 0.05
+                self.animation_index[2][1] += 0.05 * delta_time
                 if self.animation_index[2][1] >= self.max_dead_animation:
                     self.animation_index[2][1] = self.max_dead_animation
             else:
                 self.image_to_show = pygame.transform.flip(self.assets["player_dead"][math.floor(self.animation_index[2][1])],True,False)
-                self.animation_index[2][1] += 0.05
+                self.animation_index[2][1] += 0.05 * delta_time
                 if self.animation_index[2][1] >= self.max_dead_animation:
                     self.animation_index[2][1] = self.max_dead_animation
                 
             hud.healthbar_boss.set_show(False)
+            
             if self.play_died_sound_once:
                 self.assets['died_sound'].play()
                 self.play_died_sound_once = False
         return level_up
 
 
-    def died(self):
+    def died(self, delta_time):
         end = False
-        self.died_counter += 1
+        self.died_counter += 1 * delta_time
         if self.died_counter > 10000:
             end = True
             self.play_died_sound_once = True
@@ -229,7 +231,7 @@ class Character():
         if self.is_on_fire:
             # handle animation
             self.image_on_fire = self.assets["player_on_fire"][math.floor(self.animation_index[3][1])]
-            self.animation_index[3][1] += 0.2
+            self.animation_index[3][1] += 0.2 
             if self.animation_index[3][1] >= 3:
                 self.animation_index[3][1] = 0
             if pygame.time.get_ticks() - self.on_fire_counter_end >= 50000:

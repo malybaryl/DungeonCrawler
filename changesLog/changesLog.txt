@@ -96,3 +96,9 @@ VERSION: 0.1.2
 - new mechanics of the weapons
 - new weapons animations
 - bugs fixes
+
+VERSION: 0.1.3
+~~Dopisac tutaj zmiany
+
+VERSION: 0.1.4
+- crucial bug fix (no more game crash)
