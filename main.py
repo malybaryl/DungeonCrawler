@@ -227,7 +227,7 @@ while game_is_on:
             town.draw(display)
         else:  
             
-            # check if new level
+            # check if new level 
             new_level = world.check_if_new_level(exit_tiles, player, new_level)
             counter = pygame.time.get_ticks()
             
@@ -236,7 +236,7 @@ while game_is_on:
                 generate_world = True
                 fade = True
                 fight_town_button_pressed = False
-                world_level = 3
+                world_level = 0
                 hud.seconds = 0
                 hud.minutes = 0
                 hud.hours = 0 
