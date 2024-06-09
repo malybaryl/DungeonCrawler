@@ -508,7 +508,7 @@ while game_is_on:
                     if player.is_on_fire:
                         player.on_fire()
                 if not player.alive:
-                    end = player.died()
+                    end = player.died(delta_time)
                     if end:
                         game_is_on = False
             else:
