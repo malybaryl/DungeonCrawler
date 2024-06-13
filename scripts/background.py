@@ -2,6 +2,7 @@ from scripts.load import loadImages, loadImage
 import scripts.constants
 import pygame
 
+
 class Bg():
     def __init__(self):
         self.assets ={

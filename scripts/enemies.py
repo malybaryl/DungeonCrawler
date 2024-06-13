@@ -46,6 +46,8 @@ class Enemy():
         self.dist = None
         self.show_danger_sing = False
         self.add_experience_once = True
+        self.stunned_cooldown = 300
+        self.stunned_cooldown_time = pygame.time.get_ticks()
     
     def init_experience(self):
         experience = 1 + (0.1 * self.lvl)
@@ -407,17 +409,21 @@ class Wolf(Enemy):
                 self.dx = 0
                 self.dy = 0
 
-                if self.rect.centerx > player.rect.centerx:
+                if self.rect.centerx > player.rect.centerx + 3:
                     self.dx = -3* scripts.constants.SLIME_SPEED
                     self.is_fliped = False
-                if self.rect.centerx < player.rect.centerx:
+                if self.rect.centerx < player.rect.centerx - 3:
                     self.dx = 3* scripts.constants.SLIME_SPEED
                     self.is_fliped = True
                 if self.rect.centery > player.rect.centery:
                     self.dy = -3* scripts.constants.SLIME_SPEED
                 if self.rect.centery < player.rect.centery:
                     self.dy = 3*scripts.constants.SLIME_SPEED
+                    
                 
+                if pygame.time.get_ticks() - self.stunned_cooldown_time >= self.stunned_cooldown:
+                    self.stunned = False
+                    
                 # update x position
                 if not self.stunned:
                     self.rect.x += self.dx

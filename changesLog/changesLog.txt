@@ -105,3 +105,9 @@ VERSION: 0.1.3
 VERSION: 0.1.4
 - crucial bug fix (no more game crash)
 - bugs fixes
+
+VERSION: 0.1.5
+- increased code security
+- bugs fixes:
+    - generating maps problem (enemies won't appear next to ground now)
+- showing how much gold you earn after dead

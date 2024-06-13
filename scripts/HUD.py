@@ -18,6 +18,8 @@ class HUD:
         self.pos = None
         self.info = False
         self.time = 0
+        self.final_gold = 0
+        self.calculate_final_gold = True
         self.world_level = world_level
         self.full_health = player.health_max
         self.health = player.health
@@ -42,6 +44,7 @@ class HUD:
         self.player_alive = player.alive
         self.player_image = pygame.transform.scale(player.assets["player_idle"][0],(64,64))
         self.statistic_text = self.font.render("STATISTICS", True, scripts.constants.WHITE)
+        self.final_gold_text = self.font.render(f"GOLD += {self.final_gold}", True, scripts.constants.WHITE)
         self.min_damage = 0
         self.max_damage = 0
         self.health = 'HP:'
@@ -154,6 +157,11 @@ class HUD:
         back_to_town = False
         if not self.player_alive: 
             
+            if self.calculate_final_gold:
+                self.final_gold = int(self.gold + (self.gold*self.world_level*0.1))
+                self.final_gold_text = self.font.render(f"GOLD += {self.final_gold}", True, scripts.constants.WHITE)
+                self.calculate_final_gold = False
+            
             if self.cooldown_death_do_once:
                 self.cooldown_death_clock = pygame.time.get_ticks()
                 self.cooldown_death = True
@@ -188,7 +196,7 @@ class HUD:
                     back_to_town = True
                     save_score_to_score_table(self.input_text, self.hours, self.minutes, self.seconds, world_level)
                     # adding gold to town
-                    scripts.constants.GOLD += self.gold + (self.gold*self.world_level*0.1)
+                    scripts.constants.GOLD += self.final_gold
                     # button handler
                     self.back_to_town_button_clicked = False
                     self.back_to_town_button_to_show = pygame.transform.scale(self.assets["buttons"][0],(166,26))
@@ -329,6 +337,7 @@ class HUD:
             else:
                 display.fill(scripts.constants.BROWN)
                 display.blit(self.image_died,(50, 16))
+                display.blit(self.final_gold_text,(scripts.constants.DISPLAY_WIDTH//2 - self.final_gold_text.get_width()//2,scripts.constants.DISPLAY_HEIGHT//2 - self.final_gold_text.get_height()//2))
                 display.blit(self.text_input_image_to_show, (90, 80))
                 display.blit(self.back_to_town_button_to_show,(scripts.constants.DISPLAY_WIDTH//2- 83,3*scripts.constants.DISPLAY_HEIGHT//4))
                 display.blit(self.back_to_town_text,(scripts.constants.DISPLAY_WIDTH//2- 76,3*scripts.constants.DISPLAY_HEIGHT//4+10))

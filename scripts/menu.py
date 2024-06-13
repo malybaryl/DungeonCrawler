@@ -15,7 +15,7 @@ class Menu:
             "logo": loadImages("HUD/logo"),
             'background': loadImage('menu/background/0.png')
         }
-        self.version = "0.1.4"
+        self.version = "0.1.5"
         self.pos = pygame.mouse.get_pos()
         self.main_menu = True
         self.settings_menu = False

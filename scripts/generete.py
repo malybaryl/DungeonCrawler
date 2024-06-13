@@ -137,8 +137,8 @@ def generating_grassland(room, rooms_to_go):
                 mobs_and_objects[rows_and_cols//2][1] = 40
                 x = 0
                 while x < amount_of_enemies:
-                    x_cord = randint(1,rows_and_cols-2)  
-                    y_cord = randint(1,rows_and_cols-2)  
+                    x_cord = randint(2,rows_and_cols-3)  
+                    y_cord = randint(2,rows_and_cols-3)  
                     if y_cord != rows_and_cols//2 and x_cord != 1:
                         chance_enemy_spawn = randint(0, max_enemy_chance)
                         if chance_enemy_spawn <= slime_chance_spawn:
@@ -280,8 +280,8 @@ def generating_grassland(room, rooms_to_go):
                 mobs_and_objects[rows_and_cols//2][1] = 40
                 x = 0
                 while x < amount_of_enemies:
-                    x_cord = randint(1,rows_and_cols-2)  
-                    y_cord = randint(1,rows_and_cols-2)  
+                    x_cord = randint(2,rows_and_cols-3)  
+                    y_cord = randint(2,rows_and_cols-3)  
                     if y_cord != rows_and_cols//2 and x_cord != 1:
                         chance_enemy_spawn = randint(0, max_enemy_chance)
                         if chance_enemy_spawn <= slime_chance_spawn:
@@ -482,8 +482,8 @@ def generating_grassland(room, rooms_to_go):
                 mobs_and_objects[rows_and_cols//2][1] = 40
                 x = 0
                 while x < amount_of_enemies:
-                    x_cord = randint(6,rows_and_cols-6)  
-                    y_cord = randint(1,rows_and_cols-2)  
+                    x_cord = randint(7,rows_and_cols-7)  
+                    y_cord = randint(2,rows_and_cols-3)  
                     if y_cord != rows_and_cols//2 and x_cord != 1:
                         chance_enemy_spawn = randint(0, max_enemy_chance)
                         if chance_enemy_spawn <= slime_chance_spawn:
@@ -624,8 +624,8 @@ def generating_grassland(room, rooms_to_go):
                 mobs_and_objects[rows_and_cols//2][1] = 40
                 x = 0
                 while x < amount_of_enemies:
-                    x_cord = randint(1,rows_and_cols-2)  
-                    y_cord = randint(6,rows_and_cols-6)  
+                    x_cord = randint(2,rows_and_cols-3)  
+                    y_cord = randint(7,rows_and_cols-7)  
                     if y_cord != rows_and_cols//2 and x_cord != 1:
                         chance_enemy_spawn = randint(0, max_enemy_chance)
                         if chance_enemy_spawn <= slime_chance_spawn:
