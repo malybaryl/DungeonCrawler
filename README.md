@@ -1,7 +1,7 @@
 # Dungeon Crawler
 
 ## Game Description:
-Dungeon Crawler is a simple game created in Python using the Pygame library. The game offers a classic dungeon crawl system where players explore dungeons, battle enemies, collect items, and gain experience. For more information, visit the [website](https://malybaryl.github.io/DungeonCrawler/).
+Dungeon Crawler is a simple game created in Python using the Pygame library. The game offers a classic dungeon crawl system where players explore dungeons, battle enemies, collect items, and gain experience. For more information, visit the [website](https://sipmleecodee.itch.io/recrawler).
 
 ## Downloading the Game:
 [Download Dungeon Crawler](https://sipmleecodee.itch.io/recrawler)
@@ -15,7 +15,7 @@ There is a possibility that your system may detect the exe file as a potential t
 # Dungeon Crawler (PL)
 
 ## Opis gry:
-Dungeon Crawler to prosta gra stworzona w Pythonie przy użyciu biblioteki Pygame. Gra oferuje klasyczny system dungeon crawl, gdzie gracz eksploruje lochy, walczy z przeciwnikami, zbiera przedmioty i zdobywa doświadczenie. Więcej informacji znajdziesz na [stronie internetowej](https://malybaryl.github.io/DungeonCrawler/).
+Dungeon Crawler to prosta gra stworzona w Pythonie przy użyciu biblioteki Pygame. Gra oferuje klasyczny system dungeon crawl, gdzie gracz eksploruje lochy, walczy z przeciwnikami, zbiera przedmioty i zdobywa doświadczenie. Więcej informacji znajdziesz na [stronie internetowej](https://sipmleecodee.itch.io/recrawler).
 
 ## Pobranie gry:
 1. [Pobierz Dungeon Crawler](https://sipmleecodee.itch.io/recrawler)
